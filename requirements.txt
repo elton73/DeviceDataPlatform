@@ -1,0 +1,10 @@
+selenium
+PyQt6
+chromedriver-autoinstaller
+requests
+superqt
+pyqtgraph
+pandas
+sqlalchemy
+pymysql
+cryptography
