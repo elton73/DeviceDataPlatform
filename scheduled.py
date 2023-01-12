@@ -1,5 +1,10 @@
 '''Launch the Main Application here
 '''
+
+"""
+This needs to be modified to use mysql database
+"""
+
 import modules.gui.pyqtapp as gui_pyqtapp
 import modules.fitbit.authentication as auth
 import modules.fitbit.retrieve as fitbit_retrieve

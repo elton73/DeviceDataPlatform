@@ -1,3 +1,7 @@
+"""
+This needs to be modified to use mysql database
+"""
+
 import modules.fitbit.authentication as auth
 import modules.fitbit.retrieve as retrieve
 import modules.sqlite.setup as setup_db

@@ -32,7 +32,7 @@ if __name__ == '__main__':
     # Make the Data Folder if it isn't already there
     APPLICATION_PATH.joinpath('exported data').mkdir(parents=True, exist_ok=True)
 
-    db_path = APPLICATION_PATH.joinpath('db.sqlite3')
+    # db_path = APPLICATION_PATH.joinpath('db.sqlite3')
 
     # Initial Setup
     # if not os.path.exists(db_path):
