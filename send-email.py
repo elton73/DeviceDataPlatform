@@ -1,17 +1,19 @@
 import modules.fitbit.authentication as auth
 import modules.fitbit.retrieve as retrieve
-import modules.mysql.setup as setup_db
-import modules.mysql.modify as modify_db
-import modules.mysql.report as report_db
+import modules.sqlite.setup as setup_db
+import modules.sqlite.modify as modify_db
+import modules.sqlite.report as report_db
 from pathlib import Path
 import sys
 import os
 import json
 import pandas as pd
 import numpy as np
+
+import sqlite3
 from datetime import datetime, timedelta, timezone, date
 import pprint as pp
-
+import sqlite3
 try:
     import httplib  # python < 3.0
 except:
