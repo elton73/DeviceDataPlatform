@@ -1,9 +1,9 @@
 '''Launch the Main Application here
 '''
 import modules.gui.pyqtapp as gui_pyqtapp
-import modules.sqlite.setup as setup_db
-import modules.sqlite.modify as modify_db
-import modules.sqlite.report as report_db
+import modules.mysql.setup as setup_db
+import modules.mysql.modify as modify_db
+import modules.mysql.report as report_db
 from pathlib import Path
 import sys
 import os
@@ -35,8 +35,8 @@ if __name__ == '__main__':
     db_path = APPLICATION_PATH.joinpath('db.sqlite3')
 
     # Initial Setup
-    if not os.path.exists(db_path):
-        setup_db.create_db(APPLICATION_PATH)
+    # if not os.path.exists(db_path):
+    #     setup_db.create_db(APPLICATION_PATH)
 
     # Start the app
     # print(resource_path('resources'))

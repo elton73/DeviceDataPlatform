@@ -8,12 +8,22 @@ CREATE TABLE IF NOT EXISTS patient_ids(
     patientid VARCHAR(30) NOT NULL);
 '''
 
+SQL_CREATE_AUTH_TABLE = '''
+CREATE TABLE IF NOT EXISTS Auth_info(
+    userid VARCHAR(30) NOT NULL PRIMARY KEY,
+    device_type VARCHAR(30) NOT NULL,
+    auth_token VARCHAR(500) NOT NULL,
+    refresh_token VARCHAR(500) NOT NULL,
+    expires_by VARCHAR(50) NOT NULL);
+'''
+
 TABLE_NAMES = ['patient_ids']
 
 # TODO: CREATE this mysql user and GRANT them ALL PRIVILEGES if you haven't
 USER = 'writer'
 PASSWORD = 'password'
 DATABASE_NAMES = ['fitbit', 'withings', 'polar'] # add databases for new devices
+DATABASE_AUTH = 'authorization_info' #add database for authorization info
 
 def run_commands(engine, command_list):
     with engine.connect() as con:
@@ -33,6 +43,13 @@ def create_dbs():
                     f"USE {db};",
                     SQL_CREATE_DEVICE_TABLE];
         run_commands(engine, commands)
+
+    # Create database for authorization codes
+    commands = [f"CREATE DATABASE IF NOT EXISTS {DATABASE_AUTH};",
+                f"USE {DATABASE_AUTH};",
+                SQL_CREATE_AUTH_TABLE]
+
+    run_commands(engine, commands)
 
 
 if __name__ == "__main__":

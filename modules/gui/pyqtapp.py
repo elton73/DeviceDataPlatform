@@ -3,6 +3,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+from modules.fitbit.authentication import connect_to_database as connect_to_database
 from datetime import datetime, timedelta
 from PyQt6.QtCore import QSize, Qt, QObject
 from PyQt6.QtGui import QFont, QFontDatabase, QScreen, QGuiApplication, QColor, QIcon
@@ -45,16 +46,13 @@ import sys
 
 import modules.fitbit.authentication as fitbit_auth
 import modules.withings.authentication as withings_auth
-import modules.sqlite.modify as modify_db
-import modules.sqlite.report as report_db
 import modules.fitbit.retrieve as fitbit_retrieve
 import modules.withings.retrieve as withings_retrieve
-import modules.mysql.modify as mysql_modify_db
-import modules.mysql.setup as mysql_setup_db
+import modules.mysql.report as report_db
+import modules.mysql.modify as modify_db
+import modules.mysql.setup as setup_db
 from statistics import mean
 from sqlalchemy import create_engine
-import sqlite3
-import pymysql
 import pprint as pp
 
 try:
@@ -78,6 +76,9 @@ retrieve = {'fitbit': fitbit_retrieve,
             'withings': withings_retrieve}
 mysql_conn = {'fitbit': fitbit_conn,
               'withings': withings_conn}
+
+# NOTE: Authorization Database name!
+DATABASE = "authorization_info"
 
 # ==================================================
 # HELPER FUNCTIONS
@@ -141,10 +142,10 @@ class MainWindow(QMainWindow):
         self.stackedwidget = QStackedWidget()
         self.resourcepath = resourcepath
         self.db_path = db_path
-        self.sqlite_conn = sqlite3.connect(db_path)
+        self.mysql_conn = connect_to_database(DATABASE)
 
         # make a mysql connection for each database (device)
-        self.mysql_engine = {db: mysql_setup_db.make_engine(db) for db in auth.keys()}
+        self.mysql_engine = {db: setup_db.make_engine(db) for db in auth.keys()}
 
         print(self.mysql_engine, '!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         self.screensize = (screen_width, screen_height)
@@ -219,7 +220,7 @@ class GetDataWindow(QWidget):
         # Declare the Group's Widget
         title = QLabel('Select User IDs')
 
-        all_devices = report_db.get_all_device_types(self.parent.sqlite_conn)
+        all_devices = report_db.get_all_device_types(self.parent.mysql_conn)
 
         print(all_devices)
         listlabels = list(map(lambda x: format_list_row(*x), all_devices))
@@ -246,9 +247,9 @@ class GetDataWindow(QWidget):
         # Declare the Group's Widget
         title = QLabel('Edit User Labels')
 
-        all_devices = report_db.get_all_device_types(self.parent.sqlite_conn)
+        all_devices = report_db.get_all_device_types(self.parent.mysql_conn)
 
-        all_patientids = [(userid, mysql_modify_db.get_patientid(
+        all_patientids = [(userid, modify_db.get_patientid(
             self.parent.mysql_engine[dev_type], userid)) for userid, dev_type in all_devices]
 
         all_items = [format_list_row(*x)
@@ -368,9 +369,9 @@ class GetDataWindow(QWidget):
             if ' ' in patientid:
                 print('bad patient id')
                 return
-            dtype = report_db.get_device_types(self.parent.sqlite_conn, ['\"'+userid+'\"'])[userid]
+            dtype = report_db.get_device_types(self.parent.mysql_conn, ['\"'+userid+'\"'])[userid]
             print(dtype, '!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-            mysql_modify_db.update_patientid(self.parent.mysql_engine[dtype], userid, patientid)
+            modify_db.update_patientid(self.parent.mysql_engine[dtype], userid, patientid)
 
             # update list widget
             items[0].setText(format_list_row(userid, patientid))
@@ -395,7 +396,7 @@ class GetDataWindow(QWidget):
 
             try:
                 modify_db.insert_list_into(
-                    'Auth_info', data_to_insert, self.parent.sqlite_conn)
+                    'Auth_info', data_to_insert, self.parent.mysql_conn)
                 return format_list_row(auth_info['user_id'], device_type)
             except Exception as e:
                 print(e)
@@ -407,15 +408,14 @@ class GetDataWindow(QWidget):
         output_path = DATA_PATH.joinpath(
             f'{datetime.now().strftime("%Y-%m-%d %H.%M.%S")}')
 
-        # Selected user IDs must be wrapped with single quotes for SQLite Query
         query_selected_userids = list(
             map(lambda text: f'\'{text.split()[0]}\'', self.userList.get_checked_items()))
         access_tokens = report_db.get_auth_tokens(
-            self.parent.sqlite_conn, query_selected_userids)
+            self.parent.mysql_conn, query_selected_userids)
         refresh_tokens = report_db.get_refresh_tokens(
-            self.parent.sqlite_conn, query_selected_userids)
+            self.parent.mysql_conn, query_selected_userids)
         device_types = report_db.get_device_types(
-            self.parent.sqlite_conn, query_selected_userids)
+            self.parent.mysql_conn, query_selected_userids)
 
         print(query_selected_userids)
 
@@ -483,9 +483,9 @@ class GetDataWindow(QWidget):
 
                     # Update the database
                     modify_db.update_auth_token(
-                        self.parent.sqlite_conn, userid, new_auth_info['access_token'])
+                        self.parent.mysql_conn, userid, new_auth_info['access_token'])
                     modify_db.update_refresh_token(
-                        self.parent.sqlite_conn, userid, new_auth_info['refresh_token'])
+                        self.parent.mysql_conn, userid, new_auth_info['refresh_token'])
 
                     # Update the retriever
                     UserDataRetriever.token = new_auth_info['access_token']

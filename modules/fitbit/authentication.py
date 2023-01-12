@@ -1,18 +1,16 @@
 '''This package will open up a browser and retrieve the Access token'''
 import requests
 from selenium import webdriver
+from mysql import connector
 import selenium.webdriver.support.ui as ui
 import chromedriver_autoinstaller
-
-
-
 import numpy as np
 import sys
 import re
-
 # Hashing
 import base64
 import hashlib
+
 
 # retrieve data
 if __name__ == "__main__":
@@ -75,7 +73,7 @@ def get_auth_info():
     except Exception as e:
         print(e)
         return ''
-    
+
 
 def get_refreshed_auth_info(userid, refresh_token):
     '''Returns same format as the first authentication'''
@@ -95,6 +93,33 @@ def get_refreshed_auth_info(userid, refresh_token):
     else:
         return result.json()
 
+
+# Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
+def export_fitbit_to_auth_info(auth_info):
+    userid = auth_info['user_id']
+    device_type = 'fitbit'
+    auth_token = auth_info['access_token']
+    refresh_token = auth_info['refresh_token']
+    expires_by = auth_info['expires_in']  # change to expires by later
+
+    database = connect_to_database(databasename='authorization_info')
+    mycursor = database.cursor()
+    command = f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')"
+    mycursor.execute(command)
+    database.commit()
+
+
+# establish database connection
+def connect_to_database(databasename):
+    database = connector.connect(
+        host='localhost',
+        user='root',
+        passwd='password',
+        database=databasename
+    )
+
+    return database
+
 if __name__=="__main__":
     # Testing if we can get the data successfully
     # auth_token = get_auth_info()['access_token']
@@ -102,11 +127,17 @@ if __name__=="__main__":
     # print(DataGet.get_all_devices())
     # print("="*50)
     # print(DataGet.get_weight(date='2021-11-16'))
-    auth_token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM0JINTgiLCJzdWIiOiI5TlE5U0QiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJzZXQgcmFjdCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNjM3MjEyMzU3LCJpYXQiOjE2MzcxODM1NTd9.9yikywwLz5_mOOA-_tiY6RijnybUSqL7y6BFhYPojGc'
-    refresh_token = '8b2bddd17b5a79109cda8855801de6bd0fb51dc37d1bd2593d8263e31e8102c2'
+    # auth_token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM0JINTgiLCJzdWIiOiI5TlE5U0QiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJzZXQgcmFjdCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNjM3MjEyMzU3LCJpYXQiOjE2MzcxODM1NTd9.9yikywwLz5_mOOA-_tiY6RijnybUSqL7y6BFhYPojGc'
+    # refresh_token = '8b2bddd17b5a79109cda8855801de6bd0fb51dc37d1bd2593d8263e31e8102c2'
+    #
+    # DataGet = DataGetter(auth_token)
+    # print(DataGet.get_all_devices())
+    # print("="*50)
+    # print(DataGet.get_weight(date='2021-11-16'))
+    # print(get_refreshed_auth_info(refresh_token))
 
-    DataGet = DataGetter(auth_token)
-    print(DataGet.get_all_devices())
-    print("="*50)
-    print(DataGet.get_weight(date='2021-11-16'))
-    print(get_refreshed_auth_info(refresh_token))
+    """
+    Get authorization info for fitbit and upload it to authorization_info database
+    """
+    auth_info = get_auth_info()
+    export_fitbit_to_auth_info(auth_info)
