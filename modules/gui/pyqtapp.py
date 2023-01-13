@@ -3,7 +3,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
-from modules.fitbit.authentication import connect_to_database as connect_to_database
+from modules.mysql.setup import connect_to_database
 from datetime import datetime, timedelta
 from PyQt6.QtCore import QSize, Qt, QObject
 from PyQt6.QtGui import QFont, QFontDatabase, QScreen, QGuiApplication, QColor, QIcon

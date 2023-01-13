@@ -47,7 +47,12 @@ def get_patientid(engine, userid):
         rs = con.execute(command)
     id_list = list(rs)
     return id_list[0][0] if id_list else ''
-    
+
+def check_login_details(email, password, db_cursor):
+    db_cursor.execute(f"SELECT * FROM login_info WHERE email = '{email}' and password = '{password}'")
+    if db_cursor.fetchall():
+        return True
+    return False
 def test_insertion():
     data_to_insert = [['user_id', 'patientid', 'device_type',
                        'access_token', 'refresh_token', '12345'], ]
@@ -57,3 +62,5 @@ def test_insertion():
 
 if __name__ == "__main__":
     test_insertion()
+
+

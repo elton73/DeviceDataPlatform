@@ -1,7 +1,6 @@
 '''This package will open up a browser and retrieve the Access token'''
 import requests
 from selenium import webdriver
-from mysql import connector
 import selenium.webdriver.support.ui as ui
 import chromedriver_autoinstaller
 import numpy as np
@@ -107,18 +106,6 @@ def export_fitbit_to_auth_info(auth_info):
     command = f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')"
     mycursor.execute(command)
     database.commit()
-
-
-# establish database connection
-def connect_to_database(databasename):
-    database = connector.connect(
-        host='localhost',
-        user='root',
-        passwd='password',
-        database=databasename
-    )
-
-    return database
 
 if __name__=="__main__":
     # Testing if we can get the data successfully
