@@ -1,6 +1,7 @@
 '''This package will open up a browser and retrieve the Access token'''
 import requests
 from selenium import webdriver
+from modules.mysql.setup import connect_to_database
 import selenium.webdriver.support.ui as ui
 import chromedriver_autoinstaller
 import numpy as np
@@ -128,3 +129,4 @@ if __name__=="__main__":
     """
     auth_info = get_auth_info()
     export_fitbit_to_auth_info(auth_info)
+    # get_refreshed_auth_info('BD6RKR', 'bef4a95a2d97bc1422b8b38562d1dbfe4b14b8c2769d05f63173cff58037f9f5')

@@ -1,7 +1,6 @@
 '''Insert data into table'''
 from sqlalchemy import create_engine
 import pandas as pd
-import pymysql
 
 def run_command(engine, command):
     with engine.connect() as con:
@@ -48,11 +47,18 @@ def get_patientid(engine, userid):
     id_list = list(rs)
     return id_list[0][0] if id_list else ''
 
-def check_login_details(email, password, db_cursor):
-    db_cursor.execute(f"SELECT * FROM login_info WHERE email = '{email}' and password = '{password}'")
-    if db_cursor.fetchall():
-        return True
-    return False
+def add_web_app_user(email, hashed_password, username, db):
+    db.cursor().execute(f"INSERT INTO login_info VALUES ('{email}', '{hashed_password}', '{username}')")
+    db.commit()
+
+def remove_web_app_user(email, db):
+    db.cursor().execute(f"DELETE FROM login_info WHERE email='{email}'")
+    db.commit()
+
+def link_user_to_key(key, email, db):
+    db.cursor().execute(f"UPDATE registration_keys SET email = '{email}' WHERE user_key = '{key}'")
+    db.commit()
+
 def test_insertion():
     data_to_insert = [['user_id', 'patientid', 'device_type',
                        'access_token', 'refresh_token', '12345'], ]

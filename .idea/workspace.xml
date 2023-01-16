@@ -51,7 +51,7 @@
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "settings.editor.selected.configurable": "configurable.group.project",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -60,6 +60,7 @@
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform\modules\web_app" />
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform" />
     </key>
   </component>
@@ -71,10 +72,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\ML-2\anaconda3\python.exe" />
-      <option name="SDK_NAME" value="Python 3.9" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -100,6 +100,8 @@
       <workItem from="1673561902860" duration="1111000" />
       <workItem from="1673563226202" duration="2327000" />
       <workItem from="1673625401618" duration="24069000" />
+      <workItem from="1673883834904" duration="929000" />
+      <workItem from="1673884790384" duration="15830000" />
     </task>
     <servers />
   </component>
@@ -107,9 +109,11 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$setup.coverage" NAME="setup Coverage Results" MODIFIED="1673650100113" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/mysql" />
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$authentication.coverage" NAME="authentication Coverage Results" MODIFIED="1673560191315" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/fitbit" />
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$main.coverage" NAME="main Coverage Results" MODIFIED="1673562121666" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$flask_app.coverage" NAME="flask_app Coverage Results" MODIFIED="1673653109743" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$setup.coverage" NAME="setup Coverage Results" MODIFIED="1673892955048" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/mysql" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$authentication.coverage" NAME="authentication Coverage Results" MODIFIED="1673885926180" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/fitbit" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$main.coverage" NAME="main Coverage Results" MODIFIED="1673889716834" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$run_web_app.coverage" NAME="run_web_app Coverage Results" MODIFIED="1673904430550" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$flask_app.coverage" NAME="flask_app Coverage Results" MODIFIED="1673887946148" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$forms.coverage" NAME="forms Coverage Results" MODIFIED="1673904415058" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/web_app" />
   </component>
 </project>

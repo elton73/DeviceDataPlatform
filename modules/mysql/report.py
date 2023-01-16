@@ -50,6 +50,19 @@ def get_device_types(connection, selected_users):
     result = cursor.fetchall()
     return {data[0]: data[1] for data in result}
 
+def check_login_details(email, password, db):
+    cursor = db.cursor()
+    cursor.execute(f"SELECT * FROM login_info WHERE email = '{email}' and password = '{password}'")
+    if cursor.fetchall():
+        return True
+    return False
+
+def check_input_key(input_key, db):
+    cursor = db.cursor()
+    cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{input_key}' AND email IS NULL")
+    if cursor.fetchall():
+        return True
+    return False
 
 def get_all_device_types(connection):
     command = f'''
