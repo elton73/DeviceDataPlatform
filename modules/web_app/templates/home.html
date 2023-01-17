@@ -1,15 +1,42 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% for post in posts %}
-        <article class="media content-section">
-            <div class="media-body">
-                <div class="article-metadata">
-                    <a class="mr-2" href="#">{{ post.author }}</a>
-                    <small class="text-muted">{{ post.date_posted }}</small>
-                </div>
-                <h2><a class="article-title" href="#">{{ post.title }}</a></h2>
-                <p class="article-content">{{ post.content }}</p>
+<main>
+  <h1>Devices</h1>
+          <div class="container mt-3">
+          <div class="row no-gutters">
+
+            <div class="col-sm" style="text-align: center">
+              <div class="content-section">
+                Device ID
+              </div>
             </div>
-        </article>
+
+             <div class="col-sm" style="text-align: center">
+              <div class="content-section">
+                Device Type
+              </div>
+            </div>
+
+          </div>
+        </div>
+    {% for device in devices %}
+        <div class="container mt-3">
+          <div class="row no-gutters">
+
+            <div class="col-sm" style="text-align: center">
+              <div class="content-section">
+                Column 1
+              </div>
+            </div>
+
+             <div class="col-sm" style="text-align: center">
+              <div class="content-section">
+                Column 2
+              </div>
+            </div>
+
+          </div>
+        </div>
     {% endfor %}
+</main>
 {% endblock content %}

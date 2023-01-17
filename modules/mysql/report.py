@@ -1,4 +1,6 @@
 '''Functions to generate reports from the database'''
+from bcrypt import checkpw
+from modules.mysql.setup import connect_to_database
 
 def get_all_token_timeouts(connection):
     command = '''
@@ -51,12 +53,17 @@ def get_device_types(connection, selected_users):
     return {data[0]: data[1] for data in result}
 
 def check_login_details(email, password, db):
-    cursor = db.cursor()
-    cursor.execute(f"SELECT * FROM login_info WHERE email = '{email}' and password = '{password}'")
-    if cursor.fetchall():
-        return True
+    #navigate the database
+    cursor = db.cursor(dictionary=True) #allows us to access data by name
+    cursor.execute(f"SELECT * FROM login_info WHERE email = '{email}'")
+    #if user exists, check if password is correct
+    user_account = cursor.fetchone()
+    if user_account:
+        if checkpw(password.encode('utf-8'), user_account['password'].encode('utf-8')):
+            return user_account
     return False
 
+#Check if there is an available input key to register
 def check_input_key(input_key, db):
     cursor = db.cursor()
     cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{input_key}' AND email IS NULL")
@@ -97,3 +104,5 @@ def format_OR_clause(column: str, condition: list):
         
         return where_clause
 
+if __name__ == '__main__':
+    print(get_all_device_types(connect_to_database("authorization_info")))

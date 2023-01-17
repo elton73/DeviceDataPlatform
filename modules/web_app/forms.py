@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from modules.mysql.setup import connect_to_database
 
+
 #Check if email exists in database
 def validate_email(FlaskForm, email):
     # Connect to database
@@ -21,11 +22,11 @@ def validate_key(FlaskForm, key):
     cursor = db.cursor()
     cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{key}' AND email IS NULL")
     if not cursor.fetchall():
-        raise ValidationError("Email Already Exists")
+        raise ValidationError("Invalid Key")
 
 class RegistrationForm(FlaskForm):
     key = StringField('Key',
-                      validators=[DataRequired(), Length(min=2, max=10)])
+                      validators=[DataRequired(), Length(min=2, max=10), validate_key])
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
@@ -41,4 +42,11 @@ class LoginForm(FlaskForm):
                         validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Sign In')
+
+
+if __name__ == '__main__':
+    db = connect_to_database("webapp_login_info")
+
+
+
 
