@@ -24,11 +24,26 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
 }
 
+.add-button {
+    margin-top: 7px;
+    float: right;
+    width: 130px;
+    margin-left: 5px;
+}
+
 .content-section {
     background: #ffffff;
     padding: 10px 20px;
     outline: 2px solid #dddddd;
     width: 500px;
+}
+
+/* Rename Later */
+.content-section2 {
+    background: #ffffff;
+    padding: 10px 20px;
+    outline: 2px solid #dddddd;
+    width: 100%;
 }
 
 .no-margin

@@ -1,41 +1,58 @@
 {% extends "layout.html" %}
 {% block content %}
 <main>
-  <h1 class="col">Devices</h1>
-        <div class="container mt-3">
-          <div class="row no-gutters">
-            <div class="col-sm-auto" style="text-align: center">
-              <div class="content-section">
-                Device ID
-              </div>
-            </div>
-
-             <div class="col-sm-auto" style="text-align: center">
-              <div class="content-section">
-                Device Type
-              </div>
-            </div>
-
+  <div class="container-fluid">
+    <div class="row no-gutters justify-content-center">
+      <div class="col-6">
+        <h1 style="width: 100%;">
+          Devices
+        </h1>
+      </div>
+      <div class="col-6">
+          <div style="width: 100%">
+            <button class="btn btn-success add-button">
+              Add
+            </button>
+            <button class="btn btn-success add-button">
+              Remove
+            </button>
           </div>
         </div>
-    {% for device in devices %}
-        <div class="container">
-          <div class="row no-gutters">
+    </div>
+  </div>
 
-            <div class="col-sm-auto" style="text-align: center">
-              <div class="content-section">
-                {{ device['userid'] }}
-              </div>
-            </div>
-
-             <div class="col-sm-auto" style="text-align: center">
-              <div class="content-section">
-                {{ device['device_type'] }}
-              </div>
-            </div>
-
+    <div class="container-fluid mt-1">
+      <div class="row no-gutters justify-content-center">
+        <div class="col-6" style="text-align: center">
+          <div class="content-section2">
+            Device ID
           </div>
         </div>
-    {% endfor %}
+
+         <div class="col-6" style="text-align: center">
+          <div class="content-section2">
+            Device Type
+          </div>
+        </div>
+      </div>
+    </div>
+{% for device in devices %}
+    <div class="container-fluid">
+      <div class="row no-gutters justify-content-center">
+        <div class="col-6" style="text-align: center">
+          <div class="content-section2">
+            {{ device['userid'] }}
+          </div>
+        </div>
+
+         <div class="col-6" style="text-align: center">
+          <div class="content-section2">
+            {{ device['device_type'] }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+{% endfor %}
 </main>
 {% endblock content %}
