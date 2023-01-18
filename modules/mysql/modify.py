@@ -1,6 +1,9 @@
 '''Insert data into table'''
 from sqlalchemy import create_engine
 import pandas as pd
+from modules.mysql.setup import connect_to_database
+
+PATIENT_DATABASE = 'patient_labels'
 
 def run_command(engine, command):
     with engine.connect() as con:
@@ -29,9 +32,10 @@ def insert_list_into(table: str, items: list, engine):
 
     print(f"{len(items)} new rows were inserted.")
 
+
 def update_patientid(engine, userid, new_patientid):
     command = f'''
-    REPLACE INTO patient_ids (userid, patientid)
+    REPLACE INTO patient_label (userid, patientid)
     VALUES ('{userid}', '{new_patientid}');
     '''
     run_command(engine, command)
@@ -58,6 +62,13 @@ def remove_web_app_user(email, db):
 def link_user_to_key(key, email, db):
     db.cursor().execute(f"UPDATE registration_keys SET email = '{email}' WHERE user_key = '{key}'")
     db.commit()
+
+def export_patient_data(patientid, userid, device_type):
+    database = connect_to_database(PATIENT_DATABASE)
+    mycursor = database.cursor()
+    command = f"INSERT INTO patient_label VALUES (' {patientid}', '{userid}', '{device_type}')"
+    mycursor.execute(command)
+    database.commit()
 
 def test_insertion():
     data_to_insert = [['user_id', 'patientid', 'device_type',

@@ -97,7 +97,7 @@ def get_refreshed_auth_info(userid, refresh_token):
 # Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
 def export_fitbit_to_auth_info(auth_info):
     userid = auth_info['user_id']
-    device_type = 'fitbit'
+    device_type = 'Fitbit'
     auth_token = auth_info['access_token']
     refresh_token = auth_info['refresh_token']
     expires_by = auth_info['expires_in']  # change to expires by later
@@ -127,6 +127,7 @@ if __name__=="__main__":
     """
     Get authorization info for fitbit and upload it to authorization_info database
     """
-    auth_info = get_auth_info()
-    export_fitbit_to_auth_info(auth_info)
+    # auth_info = get_auth_info()
+    # print(auth_info)
+    # export_fitbit_to_auth_info(auth_info)
     # get_refreshed_auth_info('BD6RKR', 'bef4a95a2d97bc1422b8b38562d1dbfe4b14b8c2769d05f63173cff58037f9f5')

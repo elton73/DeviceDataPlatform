@@ -1,18 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
 <main>
+<!--  Title, remove and add buttons-->
   <div class="container-fluid">
     <div class="row no-gutters justify-content-center">
       <div class="col-6">
         <h1 style="width: 100%;">
-          Devices
+          Patients
         </h1>
       </div>
       <div class="col-6">
           <div style="width: 100%">
-            <button class="btn btn-success add-button">
+            <a class="btn btn-success add-button" href="{{ url_for('addpatient') }}">
               Add
-            </button>
+            </a>
             <button class="btn btn-success add-button">
               Remove
             </button>
@@ -21,31 +22,48 @@
     </div>
   </div>
 
+<!--First row-->
     <div class="container-fluid mt-1">
       <div class="row no-gutters justify-content-center">
-        <div class="col-6" style="text-align: center">
+
+        <div class="col-4" style="text-align: center">
+          <div class="content-section2">
+            Patient Label
+          </div>
+        </div>
+
+        <div class="col-4" style="text-align: center">
           <div class="content-section2">
             Device ID
           </div>
         </div>
 
-         <div class="col-6" style="text-align: center">
+         <div class="col-4" style="text-align: center">
           <div class="content-section2">
             Device Type
           </div>
         </div>
+
       </div>
     </div>
+
 {% for device in devices %}
     <div class="container-fluid">
       <div class="row no-gutters justify-content-center">
-        <div class="col-6" style="text-align: center">
+
+        <div class="col-4" style="text-align: center">
+          <div class="content-section2">
+            {{ device['patient_id'] }}
+          </div>
+        </div>
+
+        <div class="col-4" style="text-align: center">
           <div class="content-section2">
             {{ device['userid'] }}
           </div>
         </div>
 
-         <div class="col-6" style="text-align: center">
+         <div class="col-4" style="text-align: center">
           <div class="content-section2">
             {{ device['device_type'] }}
           </div>

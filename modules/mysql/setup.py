@@ -2,7 +2,6 @@
 from sqlalchemy import create_engine
 from mysql import connector
 
-#Make the create variables a method later
 SQL_CREATE_DEVICE_TABLE = '''
 CREATE TABLE IF NOT EXISTS patient_ids(
     userid VARCHAR(30) NOT NULL PRIMARY KEY,
@@ -37,6 +36,13 @@ CREATE TABLE IF NOT EXISTS registration_keys(
     email VARCHAR(254));
 '''
 
+SQL_CREATE_PATIENT_DEVICE_TABLE = '''
+CREATE TABLE IF NOT EXISTS patient_label(
+    patient_id VARCHAR(30),
+    userid VARCHAR(30) NOT NULL PRIMARY KEY,
+    device_type VARCHAR(30) NOT NULL);
+'''
+
 TABLE_NAMES = ['patient_ids']
 
 # TODO: CREATE this mysql user and GRANT them ALL PRIVILEGES if you haven't
@@ -46,6 +52,7 @@ DATABASE_NAMES = ['fitbit', 'withings', 'polar'] # add databases for new devices
 DATABASE_AUTH = ['authorization_info'] #add database for authorization info
 DATABASE_LOGIN = ['Webapp_login_info'] #add database for login info
 DATABASE_EMAILS = ['email_list'] #add database for list of emails
+DATABASE_PATIENT_LABEL = ['patient_labels']
 
 def run_commands(engine, command_list):
     with engine.connect() as con:
@@ -79,13 +86,21 @@ def connect_to_database(databasename):
         passwd='password',
         database=databasename
     )
-
     return database
+
+def connect_to_server():
+    # Connect to host server
+    server = connector.connect(
+        host='localhost',
+        user='root',
+        passwd='password',
+    )
+    return server
 
 
 if __name__ == "__main__":
     engine = make_engine()
-    # create_dbs(engine, DATABASE_EMAILS, SQL_CREATE_EMAIL_LIST_TABLE)
+    create_dbs(engine, DATABASE_PATIENT_LABEL, SQL_CREATE_PATIENT_DEVICE_TABLE)
     # create_table(engine, DATABASE_LOGIN, SQL_CREATE_KEY_TABLE)
 
 

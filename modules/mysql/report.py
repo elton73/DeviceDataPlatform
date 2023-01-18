@@ -1,6 +1,6 @@
 '''Functions to generate reports from the database'''
 from bcrypt import checkpw
-from modules.mysql.setup import connect_to_database
+from modules.mysql.setup import connect_to_database, connect_to_server
 
 def get_all_token_timeouts(connection):
     command = '''
@@ -71,6 +71,25 @@ def check_input_key(input_key, db):
         return True
     return False
 
+#Check if there is an available input key to register
+def check_input_device(input_device):
+    #case 1 device already exists is auth_info
+    invalid_device = False
+    db = connect_to_database("authorization_info")
+    cursor = db.cursor()
+    cursor.execute(f"SELECT * FROM auth_info WHERE userid = '{input_device}'")
+    if cursor.fetchall():
+        return True
+
+    #case 2 device already exists in patient_labels
+    db2 = connect_to_database("patient_labels")
+    cursor2 = db2.cursor()
+    cursor2.execute(f"SELECT * FROM patient_label WHERE userid = '{input_device}'")
+    if cursor2.fetchall():
+        return True
+
+    return False
+
 def get_all_device_types(connection):
     command = f'''
     SELECT userid, device_type FROM auth_info;
@@ -78,6 +97,28 @@ def get_all_device_types(connection):
     cursor = connection.cursor(dictionary=True)
     cursor.execute(command)
     result = cursor.fetchall()
+    return result
+
+def get_all_patient_labels(db):
+    command = f'''
+    SELECT * FROM patient_label;
+    '''
+    cursor = db.cursor(dictionary=True)
+    cursor.execute(command)
+    result = cursor.fetchall()
+    return result
+
+#Get all current fitbit users
+def get_fitbit_users():
+    server = connect_to_server()
+    cursor = server.cursor()
+    command = f'''
+    SELECT patientid FROM fitbit.patient_ids WHERE userid IN 
+   (SELECT userid FROM authorization_info.auth_info)
+    '''
+    cursor.execute(command)
+    result = cursor.fetchall()
+
     return result
 
 def capitalize_first_letter(string):
@@ -112,6 +153,6 @@ def format_OR_clause(column: str, condition: list):
         return where_clause
 
 # if __name__ == '__main__':
-    # db = connect_to_database("authorization_info")
-    # all_devices = get_all_device_types(db)
-    # print(all_devices)
+#     db = connect_to_database("authorization_info")
+#     db2 = connect_to_database("fitbit")
+#     print(get_all_device_types(db))
