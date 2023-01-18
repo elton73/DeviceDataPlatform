@@ -1,11 +1,12 @@
 from flask import render_template, url_for, flash, redirect, session
 from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm
-from modules.mysql.report import check_login_details, check_input_key, get_all_device_types
+from modules.mysql.report import check_login_details, check_input_key, get_all_device_types, capitalize_first_letter
 from modules.mysql.modify import add_web_app_user, link_user_to_key
 from modules.web_app import app, login_db, bcrypt
 
 DEVICE_DATABASE = "authorization_info"
+DEVICE_TYPE_COLUMN = "device_type"
 
 @app.route('/home')
 def home():
@@ -13,6 +14,9 @@ def home():
         #Get database information
         db = connect_to_database(DEVICE_DATABASE)
         all_devices = get_all_device_types(db)
+        # capitalizes the name of the device type
+        for device in all_devices:
+            device[DEVICE_TYPE_COLUMN] = capitalize_first_letter(device[DEVICE_TYPE_COLUMN])
         return render_template('home.html', devices=all_devices)
     else:
         return redirect(url_for('login'))
@@ -68,6 +72,3 @@ def logout():
 def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     return response
-
-# if __name__ == '__main__':
-

@@ -75,10 +75,17 @@ def get_all_device_types(connection):
     command = f'''
     SELECT userid, device_type FROM auth_info;
     '''
-    cursor = connection.cursor()
+    cursor = connection.cursor(dictionary=True)
     cursor.execute(command)
     result = cursor.fetchall()
     return result
+
+def capitalize_first_letter(string):
+    if string[0].isalpha():
+        string = string[0].upper() + string[1:]
+        return string
+    else:
+        return string
 
 
 def format_OR_clause(column: str, condition: list):
@@ -104,5 +111,7 @@ def format_OR_clause(column: str, condition: list):
         
         return where_clause
 
-if __name__ == '__main__':
-    print(get_all_device_types(connect_to_database("authorization_info")))
+# if __name__ == '__main__':
+    # db = connect_to_database("authorization_info")
+    # all_devices = get_all_device_types(db)
+    # print(all_devices)

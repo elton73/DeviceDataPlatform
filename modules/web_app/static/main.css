@@ -28,6 +28,7 @@ h1, h2, h3, h4, h5, h6 {
     background: #ffffff;
     padding: 10px 20px;
     outline: 2px solid #dddddd;
+    width: 500px;
 }
 
 .no-margin

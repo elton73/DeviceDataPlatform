@@ -1,17 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
 <main>
-  <h1>Devices</h1>
-          <div class="container mt-3">
+  <h1 class="col">Devices</h1>
+        <div class="container mt-3">
           <div class="row no-gutters">
-
-            <div class="col-sm" style="text-align: center">
+            <div class="col-sm-auto" style="text-align: center">
               <div class="content-section">
                 Device ID
               </div>
             </div>
 
-             <div class="col-sm" style="text-align: center">
+             <div class="col-sm-auto" style="text-align: center">
               <div class="content-section">
                 Device Type
               </div>
@@ -20,18 +19,18 @@
           </div>
         </div>
     {% for device in devices %}
-        <div class="container mt-3">
+        <div class="container">
           <div class="row no-gutters">
 
-            <div class="col-sm" style="text-align: center">
+            <div class="col-sm-auto" style="text-align: center">
               <div class="content-section">
-                Column 1
+                {{ device['userid'] }}
               </div>
             </div>
 
-             <div class="col-sm" style="text-align: center">
+             <div class="col-sm-auto" style="text-align: center">
               <div class="content-section">
-                Column 2
+                {{ device['device_type'] }}
               </div>
             </div>
 
