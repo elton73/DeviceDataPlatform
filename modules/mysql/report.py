@@ -108,6 +108,15 @@ def get_fitbit_users(db):
     result = cursor.fetchall()
     return result
 
+def get_fitbit_user_with_patient_id(patient_id, db):
+    cursor = db.cursor(dictionary=True)
+    command = f'''
+    SELECT * FROM patient_ids WHERE patient_id = {patient_id}
+    '''
+    cursor.execute(command)
+    result = cursor.fetchone()
+    return result
+
 def capitalize_first_letter(string):
     if string[0].isalpha():
         string = string[0].upper() + string[1:]
@@ -139,12 +148,10 @@ def format_OR_clause(column: str, condition: list):
         
         return where_clause
 
-# if __name__ == '__main__':
-    # Get device information
-    # all_patients = []
-    # fitbit_db = connect_to_database('fitbit')
-    # fitbit_patients = get_fitbit_users(fitbit_db)
-    # for patient in fitbit_patients:
-    #     all_patients.append(patient)
-    #
-    # print(fitbit_patients)
+if __name__ == '__main__':
+    auth_db = connect_to_database("authorization_info")
+    cursor = auth_db.cursor()
+    cursor.execute(f"SELECT * FROM auth_info WHERE userid='BD6RKR'")
+    if cursor.fetchone():
+        cursor.execute(f"DELETE FROM auth_info WHERE userid='BD6RKR'")
+        auth_db.commit()

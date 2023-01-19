@@ -59,13 +59,30 @@ def remove_web_app_user(email, db):
     db.cursor().execute(f"DELETE FROM login_info WHERE email='{email}'")
     db.commit()
 
+def remove_fitbit_patient(patient_id, user_id, fitbit_db, auth_db):
+    # TODO: check if patient exists in both databases before running
+    # remove patient from fitbit database
+    cursor = fitbit_db.cursor()
+    cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id='{patient_id}'")
+    if cursor.fetchone():
+        cursor.execute(f"DELETE FROM patient_ids WHERE patient_id='{patient_id}'")
+        fitbit_db.commit()
+
+    # remove patient from auth database
+    user_id = user_id.replace(' ', '') #spaces must be removed from strings
+    cursor = auth_db.cursor()
+    cursor.execute(f"SELECT * FROM auth_info WHERE userid='{user_id}'")
+    if cursor.fetchone():
+        cursor.execute(f"DELETE FROM auth_info WHERE userid='{user_id}'")
+        auth_db.commit()
+
 def link_user_to_key(key, email, db):
     db.cursor().execute(f"UPDATE registration_keys SET email = '{email}' WHERE user_key = '{key}'")
     db.commit()
 
 def export_patient_data(userid,patient_id, device_type, db):
     mycursor = db.cursor()
-    command = f"INSERT INTO patient_ids VALUES (' {userid}', '{patient_id}', '{device_type}')"
+    command = f"INSERT INTO patient_ids VALUES (' {userid}', '{device_type}', '{patient_id}')"
     mycursor.execute(command)
     db.commit()
 
@@ -78,5 +95,5 @@ def test_insertion():
 
 if __name__ == "__main__":
     test_insertion()
-
+    #DELETE FROM auth_info WHERE userid='BD6RKR'
 

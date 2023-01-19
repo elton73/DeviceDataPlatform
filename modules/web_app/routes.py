@@ -2,8 +2,8 @@ from flask import render_template, url_for, flash, redirect, session
 from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_fitbit_users, \
-    capitalize_first_letter, check_input_device
-from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data
+    get_fitbit_user_with_patient_id, check_input_device
+from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_fitbit_patient
 from modules.web_app import app, login_db, bcrypt
 from modules.fitbit.authentication import get_auth_info, export_fitbit_to_auth_info
 
@@ -14,18 +14,22 @@ FITBIT_DATABASE = 'fitbit'
 
 @app.route('/home')
 def home():
+    #check if user is logged in
     if 'logged_in' in session:
+        #initialize list of all the patients to be passed to html
         all_patients = []
         #Get fitbit users
         fitbit_db = connect_to_database(FITBIT_DATABASE)
         fitbit_patients = get_fitbit_users(fitbit_db)
 
-        #create a function for below loop
+        #TODO:create a function for below loop
+        #Add all patients using different devices into a list
         for patient in fitbit_patients:
             all_patients.append(patient)
 
         return render_template('home.html', patients=all_patients)
     else:
+        #return to login page if user is not logged in
         return redirect(url_for('login'))
 
 @app.route('/addpatient', methods=['GET', 'POST'])
@@ -33,7 +37,6 @@ def addpatient():
     #user must be logged in
     if 'logged_in' not in session:
         return redirect(url_for('login'))
-
     #Add check for unique patient_labels and device_data later
     form = PatientForm()
     if form.validate_on_submit():
@@ -55,6 +58,18 @@ def addpatient():
         else:
             flash('Invalid', 'danger')
     return render_template('addpatient.html', title='Add', form=form)
+
+@app.route('/patient/<string:patient_id>/<string:user_id>/delete', methods = ['POST'])
+def deletepatient(patient_id, user_id):
+    # user must be logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    fitbit_db = connect_to_database(FITBIT_DATABASE)
+    auth_db = connect_to_database(DEVICE_DATABASE)
+    remove_fitbit_patient(patient_id, user_id, fitbit_db, auth_db)
+    flash('Patient deleted', 'success')
+    return redirect(url_for('home'))
+
 
 
 @app.route('/', methods=['GET', 'POST'])
