@@ -21,10 +21,19 @@ def validate_key(FlaskForm, key):
     database = "webapp_login_info"
     db = connect_to_database(database)
     cursor = db.cursor()
-    cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{key}' AND email IS NULL")
+    cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{key.data}' AND email IS NULL")
     if not cursor.fetchall():
         raise ValidationError("Invalid Key")
 
+# Check if email exists in database
+def validate_fitbit_patient_id(FlaskForm, patient):
+    # Connect to database
+    database = "fitbit"
+    fitbit_db = connect_to_database(database)
+    cursor = fitbit_db.cursor()
+    cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id = '{patient.data}'")
+    if cursor.fetchall():
+        raise ValidationError("Patient Name Already Exists")
 
 class RegistrationForm(FlaskForm):
     key = StringField('Key',
@@ -47,8 +56,8 @@ class LoginForm(FlaskForm):
 
 
 class PatientForm(FlaskForm):
-    patient = StringField('Patient',
-                          validators=[DataRequired(), Length(min=2, max=20)])
+    patient = StringField('Patient ID',
+                          validators=[DataRequired(), Length(min=2, max=20), validate_fitbit_patient_id])
     submit = SubmitField('Submit')
 
 

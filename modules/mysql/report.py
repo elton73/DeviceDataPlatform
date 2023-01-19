@@ -1,6 +1,7 @@
 '''Functions to generate reports from the database'''
 from bcrypt import checkpw
-from modules.mysql.setup import connect_to_database, connect_to_server
+from modules.mysql.setup import connect_to_database
+from modules.fitbit.authentication import get_auth_info
 
 def get_all_token_timeouts(connection):
     command = '''
@@ -72,7 +73,7 @@ def check_input_key(input_key, db):
     return False
 
 #Check if there is an available input key to register
-def check_input_device(input_device):
+def check_invalid_device(input_device):
     #case 1 device already exists is auth_info
     auth_db = connect_to_database("authorization_info")
     cursor = auth_db.cursor()
@@ -88,6 +89,22 @@ def check_input_device(input_device):
         return True
 
     return False
+
+
+def check_auth_info_and_input_device():
+    auth_info = get_auth_info()
+    #check authentication info was received successfully
+    if not auth_info:
+        return "Authentication Failed", False
+
+    #check if device is available
+    user_id = auth_info['user_id']
+    invalid_device = check_invalid_device(user_id)
+    if invalid_device:
+       return "Device Invalid", False
+
+    return auth_info, True
+
 
 def get_all_device_types(connection):
     command = f'''
@@ -124,7 +141,6 @@ def capitalize_first_letter(string):
     else:
         return string
 
-
 def format_OR_clause(column: str, condition: list):
         '''Input a column to query and a list of conditions. Output will be 
             a bunch of WHERE and OR clause
@@ -148,10 +164,6 @@ def format_OR_clause(column: str, condition: list):
         
         return where_clause
 
-if __name__ == '__main__':
-    auth_db = connect_to_database("authorization_info")
-    cursor = auth_db.cursor()
-    cursor.execute(f"SELECT * FROM auth_info WHERE userid='BD6RKR'")
-    if cursor.fetchone():
-        cursor.execute(f"DELETE FROM auth_info WHERE userid='BD6RKR'")
-        auth_db.commit()
+# if __name__ == '__main__':
+#     auth_info = get_auth_info()
+#     print(auth_info)

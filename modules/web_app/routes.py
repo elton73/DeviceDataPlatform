@@ -2,7 +2,7 @@ from flask import render_template, url_for, flash, redirect, session
 from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_fitbit_users, \
-    get_fitbit_user_with_patient_id, check_input_device
+    get_fitbit_user_with_patient_id, check_auth_info_and_input_device
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_fitbit_patient
 from modules.web_app import app, login_db, bcrypt
 from modules.fitbit.authentication import get_auth_info, export_fitbit_to_auth_info
@@ -40,23 +40,22 @@ def addpatient():
     #Add check for unique patient_labels and device_data later
     form = PatientForm()
     if form.validate_on_submit():
-
-        auth_info = get_auth_info()
-        user_id = auth_info['user_id']
-
-        #check if input device already exists
-        if not check_input_device(user_id):
-            #export fitbit authorization data to sql database
-            export_fitbit_to_auth_info(auth_info)
-
-            #export patient and device data to fitbit database
+        # check if auth_info is valid and if input device already exists. Return userid, auth_info, and success.
+        auth_info, success = check_auth_info_and_input_device()
+        if success:
+            #export userid, patient and device type to fitbit database
+            user_id = auth_info['user_id']
             patient_id = form.patient.data
-            device_type = 'fitbit' #Create a dropdown for this variable in the webapp later
+            device_type = 'fitbit' #TODO: Create a dropdown for this variable in the webapp later
+
+            # export data to sql database
+            auth_db = connect_to_database(DEVICE_DATABASE)
+            export_fitbit_to_auth_info(auth_info, auth_db)
             fitbit_db = connect_to_database(FITBIT_DATABASE)
             export_patient_data(user_id, patient_id, device_type, fitbit_db)
             return redirect(url_for('home'))
         else:
-            flash('Invalid', 'danger')
+            flash(f'{auth_info}', 'danger')
     return render_template('addpatient.html', title='Add', form=form)
 
 @app.route('/patient/<string:patient_id>/<string:user_id>/delete', methods = ['POST'])
@@ -100,14 +99,11 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         if check_input_key(form.key.data, login_db): #Check if they have a key to register
-            try:
-                hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-                add_web_app_user(form.email.data, hashed_password, form.username.data, login_db)
-                link_user_to_key(form.key.data, form.email.data ,login_db)
-                flash(f'Account created for {form.username.data}!', 'success')
-                return redirect(url_for('home'))
-            except:
-                pass
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            add_web_app_user(form.email.data, hashed_password, form.username.data, login_db)
+            link_user_to_key(form.key.data, form.email.data ,login_db)
+            flash(f'Account created for {form.username.data}!', 'success')
+            return redirect(url_for('home'))
         else:
             flash('Registration Unsuccessful', 'danger')  # Provide details for why unsuccessful later
     return render_template('register.html', title='Register', form=form)

@@ -72,8 +72,7 @@ def get_auth_info():
         return token_json.json()
     except Exception as e:
         print(e)
-        return ''
-
+        return False
 
 def get_refreshed_auth_info(userid, refresh_token):
     '''Returns same format as the first authentication'''
@@ -95,18 +94,17 @@ def get_refreshed_auth_info(userid, refresh_token):
 
 
 # Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
-def export_fitbit_to_auth_info(auth_info):
+def export_fitbit_to_auth_info(auth_info, db):
     userid = auth_info['user_id']
     device_type = 'Fitbit'
     auth_token = auth_info['access_token']
     refresh_token = auth_info['refresh_token']
     expires_by = auth_info['expires_in']  # change to expires by later
 
-    database = connect_to_database(databasename='authorization_info')
-    mycursor = database.cursor()
+    mycursor = db.cursor()
     command = f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')"
     mycursor.execute(command)
-    database.commit()
+    db.commit()
 
 if __name__=="__main__":
     # Testing if we can get the data successfully

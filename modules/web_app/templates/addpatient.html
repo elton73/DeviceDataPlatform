@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="content-section">
-        <form method="post" action="">
+        <form method="post" action="" onsubmit="loading()">
             {{ form.hidden_tag() }}
             <fieldset class="form_group">
                 <legend class="border-bottom mb-4">Add Patient</legend>
                 <div class="form-group">
                     {{ form.patient.label(class="form-control-label") }}
                     {% if form.patient.errors %}
-                        {{ form.patient_label(class="form-control is-invalid") }}
+                        {{ form.patient(class="form-control is-invalid") }}
                             <div class="invalid-feedback">
                                 {% for error in form.patient.errors %}
                                     <span>{{ error }}</span>
@@ -22,9 +22,17 @@
             <div class="form-group mt-2">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
+            <div class="spinner-border" id="loading" >
+                <span class="sr-only"></span>
+            </div>
         </form>
+        <script type="text/javascript">// <![CDATA[
+                function loading(){
+                    $("#loading").show();
+                    $("#content").hide();
+                }
+        // ]]></script>
     </div>
-
 {% endblock content %}
 
 
