@@ -100,7 +100,8 @@ def connect_to_server():
 
 if __name__ == "__main__":
     engine = make_engine()
-    create_dbs(engine, DATABASE_PATIENT_LABEL, SQL_CREATE_PATIENT_DEVICE_TABLE)
+
+    # create_dbs(engine, DATABASE_PATIENT_LABEL, SQL_CREATE_PATIENT_DEVICE_TABLE)
     # create_table(engine, DATABASE_LOGIN, SQL_CREATE_KEY_TABLE)
 
 

@@ -9,16 +9,15 @@
           Patients
         </h1>
       </div>
-      <div class="col-6">
+      <div class="col-5">
           <div style="width: 100%">
-            <a class="btn btn-success add-button" href="{{ url_for('addpatient') }}">
-              Add
-            </a>
-            <button class="btn btn-success add-button">
-              Remove
-            </button>
           </div>
         </div>
+      <div class="col-1">
+        <a class="btn btn-success add-button" href="{{ url_for('addpatient') }}">
+              Add
+        </a>
+      </div>
     </div>
   </div>
 
@@ -38,36 +37,48 @@
           </div>
         </div>
 
-         <div class="col-4" style="text-align: center">
+         <div class="col-3" style="text-align: center">
           <div class="content-section2">
             Device Type
           </div>
         </div>
 
+        <div style="width: 100%" class="col-1">
+          <div class="content-button">
+          </div>
+          </div>
+
       </div>
     </div>
 
-{% for device in devices %}
+{% for patient in patients %}
     <div class="container-fluid">
       <div class="row no-gutters justify-content-center">
 
         <div class="col-4" style="text-align: center">
           <div class="content-section2">
-            {{ device['patient_id'] }}
+            {{ patient['patient_id'] }}
           </div>
         </div>
 
         <div class="col-4" style="text-align: center">
           <div class="content-section2">
-            {{ device['userid'] }}
+            {{ patient['userid'] }}
           </div>
         </div>
 
-         <div class="col-4" style="text-align: center">
+         <div class="col-3" style="text-align: center">
           <div class="content-section2">
-            {{ device['device_type'] }}
+            {{ patient['device_type'] }}
           </div>
         </div>
+        <div style="width: 100%" class="col-1">
+          <div class="content-button">
+            <a class="btn btn-danger remove-button" href="{{ url_for('addpatient') }}">
+              X
+            </a>
+          </div>
+          </div>
 
       </div>
     </div>

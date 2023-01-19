@@ -63,12 +63,11 @@ def link_user_to_key(key, email, db):
     db.cursor().execute(f"UPDATE registration_keys SET email = '{email}' WHERE user_key = '{key}'")
     db.commit()
 
-def export_patient_data(patientid, userid, device_type):
-    database = connect_to_database(PATIENT_DATABASE)
-    mycursor = database.cursor()
-    command = f"INSERT INTO patient_label VALUES (' {patientid}', '{userid}', '{device_type}')"
+def export_patient_data(userid,patient_id, device_type, db):
+    mycursor = db.cursor()
+    command = f"INSERT INTO patient_ids VALUES (' {userid}', '{patient_id}', '{device_type}')"
     mycursor.execute(command)
-    database.commit()
+    db.commit()
 
 def test_insertion():
     data_to_insert = [['user_id', 'patientid', 'device_type',

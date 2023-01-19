@@ -27,8 +27,12 @@ h1, h2, h3, h4, h5, h6 {
 .add-button {
     margin-top: 7px;
     float: right;
-    width: 130px;
-    margin-left: 5px;
+    width: 100%;
+}
+
+.remove-button {
+    width: 100%;
+    height: 100%;
 }
 
 .edit-button {

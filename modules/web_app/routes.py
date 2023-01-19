@@ -1,8 +1,8 @@
 from flask import render_template, url_for, flash, redirect, session
 from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
-from modules.mysql.report import check_login_details, check_input_key, get_all_device_types, \
-    capitalize_first_letter, get_all_patient_labels, check_input_device
+from modules.mysql.report import check_login_details, check_input_key, get_fitbit_users, \
+    capitalize_first_letter, check_input_device
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data
 from modules.web_app import app, login_db, bcrypt
 from modules.fitbit.authentication import get_auth_info, export_fitbit_to_auth_info
@@ -10,33 +10,23 @@ from modules.fitbit.authentication import get_auth_info, export_fitbit_to_auth_i
 DEVICE_DATABASE = "authorization_info"
 PATIENT_LABEL_DATABASE = "patient_labels"
 DEVICE_TYPE_COLUMN = "device_type"
+FITBIT_DATABASE = 'fitbit'
 
 @app.route('/home')
 def home():
     if 'logged_in' in session:
+        all_patients = []
+        #Get fitbit users
+        fitbit_db = connect_to_database(FITBIT_DATABASE)
+        fitbit_patients = get_fitbit_users(fitbit_db)
 
-        #Get device information
-        device_db = connect_to_database(PATIENT_LABEL_DATABASE)
-        all_patients = get_all_patient_labels(device_db)
-        #capitalizes the name of the device type
-        for patient in all_patients:
-            patient[DEVICE_TYPE_COLUMN] = capitalize_first_letter(patient[DEVICE_TYPE_COLUMN])
+        #create a function for below loop
+        for patient in fitbit_patients:
+            all_patients.append(patient)
 
-        #Get patient label for fitbits
-
-        return render_template('home.html', devices=all_patients)
+        return render_template('home.html', patients=all_patients)
     else:
         return redirect(url_for('login'))
-
-#Add device button #Clicking this button allows new devices to be added
-# @app.route('/add_device')
-# def add_device():
-#     auth_info = get_auth_info()
-#     try:
-#         export_fitbit_to_auth_info(auth_info)
-#     except:
-#         pass
-#     return redirect(url_for('home'))
 
 @app.route('/addpatient', methods=['GET', 'POST'])
 def addpatient():
@@ -56,10 +46,11 @@ def addpatient():
             #export fitbit authorization data to sql database
             export_fitbit_to_auth_info(auth_info)
 
-            #export patient and device data to sql database
-            patient_label = form.patient.data
-            device_type = 'Fitbit' #!Important Fitbit is hardcoded
-            export_patient_data(patient_label, user_id, device_type)
+            #export patient and device data to fitbit database
+            patient_id = form.patient.data
+            device_type = 'fitbit' #Create a dropdown for this variable in the webapp later
+            fitbit_db = connect_to_database(FITBIT_DATABASE)
+            export_patient_data(user_id, patient_id, device_type, fitbit_db)
             return redirect(url_for('home'))
         else:
             flash('Invalid', 'danger')
