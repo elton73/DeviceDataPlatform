@@ -3,6 +3,7 @@
 import modules.gui.pyqtapp as gui_pyqtapp
 import modules.mysql.setup as setup_db
 from modules.main_app.setup import create_data_folder, resource_path
+from modules.web_app import FITBIT_DATABASE
 
 if __name__ == '__main__':
 
@@ -10,8 +11,7 @@ if __name__ == '__main__':
     create_data_folder()
 
     #Connect to the database
-    DATABASE = "fitbit"
-    db_path = setup_db.connect_to_database(DATABASE)
+    db_path = setup_db.connect_to_database(FITBIT_DATABASE)
 
     # Start the app
     gui_pyqtapp.run(resource_path('resources'), db_path)

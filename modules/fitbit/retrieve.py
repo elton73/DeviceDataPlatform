@@ -4,12 +4,12 @@ class DataGetter():
     ''' Class that use the fitbit Web Api to get data, returns the entire response object'''
     def __init__(self, token):
         self.token = token
-        self.api_map = {
+        self.fitbit_api_map = {
             'weight': self.get_weight,
             'activities-steps': self.get_steps,
             'sleep': self.get_sleep,
             'devices': self.get_all_devices,
-            'activities-heart': self.get_heartrate,
+            #'activities-heart': self.get_heartrate,
             'activities-heart-intraday dataset': self.get_intraday_heart,
             'activities-steps-intraday dataset': self.get_intraday_steps,
             'activities-elevation-intraday dataset': self.get_intraday_elevation

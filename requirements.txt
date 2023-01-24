@@ -1,4 +1,4 @@
-selenium~=4.7.2
+selenium~=4.8.0
 PyQt6~=6.4.0
 chromedriver-autoinstaller
 requests~=2.28.1

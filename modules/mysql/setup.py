@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS patient_ids(
 TABLE_NAMES = ['patient_ids']
 
 # TODO: CREATE this mysql user and GRANT them ALL PRIVILEGES if you haven't
-USER = 'writer'
+USER = 'newwriter'
 PASSWORD = 'password'
-DATABASE_DEVICES = ['fitbit'] # add databases for new devices
+DATABASE_DEVICES = ['test6'] # add databases for new devices
 DATABASE_AUTH = ['authorization_info'] #add database for authorization info
 DATABASE_LOGIN = ['Webapp_login_info'] #add database for login info
 DATABASE_EMAILS = ['email_list'] #add database for list of emails
@@ -82,7 +82,7 @@ def create_table(engine, database_names, create_table):
 def connect_to_database(databasename):
     database = connector.connect(
         host='localhost',
-        user='root',
+        user='newwriter',
         passwd='password',
         database=databasename
     )
@@ -94,6 +94,7 @@ def setup_databases():
     create_dbs(engine, DATABASE_EMAILS, SQL_CREATE_EMAIL_LIST_TABLE)
     create_dbs(engine, DATABASE_DEVICES, SQL_CREATE_PATIENT_DEVICE_TABLE)
     create_dbs(engine, DATABASE_LOGIN, SQL_CREATE_WEBAPP_LOGIN_INFO_TABLE)
+    create_table(engine, DATABASE_LOGIN, SQL_CREATE_KEY_TABLE)
 
 if __name__ == "__main__":
     setup_databases()
