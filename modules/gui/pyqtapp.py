@@ -66,16 +66,11 @@ import time
 # NOTE: Add connection for new devices here! Make sure mysql databases already exist!!
 fitbit_conn = create_engine(
     'mysql+pymysql://writer:password@localhost/fitbit')
-withings_conn = create_engine(
-    'mysql+pymysql://writer:password@localhost/withings')
 
 # NOTE: Add new devices types here!
-auth = {'fitbit': fitbit_auth,
-        'withings': withings_auth}
-retrieve = {'fitbit': fitbit_retrieve,
-            'withings': withings_retrieve}
-mysql_conn = {'fitbit': fitbit_conn,
-              'withings': withings_conn}
+auth = {'fitbit': fitbit_auth}
+retrieve = {'fitbit': fitbit_retrieve}
+mysql_conn = {'fitbit': fitbit_conn}
 
 # NOTE: Authorization Database name!
 DATABASE = "authorization_info"
@@ -250,7 +245,8 @@ class GetDataWindow(QWidget):
         all_devices = report_db.get_all_device_types(self.parent.mysql_conn)
 
         all_patientids = [(userid, modify_db.get_patientid(
-            self.parent.mysql_engine[dev_type], userid)) for userid, dev_type in all_devices]
+            #TODO: Fix below statement
+            self.parent.mysql_engine['fitbit'], userid)) for userid, dev_type in all_devices]
 
         all_items = [format_list_row(*x)
                      for x in all_patientids]
@@ -384,7 +380,7 @@ class GetDataWindow(QWidget):
                                       "choose one:", items, 0, False)
 
         if ok and device_type:
-            auth_info = auth[device_type].get_auth_info()
+            auth_info = auth[device_type].get_fitbit_auth_info()
 
             if auth_info == '':
                 print('Couldn\'t get the new auth_info')
@@ -417,7 +413,7 @@ class GetDataWindow(QWidget):
         device_types = report_db.get_device_types(
             self.parent.mysql_conn, query_selected_userids)
 
-        print(query_selected_userids)
+        # print(query_selected_userids)
 
         # normal selected_userids
         selected_datatypes = self.dataTypeList.get_checked_items()
@@ -431,7 +427,7 @@ class GetDataWindow(QWidget):
 
             errorFlag = False
 
-            print(userid, device_type)
+            # print(userid, device_type)
             if device_type not in auth.keys():
                 self.userList.checkboxes[userid].setText(
                     f'X {userid} ERROR: Unknown Device Type')
@@ -440,21 +436,19 @@ class GetDataWindow(QWidget):
                 continue
 
             UserDataRetriever = retrieve[device_type].DataGetter(access_tokens[userid])
-
             for data_type in selected_datatypes:
-
                 if data_type not in UserDataRetriever.api_map:
                     continue    # data type for a different device
-                print(data_type, startDate, endDate)
+                # print(data_type, startDate, endDate)
 
                 result = UserDataRetriever.api_map[data_type](
                     startDate, endDate)
 
-                print('result:', result)
-                print('result.status_code: ', result.status_code)
+                # print('result:', result)
+                # print('result.status_code: ', result.status_code)
 
                 data = result.json()
-                print('data:', data)
+                # print('data:', data)
 
                 # TODO: clean up and further test this "if" statement
                 if result.status_code == 401 or ('status' in data and data['status'] == 401):
@@ -462,7 +456,7 @@ class GetDataWindow(QWidget):
                     new_auth_info = auth[device_type].get_refreshed_auth_info(
                         userid, refresh_tokens[userid])
 
-                    print('new_auth_info:', new_auth_info)
+                    # print('new_auth_info:', new_auth_info)
                     # Bad Refresh Token
                     if new_auth_info == 400:
                         self.generalMsgBox.setText(
@@ -470,7 +464,7 @@ class GetDataWindow(QWidget):
                         self.generalMsgBox.setIcon(
                             QMessageBox.Icon.Information)
                         self.generalMsgBox.exec()
-                        new_auth_info = auth[device_type].get_auth_info()
+                        new_auth_info = auth[device_type].get_fitbit_auth_info()
 
                     # If There is a problem with getting new auth info, skip
                     if new_auth_info == '':
@@ -494,12 +488,14 @@ class GetDataWindow(QWidget):
                     result = UserDataRetriever.api_map[data_type](
                         startDate, endDate)
 
-                print('data_type', data_type)
+                # print('data_type', data_type)
                 # Get the data. If intraday, it is the first date
                 data = result.json()
 
+
                 if data == '':
                     continue    # no data
+
 
                 if device_type == 'withings' and 'body' in data:
                     data = data['body']
@@ -548,12 +544,19 @@ class GetDataWindow(QWidget):
                             data += next_day_data
                             request_num += 1
 
-                print('result: ', data)
+                # print('result: ', data)
                 # Data is sometimes weirdly formatted with nested dictionaries. Flatten the data
                 data_type = data_type.replace(' dataset', '')
+
+
+                #TODO: CHECK IF THIS WORKS
+                data[0][key]= ["empty list" for key,value in data[0].items() if value == []]
+
                 if isinstance(data, dict):
                     data = [flatten_dictionary(
                         d) for d in data[data_type]]
+
+
 
                 assert(isinstance(data, list))
 
@@ -561,19 +564,19 @@ class GetDataWindow(QWidget):
                     df = pd.DataFrame(data)
                     df['userid'] = userid
 
-                    pp.pprint(df.head())
-                    print(df.info())
-
                     # Make the export path
                     output_path.mkdir(parents=True, exist_ok=True)
                     # Export to .csv
-                    df.to_csv(output_path.joinpath(
-                        f'{userid}_{data_type}_{startDate}_{endDate}.csv'), index=False)
-                    
+                    # df.to_csv(output_path.joinpath(
+                    #     f'{userid}_{data_type}_{startDate}_{endDate}.csv'), index=False)
+
                     # Write dataframe to mysql table
                     table = data_type.replace('-', '').replace(' dataset', '')
-                    df.to_sql(con=mysql_conn[device_type], name=table,
-                              if_exists='append', index=False)
+
+                    # df.to_sql(con=mysql_conn['fitbit'], name=table,
+                    #           if_exists='append', index=False)
+
+
 
             # Turn the Userid Green Once the Export is done
             if not errorFlag:  # Because we break out of the loop
@@ -581,7 +584,7 @@ class GetDataWindow(QWidget):
                 self.userList.checkboxes[index].setText(f'✓ {index}')
                 self.userList.checkboxes[index].setStyleSheet('color: green')
 
-        print(f'Time Elapsed for {request_num} requests = {time.time()-start_time}')
+        # print(f'Time Elapsed for {request_num} requests = {time.time()-start_time}')
 
         # Show that the export is done
         self.doneMsgBox.setText(
@@ -758,3 +761,5 @@ def run(resourcepath, db_path):
         app.exec()
     else:
         connectMsgBox.exec()
+
+

@@ -25,7 +25,7 @@ SYS_DEFAULT_ENCODING = sys.getdefaultencoding()
 CLIENT_ID = "d96eba460244559633e00680cddde41a26a13ebc0dc79a579cc94821479453f5"
 CLIENT_SECRET = "b6d749ee51bcb761afd8b0ca02d16cdd148fd39e2e03eac05334465e85f04d25"
 
-def get_auth_info():
+def get_withings_auth_info():
     response_type = 'code'
     callback_url = 'http://127.0.0.1:8080'
 
@@ -99,8 +99,8 @@ def get_refreshed_auth_info(userid, refresh_token):
         return result.json()['body']
 
 if __name__ == "__main__":
-    auth_info = get_auth_info()
+    auth_info = get_withings_auth_info()
     print('get_auth_info:', auth_info)
     datagetter = DataGetter(auth_info['access_token'])
-    # print(datagetter.get_heartrate(1636354800, 1636527600).json())
-    print('get_refreshed_auth_info:', get_refreshed_auth_info(auth_info['userid'], auth_info['body']['refresh_token']))
+    print(datagetter.get_sleep('2023-01-01', '2023-01-24').json())
+    print('get_refreshed_auth_info:', get_refreshed_auth_info(auth_info['user_id'], auth_info['refresh_token']))

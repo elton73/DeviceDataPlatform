@@ -1,7 +1,8 @@
 '''Functions to generate reports from the database'''
 from bcrypt import checkpw
 from modules.mysql.setup import connect_to_database
-from modules.fitbit.authentication import get_auth_info
+from modules.fitbit.authentication import get_fitbit_auth_info
+from modules.withings.authentication import get_withings_auth_info
 
 def get_all_token_timeouts(connection):
     command = '''
@@ -48,7 +49,6 @@ def get_device_types(connection, selected_users):
         WHERE {format_OR_clause('userid', selected_users)};
     '''
     cursor = connection.cursor()
-    print(command)
     cursor.execute(command)
     result = cursor.fetchall()
     return {data[0]: data[1] for data in result}
@@ -91,8 +91,12 @@ def check_invalid_device(input_device):
     return False
 
 
-def check_auth_info_and_input_device():
-    auth_info = get_auth_info()
+def check_auth_info_and_input_device(device_type):
+    if device_type == 'fitbit':
+        auth_info = get_fitbit_auth_info()
+    elif device_type == 'withings': #TODO: add withings auth_info check here
+        auth_info = get_withings_auth_info()
+
     #check authentication info was received successfully
     if not auth_info:
         return "Authentication Failed", False
@@ -101,7 +105,7 @@ def check_auth_info_and_input_device():
     user_id = auth_info['user_id']
     invalid_device = check_invalid_device(user_id)
     if invalid_device:
-       return "Device Invalid", False
+       return "Device Already Exists", False
 
     return auth_info, True
 
@@ -112,8 +116,14 @@ def get_all_device_types(connection):
     '''
     cursor = connection.cursor(dictionary=True)
     cursor.execute(command)
-    result = cursor.fetchall()
-    return result
+
+    output = []
+    results = cursor.fetchall()
+    for dict in results:
+        output.append((dict['userid'],dict['device_type']))
+
+
+    return output
 
 #Get all current fitbit users from fitbit database
 def get_fitbit_users(db):

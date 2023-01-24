@@ -32,7 +32,7 @@ def generate_challenge_code(verifier=''):
 
     return verifier.decode(SYS_DEFAULT_ENCODING), challenge_code.decode(SYS_DEFAULT_ENCODING).replace('=', '')
 
-def get_auth_info():
+def get_fitbit_auth_info():
     response_type = 'code'
     verifier, challenge_code = generate_challenge_code()
     challenge_method = 'S256'
@@ -94,9 +94,9 @@ def get_refreshed_auth_info(userid, refresh_token):
 
 
 # Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
-def export_fitbit_to_auth_info(auth_info, db):
+def export_fitbit_to_auth_info(device_type, auth_info, db):
     userid = auth_info['user_id']
-    device_type = 'Fitbit'
+    device_type = device_type
     auth_token = auth_info['access_token']
     refresh_token = auth_info['refresh_token']
     expires_by = auth_info['expires_in']  # change to expires by later

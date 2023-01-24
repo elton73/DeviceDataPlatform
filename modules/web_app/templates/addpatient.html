@@ -5,6 +5,7 @@
             {{ form.hidden_tag() }}
             <fieldset class="form_group">
                 <legend class="border-bottom mb-4">Add Patient</legend>
+<!--                Patient form group-->
                 <div class="form-group">
                     {{ form.patient.label(class="form-control-label") }}
                     {% if form.patient.errors %}
@@ -18,6 +19,11 @@
                         {{ form.patient(class="form-control") }}
                     {% endif %}
                 </div>
+<!--                Device Type Form Group-->
+                <div class="form-group">
+                    {{ form.device_type.label(class="form-control-label") }}
+                    {{ form.device_type(class="form-control") }}
+                </div>
             </fieldset>
             <div class="form-group mt-2">
                 {{ form.submit(class="btn btn-outline-info") }}
@@ -27,6 +33,7 @@
             </div>
         </form>
         <script type="text/javascript">// <![CDATA[
+                // Loading Spinner
                 function loading(){
                     $("#loading").show();
                     $("#content").hide();

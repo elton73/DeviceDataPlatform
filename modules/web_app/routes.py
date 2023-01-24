@@ -2,10 +2,10 @@ from flask import render_template, url_for, flash, redirect, session
 from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_fitbit_users, \
-    get_fitbit_user_with_patient_id, check_auth_info_and_input_device
+    check_auth_info_and_input_device
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_fitbit_patient
 from modules.web_app import app, login_db, bcrypt
-from modules.fitbit.authentication import get_auth_info, export_fitbit_to_auth_info
+from modules.fitbit.authentication import export_fitbit_to_auth_info
 
 DEVICE_DATABASE = "authorization_info"
 PATIENT_LABEL_DATABASE = "patient_labels"
@@ -40,17 +40,16 @@ def addpatient():
     #Add check for unique patient_labels and device_data later
     form = PatientForm()
     if form.validate_on_submit():
+        device_type = form.device_type.data
         # check if auth_info is valid and if input device already exists. Return userid, auth_info, and success.
-        auth_info, success = check_auth_info_and_input_device()
+        auth_info, success = check_auth_info_and_input_device(device_type)
         if success:
             #export userid, patient and device type to fitbit database
             user_id = auth_info['user_id']
             patient_id = form.patient.data
-            device_type = 'fitbit' #TODO: Create a dropdown for this variable in the webapp later
-
             # export data to sql database
             auth_db = connect_to_database(DEVICE_DATABASE)
-            export_fitbit_to_auth_info(auth_info, auth_db)
+            export_fitbit_to_auth_info(device_type, auth_info, auth_db)
             fitbit_db = connect_to_database(FITBIT_DATABASE)
             export_patient_data(user_id, patient_id, device_type, fitbit_db)
             return redirect(url_for('home'))

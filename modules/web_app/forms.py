@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from modules.mysql.setup import connect_to_database
 
@@ -56,8 +56,14 @@ class LoginForm(FlaskForm):
 
 
 class PatientForm(FlaskForm):
+    choices = [('fitbit', 'Fitbit'), ('withings', 'Withings')]
+
     patient = StringField('Patient ID',
                           validators=[DataRequired(), Length(min=2, max=20), validate_fitbit_patient_id])
+
+    device_type = SelectField('Device Type',
+                              choices=choices)
+
     submit = SubmitField('Submit')
 
 
