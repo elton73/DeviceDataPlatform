@@ -1,6 +1,9 @@
 '''Setup the DB to store authentication codes'''
+import sqlite3
+
 from sqlalchemy import create_engine
 from mysql import connector
+from sqlite_dump import iterdump
 
 SQL_CREATE_DEVICE_TABLE = '''
 CREATE TABLE IF NOT EXISTS patient_ids(
@@ -97,6 +100,11 @@ def setup_databases():
     create_table(engine, DATABASE_LOGIN, SQL_CREATE_KEY_TABLE)
 
 if __name__ == "__main__":
-    setup_databases()
+    # setup_databases()
+    conn = sqlite3.connect("db.sqlite3")
+    for line in iterdump(conn):
+        print(line)
+
+
 
 
