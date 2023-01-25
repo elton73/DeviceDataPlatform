@@ -24,10 +24,16 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
 }
 
+.update-button {
+    margin-top: 7px;
+    float: right;
+    width: auto;
+}
+
 .add-button {
     margin-top: 7px;
     float: right;
-    width: 100%;
+    width: auto;
 }
 
 .remove-button {
@@ -78,7 +84,10 @@ h1, h2, h3, h4, h5, h6 {
     outline: 1px solid #dddddd;
     width: 100%;
     height: 100%;
+
 }
+
+
 
 .content-button {
     background: #ffffff;

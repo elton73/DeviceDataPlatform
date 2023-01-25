@@ -11,5 +11,6 @@ bcrypt = Bcrypt(app)
 FITBIT_DATABASE = 'test6'
 AUTH_DATABASE = "authorization_info"
 ENGINE = create_engine('mysql+pymysql://newwriter:password@localhost/test6')
+GRAFANA_PLATFORM = "https://c5ab-142-244-4-196.ngrok.io"
 
 from modules.web_app import routes

@@ -5,6 +5,7 @@ from modules.mysql.report import check_login_details, check_input_key, get_fitbi
     check_auth_info_and_input_device
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_fitbit_patient
 from modules.web_app import app, login_db, bcrypt, FITBIT_DATABASE, AUTH_DATABASE
+from scheduled import runschedule
 from modules.fitbit.authentication import export_fitbit_to_auth_info
 
 @app.route('/home')
@@ -64,10 +65,8 @@ def deletepatient(patient_id, user_id):
     fitbit_db = connect_to_database(FITBIT_DATABASE)
     auth_db = connect_to_database(AUTH_DATABASE)
     remove_fitbit_patient(patient_id, user_id, fitbit_db, auth_db)
-    flash('Patient deleted', 'success')
+    flash('Patient Deleted', 'success')
     return redirect(url_for('home'))
-
-
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
@@ -117,4 +116,10 @@ def logout():
 def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     return response
+
+@app.route('/updatenow')
+def updatenow():
+    runschedule()
+    flash('Data Updated', 'info')
+    return redirect(url_for('home'))
 

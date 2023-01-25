@@ -1,52 +1,54 @@
 {% extends "layout.html" %}
 {% block content %}
 <main>
-<!--  Title, remove and add buttons-->
+<!--  Title, update and add buttons-->
   <div class="container-fluid">
     <div class="row no-gutters justify-content-center">
-      <div class="col-6">
+      <div class="col-2">
         <h1 style="width: 100%;">
           Patients
         </h1>
       </div>
-      <div class="col-5">
-          <div style="width: 100%">
-          </div>
-        </div>
-      <div class="col-1">
-        <a class="btn btn-success add-button" href="{{ url_for('addpatient') }}">
-              Add
+
+      <div class="col-7">
+      </div>
+      <div class="col-3">
+        <a class="btn btn-outline-success add-button ml-3" href="{{ url_for('addpatient') }}">
+          Add Patient
+        </a>
+         <a class="btn btn-outline-info update-button" href="{{ url_for('updatenow') }}">
+          Update Now
         </a>
       </div>
     </div>
   </div>
 
 <!--First row-->
-    <div class="container-fluid mt-1">
+    <div class="container-fluid mt-1" >
       <div class="row no-gutters justify-content-center">
-        <div class="col-4" style="text-align: center">
+        <div class="col-4" style="text-align: center;">
           <div class="content-section2">
-            Patient Label
+            <b>Patient ID</b>
           </div>
         </div>
 
-        <div class="col-4" style="text-align: center">
+        <div class="col-4" style="text-align: center;">
           <div class="content-section2">
-            Device ID
+            <b>Device ID</b>
           </div>
         </div>
 
-         <div class="col-4" style="text-align: center">
+         <div class="col-4" style="text-align: center;">
           <div class="content-section2">
-            Device Type
+            <b>Device Type</b>
           </div>
         </div>
       </div>
     </div>
 
 {% for patient in patients %}
-    <div class="container-fluid">
-      <button type="button" class=" btn btn-primary-outline" data-toggle="modal" data-target="#exampleModal{{ patient['patient_id'] }}">
+    <div class="container-fluid" style="border-radius: 0 !important;">
+      <button type="button" style="padding: 0 !important" class=" btn btn-primary-outline" data-toggle="modal" data-target="#exampleModal{{ patient['patient_id'] }}">
       <div class="row no-gutters justify-content-center">
         <div class="col-4" style="text-align: center">
           <div class="content-section2">

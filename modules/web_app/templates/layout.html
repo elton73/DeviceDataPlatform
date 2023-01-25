@@ -23,17 +23,23 @@
         <nav class ="navbar navbar-expand-md navbar-dark bg-darkgreen fixed-top">
             <div class="container">
 
-                <a class="navbar-brand mr-4" href="{{ url_for('home') }}">Data Platform</a>
+                <a class="navbar-brand mr-4" href="{{ url_for('home') }}">Home</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
                         aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-
+                <div class="collapse navbar-collapse" id="navbarToggle">
                 {% if session.logged_in %}
-                    <div class="collapse navbar-collapse" id="navbarToggle">
-                        <div class="navbar-nav mr-auto">
-                            <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
-                        </div>
+                    <div class="navbar-nav mr-auto">
+<!--                        Data links to localhost grafana server-->
+                        <a class="navbar-brand nav-link" href="http://localhost:3000/" target="_blank">Data</a>
+                    </div>
+
+                    <div class="navbar-nav">
+                        <a class="navbar-brand nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </div>
+
+
                 {% endif %}
             </div>
             </div>

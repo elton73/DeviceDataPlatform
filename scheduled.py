@@ -162,11 +162,14 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
 
     print(f'Time Elapsed for {request_num} requests = {time.time()-start_time}')
 
-
-if __name__ == '__main__':
-
+def runschedule():
     auth_db = setup_db.connect_to_database(AUTH_DATABASE)
     user_ids = report_db.get_all_user_ids(auth_db)
-    selected_datatypes = ['devices', 'activities-steps', 'sleep', 'activities-heart-intraday dataset', 'activities-steps-intraday dataset']
-
+    selected_datatypes = ['devices', 'activities-steps', 'sleep', 'activities-heart-intraday dataset',
+                          'activities-steps-intraday dataset']
     writeSQLData(auth_db, user_ids, selected_datatypes)
+
+if __name__ == '__main__':
+    runschedule()
+
+

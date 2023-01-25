@@ -1,13 +1,10 @@
 '''Insert data into table'''
 from sqlalchemy import create_engine
 import pandas as pd
-from modules.mysql.setup import connect_to_database
-
-PATIENT_DATABASE = 'patient_labels'
 
 def run_command(engine, command):
     with engine.connect() as con:
-        rs = con.execute(command)
+        con.execute(command)
 
 def insert_list_into(table: str, items: list, engine):
 
