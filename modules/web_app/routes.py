@@ -49,6 +49,8 @@ def addpatient():
             export_fitbit_to_auth_info(device_type, auth_info, auth_db)
             fitbit_db = connect_to_database(FITBIT_DATABASE)
             export_patient_data(user_id, patient_id, device_type, fitbit_db)
+
+            flash('Patient Added', 'success')
             return redirect(url_for('home'))
         else:
             flash(f'{auth_info}', 'danger')

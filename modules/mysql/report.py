@@ -29,11 +29,12 @@ def get_auth_tokens(connection, selected_users):
     cursor = connection.cursor()
     cursor.execute(command)
     result = cursor.fetchall()
+    print(cursor.fetchall())
     return {data[0]: data[1] for data in result}
 
 def get_refresh_tokens(connection, selected_users):
     command = f'''
-    SELECT userid, refresh_token FROM Auth_info
+    SELECT userid, refresh_token FROM auth_info
         WHERE {format_OR_clause('userid', selected_users)};
     '''
     cursor = connection.cursor()
@@ -44,7 +45,7 @@ def get_refresh_tokens(connection, selected_users):
 
 def get_device_types(connection, selected_users):
     command = f'''
-    SELECT userid, device_type FROM Auth_info
+    SELECT userid, device_type FROM auth_info
         WHERE {format_OR_clause('userid', selected_users)};
     '''
     cursor = connection.cursor()

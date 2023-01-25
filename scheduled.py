@@ -54,6 +54,10 @@ def drop_table(engine, table):
 
 def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
     '''Grab the users, the data types, the date range'''
+    #No users
+    if not selected_user_ids:
+        print("No users")
+        return
 
     # Selected user IDs must be wrapped with single quotes for SQLite Query
     query_selected_user_ids = list(map(lambda text: f'\'{text}\'', selected_user_ids))
@@ -72,7 +76,7 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
         errorFlag = False
         UserDataRetriever = fitbit_retrieve.DataGetter(access_tokens[userid])
         for dataType in selectedDataTypes:
-            print(dataType, startDate, endDate)
+            # print(dataType, startDate, endDate)
             result = UserDataRetriever.fitbit_api_map[dataType](startDate, endDate)
             if result.status_code == 401:
                 # Expired token
@@ -94,14 +98,14 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
                 UserDataRetriever.token = new_auth_info['access_token']
                 # Try the request again
 
-                print(startDate, endDate)
+                # print(startDate, endDate)
                 result = UserDataRetriever.fitbit_api_map[dataType](startDate, endDate)
 
-            print('dataType', dataType)
+            # print('dataType', dataType)
             # Get the data. If intraday, it is the first date
             data = result.json()
 
-            print(data)
+            # print(data)
             request_num += 1
             # Most likely too many request error here:
 
@@ -139,15 +143,15 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
             # Format the data as a dataframe
 
             if len(data):
-                print(data[0])
+                # print(data[0])
 
                 data = [flatten_dictionary(d) for d in data]
-                print('data: ', data)
+                # print('data: ', data)
                 df = pd.DataFrame(data)
                 df['userid'] = userid
 
-                print(df.head())
-                print(df.info())
+                # print(df.head())
+                # print(df.info())
 
                 table = dataType.replace('-','').replace(' dataset', '')
                 try:

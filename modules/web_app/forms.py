@@ -56,7 +56,7 @@ class LoginForm(FlaskForm):
 
 
 class PatientForm(FlaskForm):
-    choices = [('fitbit', 'Fitbit'), ('withings', 'Withings')]
+    choices = [('fitbit', 'Fitbit')] #, ('withings', 'Withings')]
 
     patient = StringField('Patient ID',
                           validators=[DataRequired(), Length(min=2, max=20), validate_fitbit_patient_id])
