@@ -88,6 +88,26 @@ def export_patient_data(userid, patient_id, device_type, db):
     mycursor.execute(command)
     db.commit()
 
+def update_auth_token(connection, userid, new_auth_token):
+    command = f'''
+    UPDATE Auth_info
+    SET auth_token = '{new_auth_token}'
+    WHERE userid = '{userid}';
+    '''
+    cursor = connection.cursor()
+    cursor.execute(command)
+    connection.commit()
+
+def update_refresh_token(connection, userid, new_refresh_token):
+    command = f'''
+    UPDATE Auth_info
+    SET refresh_token = '{new_refresh_token}'
+    WHERE userid = '{userid}';
+    '''
+    cursor = connection.cursor()
+    cursor.execute(command)
+    connection.commit()
+
 def test_insertion():
     data_to_insert = [['user_id', 'patientid', 'device_type',
                        'access_token', 'refresh_token', '12345'], ]
@@ -97,11 +117,14 @@ def test_insertion():
 
 #Remove health data from fitbit database
 def remove_heath_data(user_id, fitbit_db):
-    list = ['devices', 'activitiessteps', 'weight', "activitiesheart"]
+    list = ['devices', 'activitiessteps', 'weight', "activitiesheart", "activitiesheartintraday", "activitiesstepsintraday"]
 
     cursor = fitbit_db.cursor()
     for data in list:
-        cursor.execute(f"DELETE FROM {data} WHERE userid='{user_id}'")
+        try:
+            cursor.execute(f"DELETE FROM {data} WHERE userid='{user_id}'")
+        except:
+            print(f"{data} table does not exist")
     fitbit_db.commit()
 
 if __name__ == "__main__":

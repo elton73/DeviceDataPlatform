@@ -1,6 +1,5 @@
 '''Functions to generate reports from the database'''
 from bcrypt import checkpw
-from modules.mysql.setup import connect_to_database
 from modules.fitbit.authentication import get_fitbit_auth_info
 from modules.withings.authentication import get_withings_auth_info
 

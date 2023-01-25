@@ -54,8 +54,7 @@ import modules.mysql.report as report_db
 import modules.mysql.modify as modify_db
 import modules.mysql.setup as setup_db
 from statistics import mean
-from sqlalchemy import create_engine
-import pprint as pp
+from modules.web_app import engine
 
 try:
     import httplib  # python < 3.0
@@ -317,7 +316,7 @@ class GetDataWindow(QWidget):
         startDate = self.startDate.date().toString('yyyy-MM-dd')
         endDate = self.endDate.date().toString('yyyy-MM-dd')
 
-        conn = create_engine(f'mysql+pymysql://newwriter:password@localhost/{FITBIT_DATABASE}', echo=True)
+        conn = engine
 
         request_num = 0
         start_time = time.time()

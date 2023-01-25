@@ -1,5 +1,5 @@
 from flask import Flask
-from modules.mysql.setup import connect_to_database
+from modules.mysql.setup import connect_to_database, create_engine
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
@@ -10,5 +10,6 @@ login_db_cursor = login_db.cursor()
 bcrypt = Bcrypt(app)
 FITBIT_DATABASE = 'test6'
 AUTH_DATABASE = "authorization_info"
+engine = create_engine('mysql+pymysql://newwriter:password@localhost/test6')
 
 from modules.web_app import routes

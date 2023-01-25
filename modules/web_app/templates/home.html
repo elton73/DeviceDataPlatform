@@ -46,7 +46,7 @@
 
 {% for patient in patients %}
     <div class="container-fluid">
-      <button type="button" class=" btn btn-primary-outline" data-toggle="modal" data-target="#exampleModal">
+      <button type="button" class=" btn btn-primary-outline" data-toggle="modal" data-target="#exampleModal{{ patient['patient_id'] }}">
       <div class="row no-gutters justify-content-center">
         <div class="col-4" style="text-align: center">
           <div class="content-section2">
@@ -70,27 +70,27 @@
       </button>
     </div>
   <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Delete User?</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <form action="{{ url_for('deletepatient', patient_id=patient['patient_id'], user_id=patient['userid']) }}" method="POST">
-          <input class="btn btn-danger" type="submit" value="Delete">
-        </form>
+  <div class="modal fade" id="exampleModal{{ patient['patient_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" id="{{ patient['patient_id'] }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel{{ patient['patient_id'] }}">Delete User?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Delete {{ patient['patient_id'] }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('deletepatient', patient_id=patient['patient_id'], user_id=patient['userid']) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endfor %}
 </main>
 

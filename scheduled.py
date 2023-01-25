@@ -1,26 +1,16 @@
 '''Launch the Main Application here
 '''
-
-"""
-This needs to be modified to use mysql database
-"""
-
-import modules.gui.pyqtapp as gui_pyqtapp
 import modules.fitbit.authentication as auth
 import modules.fitbit.retrieve as fitbit_retrieve
-import modules.sqlite.setup as setup_db
-import modules.sqlite.modify as modify_db
-import modules.sqlite.report as report_db
+import modules.mysql.setup as setup_db
+import modules.mysql.modify as modify_db
+import modules.mysql.report as report_db
 from pathlib import Path
-import sys, os, json
+import sys, os
 import pandas as pd
-import numpy as np
-
-import sqlite3
 from datetime import datetime, timedelta, timezone, date
 
-from sqlalchemy import create_engine
-import sqlite3, pymysql
+from modules.web_app import AUTH_DATABASE, engine
 try:
     import httplib  # python < 3.0
 except:
@@ -62,26 +52,22 @@ def drop_table(engine, table):
     conn.commit()
     cursor.close()
 
-def writeSQLData(db_path, selected_userids, selectedDataTypes):
+def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
     '''Grab the users, the data types, the date range'''
 
-    auth_conn = sqlite3.connect(db_path)
-
     # Selected user IDs must be wrapped with single quotes for SQLite Query
-    query_selected_userids = list(map(lambda text: f'\'{text}\'', selected_userids))
-    access_tokens = report_db.get_auth_tokens(auth_conn, query_selected_userids)
-    refresh_tokens = report_db.get_refresh_tokens(auth_conn, query_selected_userids)
+    query_selected_user_ids = list(map(lambda text: f'\'{text}\'', selected_user_ids))
+    access_tokens = report_db.get_auth_tokens(auth_conn, query_selected_user_ids)
+    refresh_tokens = report_db.get_refresh_tokens(auth_conn, query_selected_user_ids)
 
     startDate = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')         # yesterday
     endDate = date.today().strftime('%Y-%m-%d')                               # today
 
-    engine = create_engine('mysql+pymysql://writer:password@localhost/fitbit')
-
     drop_table(engine, 'devices')
 
-    request_num = 0 
+    request_num = 0
     start_time = time.time()
-    for userid in selected_userids:
+    for userid in selected_user_ids:
 
         errorFlag = False
         UserDataRetriever = fitbit_retrieve.DataGetter(access_tokens[userid])
@@ -126,10 +112,10 @@ def writeSQLData(db_path, selected_userids, selectedDataTypes):
 
                 # Get the first list
                 for key in dataType.split(' '):
-                    data = data[key]                
+                    data = data[key]
 
                 # Handle Intraday - selection includes 'dataset'... since intraday can only grab one day
-                if len(dataType.split(' ')) > 1 and dataType.split(' ')[1] == 'dataset': 
+                if len(dataType.split(' ')) > 1 and dataType.split(' ')[1] == 'dataset':
                     data =[]
                     intraday_dates = list(range_dates(datetime.strptime(startDate, '%Y-%m-%d').date(), datetime.strptime(endDate, '%Y-%m-%d').date()))
                     for one_date in intraday_dates:
@@ -150,7 +136,7 @@ def writeSQLData(db_path, selected_userids, selectedDataTypes):
 
             # Data is sometimes weirdly formatted with nested dictionaries. Flatten the data
             # data = [flatten_dictionary(d) for d in data]
-            # Format the data as a dataframe 
+            # Format the data as a dataframe
 
             if len(data):
                 print(data[0])
@@ -168,26 +154,28 @@ def writeSQLData(db_path, selected_userids, selectedDataTypes):
                     df.to_sql(con=engine, name=table, if_exists='append')
                 except:
                     continue
-    
+
 
     print(f'Time Elapsed for {request_num} requests = {time.time()-start_time}')
 
 
 if __name__ == '__main__':
-    if getattr(sys, 'frozen', False):
-        APPLICATION_PATH = Path(os.path.dirname(sys.executable))
-    elif __file__:
-        APPLICATION_PATH = Path(os.path.dirname(__file__))
-
-    db_path = APPLICATION_PATH.joinpath('db.sqlite3')
+    # if getattr(sys, 'frozen', False):
+    #     APPLICATION_PATH = Path(os.path.dirname(sys.executable))
+    # elif __file__:
+    #     APPLICATION_PATH = Path(os.path.dirname(__file__))
+    #
+    # db_path = APPLICATION_PATH.joinpath('db.sqlite3')
 
     # Initial Setup
-    if not os.path.exists(db_path):
-        setup_db.create_db(APPLICATION_PATH)
+    # if not os.path.exists(db_path):
+    #     setup_db.create_db(APPLICATION_PATH)
 
     # Start the app
     # print(resource_path('resources'))
 
-    userids = ['27ZJZ3', '38W7SM', '4YGW8L', '52L7G2', '9NTQHL', '9TRBQ7', '9TVN36', '9XNW2S', '9XYQ53', '9YKJ6S', 'B7L3JZ']
+    auth_db = setup_db.connect_to_database(AUTH_DATABASE)
+    user_ids = report_db.get_all_user_ids(auth_db)
     selected_datatypes = ['devices', 'activities-steps', 'sleep', 'activities-heart-intraday dataset', 'activities-steps-intraday dataset']
-    writeSQLData(db_path, userids, selected_datatypes)
+
+    writeSQLData(auth_db, user_ids, selected_datatypes)

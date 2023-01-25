@@ -11,7 +11,7 @@ if __name__ == '__main__':
     create_data_folder()
 
     #Connect to the database
-    db_path = setup_db.connect_to_database(FITBIT_DATABASE)
+    db = setup_db.connect_to_database(FITBIT_DATABASE)
 
     # Start the app
-    gui_pyqtapp.run(resource_path('resources'), db_path)
+    gui_pyqtapp.run(resource_path('resources'), db)
