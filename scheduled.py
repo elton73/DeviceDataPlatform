@@ -10,7 +10,7 @@ import sys, os
 import pandas as pd
 from datetime import datetime, timedelta, timezone, date
 
-from modules.web_app import AUTH_DATABASE, engine
+from modules.web_app import AUTH_DATABASE, ENGINE
 try:
     import httplib  # python < 3.0
 except:
@@ -63,7 +63,7 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
     startDate = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')         # yesterday
     endDate = date.today().strftime('%Y-%m-%d')                               # today
 
-    drop_table(engine, 'devices')
+    drop_table(ENGINE, 'devices')
 
     request_num = 0
     start_time = time.time()
@@ -151,7 +151,7 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
 
                 table = dataType.replace('-','').replace(' dataset', '')
                 try:
-                    df.to_sql(con=engine, name=table, if_exists='append')
+                    df.to_sql(con=ENGINE, name=table, if_exists='append')
                 except:
                     continue
 
@@ -160,19 +160,6 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
 
 
 if __name__ == '__main__':
-    # if getattr(sys, 'frozen', False):
-    #     APPLICATION_PATH = Path(os.path.dirname(sys.executable))
-    # elif __file__:
-    #     APPLICATION_PATH = Path(os.path.dirname(__file__))
-    #
-    # db_path = APPLICATION_PATH.joinpath('db.sqlite3')
-
-    # Initial Setup
-    # if not os.path.exists(db_path):
-    #     setup_db.create_db(APPLICATION_PATH)
-
-    # Start the app
-    # print(resource_path('resources'))
 
     auth_db = setup_db.connect_to_database(AUTH_DATABASE)
     user_ids = report_db.get_all_user_ids(auth_db)

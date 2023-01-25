@@ -54,7 +54,7 @@ import modules.mysql.report as report_db
 import modules.mysql.modify as modify_db
 import modules.mysql.setup as setup_db
 from statistics import mean
-from modules.web_app import engine
+from modules.web_app import ENGINE
 
 try:
     import httplib  # python < 3.0
@@ -316,7 +316,7 @@ class GetDataWindow(QWidget):
         startDate = self.startDate.date().toString('yyyy-MM-dd')
         endDate = self.endDate.date().toString('yyyy-MM-dd')
 
-        conn = engine
+        conn = ENGINE
 
         request_num = 0
         start_time = time.time()

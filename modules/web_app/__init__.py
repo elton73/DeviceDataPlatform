@@ -10,6 +10,6 @@ login_db_cursor = login_db.cursor()
 bcrypt = Bcrypt(app)
 FITBIT_DATABASE = 'test6'
 AUTH_DATABASE = "authorization_info"
-engine = create_engine('mysql+pymysql://newwriter:password@localhost/test6')
+ENGINE = create_engine('mysql+pymysql://newwriter:password@localhost/test6')
 
 from modules.web_app import routes

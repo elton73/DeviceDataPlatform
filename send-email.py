@@ -1,30 +1,23 @@
-"""
-This needs to be modified to use mysql database
-"""
-
 import modules.fitbit.authentication as auth
 import modules.fitbit.retrieve as retrieve
-import modules.sqlite.setup as setup_db
-import modules.sqlite.modify as modify_db
-import modules.sqlite.report as report_db
+import modules.mysql.setup as setup_db
+import modules.mysql.modify as modify_db
+import modules.mysql.report as report_db
+from modules.web_app import AUTH_DATABASE, ENGINE
 from pathlib import Path
 import sys
 import os
 import json
 import pandas as pd
 import numpy as np
-
-import sqlite3
 from datetime import datetime, timedelta, timezone, date
 import pprint as pp
-import sqlite3
+
 try:
     import httplib  # python < 3.0
 except:
     import http.client as httplib
 import time
-
-from sqlalchemy import create_engine
 import smtplib, ssl
 import pymysql
 
@@ -41,9 +34,9 @@ def resource_path(relative_path):
 def sendEmail(subject, body):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
-    sender_email = "<email>"  # Enter your address
-    receiver_email = ["<email>"]  # Enter receiver addresses
-    password = "<enter your password>"
+    sender_email = ""  # Enter your address
+    receiver_email = [""]  # Enter receiver addresses
+    password = "smzieszhebcdifsg"
     message = f"Subject: {subject}\n\n{body}"
 
     print(message)
@@ -53,7 +46,7 @@ def sendEmail(subject, body):
         server.sendmail(sender_email, receiver_email, message)
 
 def lateSyncEmail(selected_userids):
-    auth_conn = sqlite3.connect(db_path)
+    auth_conn = setup_db.connect_to_database(AUTH_DATABASE)
 
     # Selected user IDs must be wrapped with single quotes for SQLite Query
     query_selected_userids = list(
@@ -63,8 +56,7 @@ def lateSyncEmail(selected_userids):
     refresh_tokens = report_db.get_refresh_tokens(
         auth_conn, query_selected_userids)
 
-    mysql_conn = create_engine(
-        'mysql+pymysql://writer:password@localhost/fitbit')
+    mysql_conn = ENGINE
 
     device_list = []
     request_num = 0
@@ -116,7 +108,7 @@ def lateSyncEmail(selected_userids):
             # condition to send email notification: > 1 day since last sync
             if ts + timedelta(days=4) < datetime.now():
                 cursor = mysql_conn.raw_connection().cursor()
-                cursor.execute(f'SELECT patientid FROM patientid WHERE userid = \'{userid}\';')
+                cursor.execute(f'SELECT patient_id FROM patient_ids WHERE userid = \'{userid}\';')
 
                 patientid = cursor.fetchall()[0][0]
                 device_list.append((patientid, device['deviceVersion']))
@@ -130,18 +122,7 @@ def lateSyncEmail(selected_userids):
     print(f'Time Elapsed for {request_num} requests = {time.time()-start_time}')
 
 if __name__=="__main__":
-    if getattr(sys, 'frozen', False):
-        APPLICATION_PATH = Path(os.path.dirname(sys.executable))
-    elif os.path.abspath(''):
-        APPLICATION_PATH = Path(os.path.abspath(''))
-
-    db_path = APPLICATION_PATH.joinpath('db.sqlite3')
-
-    # Initial Setup
-    if not os.path.exists(db_path):
-        setup_db.create_db(APPLICATION_PATH)
-
+    auth_db = setup_db.connect_to_database(AUTH_DATABASE)
     # fitbit users to monitor
-    selected_userids = ['B7L3JZ', '4YGW8L']
-
+    selected_userids = ['BD6RKR']
     lateSyncEmail(selected_userids)
