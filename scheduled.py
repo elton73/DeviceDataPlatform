@@ -10,7 +10,7 @@ import sys, os
 import pandas as pd
 from datetime import datetime, timedelta, timezone, date
 
-from modules.web_app import AUTH_DATABASE, ENGINE
+from modules import AUTH_DATABASE, ENGINE
 try:
     import httplib  # python < 3.0
 except:
