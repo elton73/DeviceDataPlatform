@@ -114,7 +114,7 @@ def test_insertion():
 
 #Remove health data from fitbit database
 def remove_heath_data(user_id, fitbit_db):
-    list = ['devices', 'activitiessteps', 'weight', "activitiesheart", "activitiesheartintraday", "activitiesstepsintraday"]
+    list = ['devices', 'activitiessteps', 'weight', "activitiesheart", "activitiesheartintraday", "activitiesstepsintraday", "sleep"]
 
     cursor = fitbit_db.cursor()
     for data in list:
