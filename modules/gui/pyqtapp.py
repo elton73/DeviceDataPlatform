@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from modules.mysql.setup import connect_to_database
 from modules.fitbit.authentication import get_fitbit_auth_info as get_auth_info, get_refreshed_auth_info
-from modules.web_app import AUTH_DATABASE, FITBIT_DATABASE
+from modules import AUTH_DATABASE, FITBIT_DATABASE, ENGINE
 from datetime import datetime, timedelta
 from PyQt6.QtCore import QSize, Qt, QObject
 from PyQt6.QtGui import QFont, QFontDatabase, QScreen, QGuiApplication, QColor, QIcon
@@ -54,7 +54,6 @@ import modules.mysql.report as report_db
 import modules.mysql.modify as modify_db
 import modules.mysql.setup as setup_db
 from statistics import mean
-from modules.web_app import ENGINE
 
 try:
     import httplib  # python < 3.0

@@ -3,7 +3,7 @@ import modules.fitbit.retrieve as retrieve
 import modules.mysql.setup as setup_db
 import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
-from modules.web_app import AUTH_DATABASE, ENGINE
+from modules import AUTH_DATABASE, ENGINE
 from pathlib import Path
 import sys
 import os

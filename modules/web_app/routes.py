@@ -4,7 +4,8 @@ from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_fitbit_users, \
     check_auth_info_and_input_device
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_fitbit_patient
-from modules.web_app import app, login_db, bcrypt, FITBIT_DATABASE, AUTH_DATABASE
+from modules.web_app import app, login_db, bcrypt
+from modules import FITBIT_DATABASE, AUTH_DATABASE
 from scheduled import runschedule
 from modules.fitbit.authentication import export_fitbit_to_auth_info
 

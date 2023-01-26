@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from modules.mysql.setup import connect_to_database
-from modules.web_app import FITBIT_DATABASE
+from modules import FITBIT_DATABASE
 
 
 # Check if email exists in database

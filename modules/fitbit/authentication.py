@@ -1,7 +1,6 @@
 '''This package will open up a browser and retrieve the Access token'''
 import requests
 from selenium import webdriver
-from modules.mysql.setup import connect_to_database
 import selenium.webdriver.support.ui as ui
 import chromedriver_autoinstaller
 import numpy as np
