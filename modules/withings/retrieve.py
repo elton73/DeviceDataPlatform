@@ -6,7 +6,7 @@ class DataGetter():
     def __init__(self, token):
         self.token = token
         self.api_map = {
-            'withings-sleep': self.get_sleep,
+            'sleep': self.get_sleep,
         }
 
     def str_to_unix(self, s):

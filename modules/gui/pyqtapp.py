@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from modules.mysql.setup import connect_to_database
 from modules.fitbit.authentication import get_fitbit_auth_info as get_auth_info, get_refreshed_auth_info
-from modules import AUTH_DATABASE, FITBIT_DATABASE, ENGINE
+from modules import AUTH_DATABASE, DEVICE_DATABASE, ENGINE
 from datetime import datetime, timedelta
 from PyQt6.QtCore import QSize, Qt, QObject
 from PyQt6.QtGui import QFont, QFontDatabase, QScreen, QGuiApplication, QColor, QIcon
@@ -214,7 +214,7 @@ class GetDataWindow(QWidget):
 
         # Declare the Widgets
         title = QLabel('Select Data Types')
-        self.dataTypeList = QCheckBoxListWidget(list(fitbit_retrieve.DataGetter('1111').fitbit_api_map.keys()))
+        self.dataTypeList = QCheckBoxListWidget(list(fitbit_retrieve.DataGetter('1111').api_map.keys()))
         # Configure the Widgets
         title.setObjectName('group-title')
         self.dataTypeList.selectAllCheckbox.setChecked(False)
@@ -325,7 +325,7 @@ class GetDataWindow(QWidget):
             UserDataRetriever = fitbit_retrieve.DataGetter(access_tokens[userid])
             for dataType in selectedDataTypes:
                 print(dataType, startDate, endDate)
-                result = UserDataRetriever.fitbit_api_map[dataType](startDate, endDate)
+                result = UserDataRetriever.api_map[dataType](startDate, endDate)
                 if result.status_code == 401:
                     # Expired token
                     new_auth_info = get_refreshed_auth_info(userid, refresh_tokens[userid])
@@ -352,7 +352,7 @@ class GetDataWindow(QWidget):
                     # Try the request again
 
                     print(startDate, endDate)
-                    result = UserDataRetriever.fitbit_api_map[dataType](startDate, endDate)
+                    result = UserDataRetriever.api_map[dataType](startDate, endDate)
 
                 print('dataType', dataType)
                 # Get the data. If intraday, it is the first date
@@ -380,8 +380,8 @@ class GetDataWindow(QWidget):
                                                           datetime.strptime(endDate, '%Y-%m-%d').date()))
                         for one_date in intraday_dates:
                             # Grab the result for the next date
-                            result = UserDataRetriever.fitbit_api_map[dataType](str(one_date),
-                                                                                endDate)  # Since one_date is a datetime.date
+                            result = UserDataRetriever.api_map[dataType](str(one_date),
+                                                                         endDate)  # Since one_date is a datetime.date
                             next_day_data = result.json()
 
                             # Fitbit only returns the time so format it into a datetime
@@ -444,7 +444,7 @@ class GetDataWindow(QWidget):
             UserDataRetriever = fitbit_retrieve.DataGetter(access_tokens[userid])
             for dataType in selectedDataTypes:
                 print(dataType, startDate, endDate)
-                result = UserDataRetriever.fitbit_api_map[dataType](startDate, endDate)
+                result = UserDataRetriever.api_map[dataType](startDate, endDate)
                 if result.status_code == 401:
                     # Expired token
                     new_auth_info = get_refreshed_auth_info(userid, refresh_tokens[userid])
@@ -469,7 +469,7 @@ class GetDataWindow(QWidget):
                     # Update the retriever
                     UserDataRetriever.token = new_auth_info['access_token']
                     # Try the request again
-                    result = UserDataRetriever.fitbit_api_map[dataType](startDate, endDate)
+                    result = UserDataRetriever.api_map[dataType](startDate, endDate)
 
                 # Get the data. If intraday, it is the first date
                 data = result.json()
@@ -496,8 +496,8 @@ class GetDataWindow(QWidget):
                                                       datetime.strptime(endDate, '%Y-%m-%d').date()))
                     for one_date in intraday_dates:
                         # Grab the result for the next date
-                        result = UserDataRetriever.fitbit_api_map[dataType](str(one_date),
-                                                                            endDate)  # Since one_date is a datetime.date
+                        result = UserDataRetriever.api_map[dataType](str(one_date),
+                                                                     endDate)  # Since one_date is a datetime.date
                         next_day_data = result.json()
 
                         # Fitbit only returns the time so format it into a datetime

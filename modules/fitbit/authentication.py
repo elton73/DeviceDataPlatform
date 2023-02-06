@@ -37,7 +37,7 @@ def get_fitbit_auth_info():
     challenge_method = 'S256'
     callback_url = '127.0.0.1:8080'
 
-    try: 
+    try:
         auth_code_request_url = f'''https://www.fitbit.com/oauth2/authorize?client_id={CLIENT_ID}&response_type={response_type}
 &code_challenge={challenge_code}&code_challenge_method={challenge_method}
 &scope=weight%20settings%20nutrition%20activity%20sleep
@@ -52,7 +52,6 @@ def get_fitbit_auth_info():
         wait.until(lambda driver: callback_url in driver.current_url)
         authorization_code = driver.current_url
         driver.quit()
-
         # Clean up the returned code
         code_p = re.compile('code=[\d\w]+#')
         authorization_code = code_p.search(authorization_code)[0].replace('code=','').replace('#', '')
@@ -91,40 +90,16 @@ def get_refreshed_auth_info(userid, refresh_token):
     else:
         return result.json()
 
-
-# Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
-def export_fitbit_to_auth_info(device_type, auth_info, db):
-    userid = auth_info['user_id']
-    device_type = device_type
-    auth_token = auth_info['access_token']
-    refresh_token = auth_info['refresh_token']
-    expires_by = auth_info['expires_in']  # change to expires by later
-
-    mycursor = db.cursor()
-    command = f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')"
-    mycursor.execute(command)
-    db.commit()
-
-if __name__=="__main__":
-    # Testing if we can get the data successfully
-    # auth_token = get_auth_info()['access_token']
-    # DataGet = DataGetter(auth_token)
-    # print(DataGet.get_all_devices())
-    # print("="*50)
-    # print(DataGet.get_weight(date='2021-11-16'))
-    # auth_token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM0JINTgiLCJzdWIiOiI5TlE5U0QiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJzZXQgcmFjdCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNjM3MjEyMzU3LCJpYXQiOjE2MzcxODM1NTd9.9yikywwLz5_mOOA-_tiY6RijnybUSqL7y6BFhYPojGc'
-    # refresh_token = '8b2bddd17b5a79109cda8855801de6bd0fb51dc37d1bd2593d8263e31e8102c2'
-    #
-    # DataGet = DataGetter(auth_token)
-    # print(DataGet.get_all_devices())
-    # print("="*50)
-    # print(DataGet.get_weight(date='2021-11-16'))
-    # print(get_refreshed_auth_info(refresh_token))
-
-    """
-    Get authorization info for fitbit and upload it to authorization_info database
-    """
-    # auth_info = get_auth_info()
-    # print(auth_info)
-    # export_fitbit_to_auth_info(auth_info)
-    # get_refreshed_auth_info('BD6RKR', 'bef4a95a2d97bc1422b8b38562d1dbfe4b14b8c2769d05f63173cff58037f9f5')
+# if __name__=="__main__":
+    # callback_url = '127.0.0.1:8080'
+    # auth_code_request_url = f'''https://www.google.com'''
+    # chromedriver_autoinstaller.install(cwd=True)
+    # chrome_options = webdriver.chrome.options.Options()
+    # chrome_options.add_argument("log-level=3")
+    # chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    # driver = webdriver.Chrome(options=chrome_options)
+    # driver.get(auth_code_request_url)
+    # wait = ui.WebDriverWait(driver, 200)
+    # wait.until(lambda driver: callback_url in driver.current_url)
+    # authorization_code = driver.current_url
+    # driver.quit()

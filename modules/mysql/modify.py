@@ -124,6 +124,19 @@ def remove_heath_data(user_id, fitbit_db):
             print(f"{data} table does not exist")
     fitbit_db.commit()
 
+# Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
+def export_device_to_auth_info(device_type, auth_info, db):
+    userid = auth_info['user_id']
+    device_type = device_type
+    auth_token = auth_info['access_token']
+    refresh_token = auth_info['refresh_token']
+    expires_by = auth_info['expires_in']  # change to expires by later
+
+    mycursor = db.cursor()
+    command = f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')"
+    mycursor.execute(command)
+    db.commit()
+
 if __name__ == "__main__":
     test_insertion()
     #DELETE FROM auth_info WHERE userid='BD6RKR'

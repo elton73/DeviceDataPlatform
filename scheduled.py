@@ -2,6 +2,7 @@
 '''
 import modules.fitbit.authentication as auth
 import modules.fitbit.retrieve as fitbit_retrieve
+import modules.withings.retrieve as withings_retrieve
 import modules.mysql.setup as setup_db
 import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
@@ -52,7 +53,7 @@ def drop_table(engine, table):
     conn.commit()
     cursor.close()
 
-def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
+def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes, device_type):
     '''Grab the users, the data types, the date range'''
     #No users
     if not selected_user_ids:
@@ -71,13 +72,18 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
 
     request_num = 0
     start_time = time.time()
+    if device_type == 'fitbit':
+        device_retrieve = fitbit_retrieve
+    elif device_type == 'withings':
+        device_retrieve = withings_retrieve
+
     for userid in selected_user_ids:
 
         errorFlag = False
-        UserDataRetriever = fitbit_retrieve.DataGetter(access_tokens[userid])
+        UserDataRetriever = device_retrieve.DataGetter(access_tokens[userid])
         for dataType in selectedDataTypes:
             # print(dataType, startDate, endDate)
-            result = UserDataRetriever.fitbit_api_map[dataType](startDate, endDate)
+            result = UserDataRetriever.api_map[dataType](startDate, endDate)
             if result.status_code == 401:
                 # Expired token
                 new_auth_info = auth.get_refreshed_auth_info(userid, refresh_tokens[userid])
@@ -99,7 +105,7 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
                 # Try the request again
 
                 # print(startDate, endDate)
-                result = UserDataRetriever.fitbit_api_map[dataType](startDate, endDate)
+                result = UserDataRetriever.api_map[dataType](startDate, endDate)
 
             # print('dataType', dataType)
             # Get the data. If intraday, it is the first date
@@ -116,6 +122,7 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
 
                 # Get the first list
                 for key in dataType.split(' '):
+                    print(data)
                     data = data[key]
 
                 # Handle Intraday - selection includes 'dataset'... since intraday can only grab one day
@@ -124,7 +131,7 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
                     intraday_dates = list(range_dates(datetime.strptime(startDate, '%Y-%m-%d').date(), datetime.strptime(endDate, '%Y-%m-%d').date()))
                     for one_date in intraday_dates:
                         # Grab the result for the next date
-                        result = UserDataRetriever.fitbit_api_map[dataType](str(one_date), endDate) # Since one_date is a datetime.date
+                        result = UserDataRetriever.api_map[dataType](str(one_date), endDate) # Since one_date is a datetime.date
                         next_day_data = result.json()
 
                         # Fitbit only returns the time so format it into a datetime
@@ -165,9 +172,11 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes):
 def runschedule():
     auth_db = setup_db.connect_to_database(AUTH_DATABASE)
     user_ids = report_db.get_all_user_ids(auth_db)
-    selected_datatypes = ['devices', 'activities-steps', 'sleep', 'activities-heart-intraday dataset',
+    selected_fitbit_datatypes = ['devices', 'activities-steps', 'activities-heart-intraday dataset',
                           'activities-steps-intraday dataset']
-    writeSQLData(auth_db, user_ids, selected_datatypes)
+    selected_withings_datatypes = ['sleep']
+    # writeSQLData(auth_db, user_ids, selected_fitbit_datatypes)
+    writeSQLData(auth_db, user_ids, selected_withings_datatypes, 'withings')
 
 if __name__ == '__main__':
     runschedule()

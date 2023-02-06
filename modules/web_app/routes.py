@@ -3,11 +3,11 @@ from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_fitbit_users, \
     check_auth_info_and_input_device
-from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_fitbit_patient
+from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_fitbit_patient, \
+    export_device_to_auth_info
 from modules.web_app import app, login_db, bcrypt
-from modules import FITBIT_DATABASE, AUTH_DATABASE
+from modules import DEVICE_DATABASE, AUTH_DATABASE
 from scheduled import runschedule
-from modules.fitbit.authentication import export_fitbit_to_auth_info
 
 @app.route('/home')
 def home():
@@ -16,7 +16,7 @@ def home():
         #initialize list of all the patients to be passed to html
         all_patients = []
         #Get fitbit users
-        fitbit_db = connect_to_database(FITBIT_DATABASE)
+        fitbit_db = connect_to_database(DEVICE_DATABASE)
         fitbit_patients = get_fitbit_users(fitbit_db)
 
         #TODO:create a function for below loop
@@ -34,23 +34,24 @@ def addpatient():
     #user must be logged in
     if 'logged_in' not in session:
         return redirect(url_for('login'))
-    #Add check for unique patient_labels and device_data later
     form = PatientForm()
+
+    #Validate user input
     if form.validate_on_submit():
         device_type = form.device_type.data
         # check if auth_info is valid and if input device already exists. Return userid, auth_info, and success.
         auth_db = connect_to_database(AUTH_DATABASE)
-        fitbit_db = connect_to_database(FITBIT_DATABASE)
-        auth_info, success = check_auth_info_and_input_device(device_type, auth_db, fitbit_db)
+        db = connect_to_database(DEVICE_DATABASE)
+        #check if valid data obtained from wearable's login form
+        auth_info, success = check_auth_info_and_input_device(device_type, auth_db, db)
         if success:
             #export userid, patient and device type to fitbit database
             user_id = auth_info['user_id']
             patient_id = form.patient.data
             # export data to sql database
             auth_db = connect_to_database(AUTH_DATABASE)
-            export_fitbit_to_auth_info(device_type, auth_info, auth_db)
-            fitbit_db = connect_to_database(FITBIT_DATABASE)
-            export_patient_data(user_id, patient_id, device_type, fitbit_db)
+            export_device_to_auth_info(device_type, auth_info, auth_db)
+            export_patient_data(user_id, patient_id, device_type, db)
 
             flash('Patient Added', 'success')
             return redirect(url_for('home'))
@@ -63,7 +64,7 @@ def deletepatient(patient_id, user_id):
     # user must be logged in
     if 'logged_in' not in session:
         return redirect(url_for('login'))
-    fitbit_db = connect_to_database(FITBIT_DATABASE)
+    fitbit_db = connect_to_database(DEVICE_DATABASE)
     auth_db = connect_to_database(AUTH_DATABASE)
     remove_fitbit_patient(patient_id, user_id, fitbit_db, auth_db)
     flash('Patient Deleted', 'success')

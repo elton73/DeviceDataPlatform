@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from modules.mysql.setup import connect_to_database
-from modules import FITBIT_DATABASE
+from modules import DEVICE_DATABASE
 
 
 # Check if email exists in database
@@ -26,10 +26,10 @@ def validate_key(FlaskForm, key):
     if not cursor.fetchall():
         raise ValidationError("Invalid Key")
 
-# Check if email exists in database
+# Check if patient_id exists in database (Deprecated)
 def validate_fitbit_patient_id(FlaskForm, patient):
     # Connect to database
-    fitbit_db = connect_to_database(FITBIT_DATABASE)
+    fitbit_db = connect_to_database(DEVICE_DATABASE)
     cursor = fitbit_db.cursor()
     cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id = '{patient.data}'")
     if cursor.fetchall():
@@ -56,10 +56,10 @@ class LoginForm(FlaskForm):
 
 
 class PatientForm(FlaskForm):
-    choices = [('fitbit', 'Fitbit')] #, ('withings', 'Withings')]
+    choices = [('fitbit', 'Fitbit'), ('withings', 'Withings')]
 
     patient = StringField('Patient ID',
-                          validators=[DataRequired(), Length(min=2, max=20), validate_fitbit_patient_id])
+                          validators=[DataRequired(), Length(min=2, max=20)])
 
     device_type = SelectField('Device Type',
                               choices=choices)

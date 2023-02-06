@@ -4,15 +4,8 @@ import requests
 from selenium import webdriver
 import selenium.webdriver.support.ui as ui
 import chromedriver_autoinstaller
-# import decouple 
-
-import numpy as np
 import sys
 import re
-
-# Hashing
-import base64
-import hashlib
 
 # API Retrieiver
 # retrieve data
@@ -98,9 +91,24 @@ def get_refreshed_auth_info(userid, refresh_token):
     else:
         return result.json()['body']
 
-if __name__ == "__main__":
-    auth_info = get_withings_auth_info()
-    print('get_auth_info:', auth_info)
-    datagetter = DataGetter(auth_info['access_token'])
-    print(datagetter.get_sleep('2023-01-01', '2023-01-24').json())
-    print('get_refreshed_auth_info:', get_refreshed_auth_info(auth_info['user_id'], auth_info['refresh_token']))
+def export_withings_to_auth_info(device_type, auth_info, db):
+    userid = auth_info['user_id']
+    device_type = device_type
+    auth_token = auth_info['access_token']
+    refresh_token = auth_info['refresh_token']
+    expires_by = auth_info['expires_in']  # change to expires by later
+
+    mycursor = db.cursor()
+    command = f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')"
+    mycursor.execute(command)
+    db.commit()
+
+# if __name__ == "__main__":
+#     auth_info = get_withings_auth_info()
+#     datagetter = DataGetter(auth_info['access_token'])
+#     print(datagetter.get_sleep('2023-01-01', '2023-01-24').json())
+
+    # print('get_auth_info:', auth_info)
+    # datagetter = DataGetter(auth_info['access_token'])
+    # print(datagetter.get_sleep('2023-01-01', '2023-01-24').json())
+    # print('get_refreshed_auth_info:', get_refreshed_auth_info(auth_info['user_id'], auth_info['refresh_token']))

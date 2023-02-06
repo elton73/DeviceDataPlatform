@@ -6,7 +6,7 @@ class DataGetter():
 
     def __init__(self, token):
         self.token = token
-        self.fitbit_api_map = {
+        self.api_map = {
             'weight': self.get_weight,
             'activities-steps': self.get_steps,
             'sleep': self.get_sleep,
