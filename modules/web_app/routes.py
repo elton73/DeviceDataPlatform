@@ -60,6 +60,7 @@ def addpatient():
     return render_template('addpatient.html', title='Add', form=form)
 
 @app.route('/patient/<string:patient_id>/<string:user_id>/delete', methods = ['POST'])
+#todo: delete only the device, not all the devices with patient_id
 def deletepatient(patient_id, user_id):
     # user must be logged in
     if 'logged_in' not in session:

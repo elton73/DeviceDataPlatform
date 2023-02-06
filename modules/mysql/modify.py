@@ -60,7 +60,7 @@ def remove_web_app_user(email, db):
 def remove_fitbit_patient(patient_id, user_id, fitbit_db, auth_db):
     # TODO: check if patient exists in both databases before running
     # remove patient from fitbit database
-    cursor = fitbit_db.cursor()
+    cursor = fitbit_db.cursor(buffered=True)
     cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id='{patient_id}'")
     if cursor.fetchone():
         cursor.execute(f"DELETE FROM patient_ids WHERE patient_id='{patient_id}'")
