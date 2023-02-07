@@ -57,15 +57,15 @@ def remove_web_app_user(email, db):
     db.cursor().execute(f"DELETE FROM login_info WHERE email='{email}'")
     db.commit()
 
-def remove_fitbit_patient(patient_id, user_id, fitbit_db, auth_db):
+def remove_patient(patient_id, user_id, device_db, auth_db):
     # TODO: check if patient exists in both databases before running
     # remove patient from fitbit database
-    cursor = fitbit_db.cursor(buffered=True)
+    cursor = device_db.cursor(buffered=True)
     cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id='{patient_id}'")
     if cursor.fetchone():
         cursor.execute(f"DELETE FROM patient_ids WHERE patient_id='{patient_id}'")
-        fitbit_db.commit()
-    remove_heath_data(user_id, fitbit_db)
+        device_db.commit()
+    remove_heath_data(user_id, device_db)
 
     # remove patient from auth database
     user_id = user_id.replace(' ', '') #spaces must be removed from strings
@@ -125,12 +125,15 @@ def remove_heath_data(user_id, fitbit_db):
     fitbit_db.commit()
 
 # Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
-def export_device_to_auth_info(device_type, auth_info, db):
+def export_device_to_auth_info(auth_info, db):
     userid = auth_info['user_id']
-    device_type = device_type
+    device_type = auth_info['device_type']
     auth_token = auth_info['access_token']
-    refresh_token = auth_info['refresh_token']
-    expires_by = auth_info['expires_in']  # change to expires by later
+    if device_type != "polar":
+        refresh_token = auth_info['refresh_token']
+    else:
+        refresh_token = None
+    expires_by = auth_info['expires_in']  #todo: change to expires by later
 
     mycursor = db.cursor()
     command = f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')"

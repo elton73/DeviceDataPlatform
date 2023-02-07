@@ -3,7 +3,7 @@ import modules.fitbit.retrieve as retrieve
 import modules.mysql.setup as setup_db
 import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
-from modules import AUTH_DATABASE, ENGINE
+from modules import AUTH_DATABASE, FITBIT_ENGINE
 from pathlib import Path
 import sys
 import os
@@ -56,7 +56,7 @@ def lateSyncEmail(selected_userids):
     refresh_tokens = report_db.get_refresh_tokens(
         auth_conn, query_selected_userids)
 
-    mysql_conn = ENGINE
+    mysql_conn = FITBIT_ENGINE
 
     device_list = []
     request_num = 0
@@ -68,7 +68,7 @@ def lateSyncEmail(selected_userids):
         result = UserDataRetriever.get_all_devices('', '')
         if result.status_code == 401:
             # Expired token
-            new_auth_info = auth.get_refreshed_auth_info(
+            new_auth_info = auth.get_refreshed_fitbit_auth_info(
                 userid, refresh_tokens[userid])
 
             # Bad Refresh Token

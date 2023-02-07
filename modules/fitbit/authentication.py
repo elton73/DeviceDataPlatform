@@ -67,12 +67,14 @@ def get_fitbit_auth_info():
             'expires_in': '10',
         }
         token_json = requests.post(token_exchange_url, headers=headers, data=payload)
-        return token_json.json()
+        result = token_json.json()
+        result['device_type'] = 'fitbit'
+        return result
     except Exception as e:
         print(e)
         return False
 
-def get_refreshed_auth_info(userid, refresh_token):
+def get_refreshed_fitbit_auth_info(userid, refresh_token):
     '''Returns same format as the first authentication'''
 
     payload = {
@@ -90,16 +92,8 @@ def get_refreshed_auth_info(userid, refresh_token):
     else:
         return result.json()
 
-# if __name__=="__main__":
-    # callback_url = '127.0.0.1:8080'
-    # auth_code_request_url = f'''https://www.google.com'''
-    # chromedriver_autoinstaller.install(cwd=True)
-    # chrome_options = webdriver.chrome.options.Options()
-    # chrome_options.add_argument("log-level=3")
-    # chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    # driver = webdriver.Chrome(options=chrome_options)
-    # driver.get(auth_code_request_url)
-    # wait = ui.WebDriverWait(driver, 200)
-    # wait.until(lambda driver: callback_url in driver.current_url)
-    # authorization_code = driver.current_url
-    # driver.quit()
+if __name__=="__main__":
+    a = get_fitbit_auth_info()
+    print(a)
+    a['device_type'] = 'fitbit'
+    print(a)

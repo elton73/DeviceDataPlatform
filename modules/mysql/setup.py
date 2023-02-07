@@ -48,9 +48,9 @@ TABLE_NAMES = ['patient_ids']
 # TODO: CREATE this mysql user and GRANT them ALL PRIVILEGES if you haven't
 USER = 'newwriter'
 PASSWORD = 'password'
-DATABASE_DEVICES = ['test6'] # add databases for new devices
+DATABASE_DEVICES = ['fitbit', 'withings', 'polar'] # add databases for new devices
 DATABASE_AUTH = ['authorization_info'] #add database for authorization info
-DATABASE_LOGIN = ['Webapp_login_info'] #add database for login info
+DATABASE_LOGIN = ['webapp_login_info'] #add database for login info
 DATABASE_EMAILS = ['email_list'] #add database for list of emails
 DATABASE_PATIENT_IDS = ['patient_ids']
 
@@ -82,8 +82,8 @@ def create_table(engine, database_names, create_table):
 def connect_to_database(databasename):
     database = connector.connect(
         host='localhost',
-        user='newwriter',
-        passwd='password',
+        user=USER,
+        passwd=PASSWORD,
         database=databasename
     )
     return database
@@ -91,10 +91,23 @@ def connect_to_database(databasename):
 def setup_databases():
     engine = make_engine()
     create_dbs(engine, DATABASE_AUTH, SQL_CREATE_AUTH_TABLE)
-    create_dbs(engine, DATABASE_EMAILS, SQL_CREATE_EMAIL_LIST_TABLE)
+    # create_dbs(engine, DATABASE_EMAILS, SQL_CREATE_EMAIL_LIST_TABLE)
     create_dbs(engine, DATABASE_DEVICES, SQL_CREATE_PATIENT_DEVICE_TABLE)
     create_dbs(engine, DATABASE_LOGIN, SQL_CREATE_WEBAPP_LOGIN_INFO_TABLE)
     create_table(engine, DATABASE_LOGIN, SQL_CREATE_KEY_TABLE)
+    create_key("12345")
+
+def create_key(key):
+    if key.isnumeric():
+        command = f"""
+        INSERT INTO registration_keys (user_key) VALUES ('{key}')
+        """
+        db = connect_to_database(DATABASE_LOGIN[0])
+        mycursor = db.cursor()
+        mycursor.execute(command)
+        db.commit()
+    else:
+        print("Invalid Key")
 
 if __name__ == "__main__":
     setup_databases()

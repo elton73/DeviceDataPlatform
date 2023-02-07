@@ -13,7 +13,7 @@ if __name__=="__main__":
     while True:
         curTime = time.time()
         if (curTime - lastTime) > tokenPeriod:
-            refresh_token = auth.get_refreshed_auth_info(refresh_token)
+            refresh_token = auth.get_refreshed_fitbit_auth_info(refresh_token)
             print(refresh_token, curTime)
             lastTime = curTime
 

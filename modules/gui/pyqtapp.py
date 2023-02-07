@@ -4,8 +4,8 @@ import sys
 import numpy as np
 import pandas as pd
 from modules.mysql.setup import connect_to_database
-from modules.fitbit.authentication import get_fitbit_auth_info as get_auth_info, get_refreshed_auth_info
-from modules import AUTH_DATABASE, DEVICE_DATABASE, ENGINE
+from modules.fitbit.authentication import get_fitbit_auth_info as get_auth_info, get_refreshed_fitbit_auth_info
+from modules import AUTH_DATABASE, FITBIT_DATABASE, FITBIT_ENGINE
 from datetime import datetime, timedelta
 from PyQt6.QtCore import QSize, Qt, QObject
 from PyQt6.QtGui import QFont, QFontDatabase, QScreen, QGuiApplication, QColor, QIcon
@@ -315,7 +315,7 @@ class GetDataWindow(QWidget):
         startDate = self.startDate.date().toString('yyyy-MM-dd')
         endDate = self.endDate.date().toString('yyyy-MM-dd')
 
-        conn = ENGINE
+        conn = FITBIT_ENGINE
 
         request_num = 0
         start_time = time.time()
@@ -328,7 +328,7 @@ class GetDataWindow(QWidget):
                 result = UserDataRetriever.api_map[dataType](startDate, endDate)
                 if result.status_code == 401:
                     # Expired token
-                    new_auth_info = get_refreshed_auth_info(userid, refresh_tokens[userid])
+                    new_auth_info = get_refreshed_fitbit_auth_info(userid, refresh_tokens[userid])
 
                     # Bad Refresh Token
                     if new_auth_info == 400:
@@ -447,7 +447,7 @@ class GetDataWindow(QWidget):
                 result = UserDataRetriever.api_map[dataType](startDate, endDate)
                 if result.status_code == 401:
                     # Expired token
-                    new_auth_info = get_refreshed_auth_info(userid, refresh_tokens[userid])
+                    new_auth_info = get_refreshed_fitbit_auth_info(userid, refresh_tokens[userid])
 
                     # Bad Refresh Token
                     if new_auth_info == 400:

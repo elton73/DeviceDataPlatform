@@ -1,6 +1,7 @@
 '''Launch the Main Application here
 '''
-import modules.fitbit.authentication as auth
+import modules.fitbit.authentication as fitbit_auth
+import modules.withings.authentication as withings_auth
 import modules.fitbit.retrieve as fitbit_retrieve
 import modules.withings.retrieve as withings_retrieve
 import modules.mysql.setup as setup_db
@@ -11,7 +12,12 @@ import sys, os
 import pandas as pd
 from datetime import datetime, timedelta, timezone, date
 
-from modules import AUTH_DATABASE, ENGINE
+from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE
+
+FITBIT_DATATYPES = ['devices', 'activities-steps', 'sleep', 'activities-heart-intraday dataset',
+                          'activities-steps-intraday dataset']
+WITHINGS_DATATYPES = ['sleep']
+
 try:
     import httplib  # python < 3.0
 except:
@@ -53,31 +59,33 @@ def drop_table(engine, table):
     conn.commit()
     cursor.close()
 
-def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes, device_type):
+def writeSQLData(auth_db, selected_user_ids):
     '''Grab the users, the data types, the date range'''
     #No users
+
     if not selected_user_ids:
         print("No users")
         return
 
-    # Selected user IDs must be wrapped with single quotes for SQLite Query
-    query_selected_user_ids = list(map(lambda text: f'\'{text}\'', selected_user_ids))
-    access_tokens = report_db.get_auth_tokens(auth_conn, query_selected_user_ids)
-    refresh_tokens = report_db.get_refresh_tokens(auth_conn, query_selected_user_ids)
-
+    # Selected user IDs must be wrapped with single quotes for SQLite Query)
+    access_tokens = report_db.get_auth_tokens(auth_db, selected_user_ids)
+    refresh_tokens = report_db.get_refresh_tokens(auth_db, selected_user_ids)
     startDate = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')         # yesterday
     endDate = date.today().strftime('%Y-%m-%d')                               # today
 
-    drop_table(ENGINE, 'devices')
-
     request_num = 0
     start_time = time.time()
-    if device_type == 'fitbit':
-        device_retrieve = fitbit_retrieve
-    elif device_type == 'withings':
-        device_retrieve = withings_retrieve
-
     for userid in selected_user_ids:
+        device_type = report_db.get_device_type(auth_db, userid)
+        #choose correct device
+        if device_type == 'fitbit':
+            device_retrieve = fitbit_retrieve
+            selectedDataTypes = FITBIT_DATATYPES
+            engine = FITBIT_ENGINE
+        elif device_type == 'withings':
+            device_retrieve = withings_retrieve
+            selectedDataTypes = WITHINGS_DATATYPES
+            engine = WITHINGS_ENGINE
 
         errorFlag = False
         UserDataRetriever = device_retrieve.DataGetter(access_tokens[userid])
@@ -86,7 +94,10 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes, device_type):
             result = UserDataRetriever.api_map[dataType](startDate, endDate)
             if result.status_code == 401:
                 # Expired token
-                new_auth_info = auth.get_refreshed_auth_info(userid, refresh_tokens[userid])
+                if device_type == 'fitbit':
+                    new_auth_info = fitbit_auth.get_refreshed_fitbit_auth_info(userid, refresh_tokens[userid])
+                elif device_type == 'withings':
+                    new_auth_info = withings_auth.get_refreshed_withings_auth_info(userid, refresh_tokens[userid])
 
                 # Bad Refresh Token
                 if new_auth_info == 400:
@@ -98,8 +109,8 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes, device_type):
                     break
 
                 # Update the database
-                modify_db.update_auth_token(auth_conn, userid, new_auth_info['access_token'])
-                modify_db.update_refresh_token(auth_conn, userid, new_auth_info['refresh_token'])
+                modify_db.update_auth_token(auth_db, userid, new_auth_info['access_token'])
+                modify_db.update_refresh_token(auth_db, userid, new_auth_info['refresh_token'])
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
                 # Try the request again
@@ -162,7 +173,7 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes, device_type):
 
                 table = dataType.replace('-','').replace(' dataset', '')
                 try:
-                    df.to_sql(con=ENGINE, name=table, if_exists='append')
+                    df.to_sql(con=engine, name=table, if_exists='append')
                 except:
                     continue
 
@@ -171,12 +182,10 @@ def writeSQLData(auth_conn, selected_user_ids, selectedDataTypes, device_type):
 
 def runschedule():
     auth_db = setup_db.connect_to_database(AUTH_DATABASE)
-    user_ids = report_db.get_all_user_ids(auth_db)
-    selected_fitbit_datatypes = ['devices', 'activities-steps', 'activities-heart-intraday dataset',
-                          'activities-steps-intraday dataset']
-    selected_withings_datatypes = ['sleep']
+    # user_ids = report_db.get_all_user_ids(auth_db)
     # writeSQLData(auth_db, user_ids, selected_fitbit_datatypes)
-    writeSQLData(auth_db, user_ids, selected_withings_datatypes, 'withings')
+    user_ids = ['59745643']
+    writeSQLData(auth_db, user_ids)
 
 if __name__ == '__main__':
     runschedule()
