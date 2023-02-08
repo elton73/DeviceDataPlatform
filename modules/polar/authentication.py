@@ -2,9 +2,6 @@
 import sys
 from urllib.parse import urlencode
 
-
-
-
 # retrieve data
 # if __name__ == "__main__":
 #     from retrieve import DataGetter
@@ -19,8 +16,8 @@ AUTHORIZATION_URL = "https://flow.polar.com/oauth2/authorization"
 ACCESS_TOKEN_URL = "https://polarremote.com/v2/oauth2/token"
 ACCESSLINK_URL = "https://www.polaraccesslink.com/v3"
 
-class AccessLink(object):
-    def __init__(self, redirect_url=None):
+# class AccessLink(object):
+#     def __init__(self, redirect_url=None):
 
 class OAuth2Client(object):
     def __init__(self, redirect_url):

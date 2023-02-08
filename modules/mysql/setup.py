@@ -96,11 +96,13 @@ def setup_databases():
     create_dbs(engine, DATABASE_LOGIN, SQL_CREATE_WEBAPP_LOGIN_INFO_TABLE)
     create_table(engine, DATABASE_LOGIN, SQL_CREATE_KEY_TABLE)
     create_key("12345")
+    #debug
+    print('success')
 
 def create_key(key):
     if key.isnumeric():
         command = f"""
-        INSERT INTO registration_keys (user_key) VALUES ('{key}')
+        INSERT IGNORE INTO registration_keys (user_key) VALUES ('{key}')
         """
         db = connect_to_database(DATABASE_LOGIN[0])
         mycursor = db.cursor()

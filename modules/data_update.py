@@ -1,21 +1,16 @@
-import modules.fitbit.authentication as fitbit_auth
-import modules.withings.authentication as withings_auth
 import modules.fitbit.retrieve as fitbit_retrieve
 import modules.withings.retrieve as withings_retrieve
 from modules.mysql.setup import connect_to_database
 import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
-from pathlib import Path
-import sys, os
 import requests
 import pandas as pd
 from datetime import datetime, timedelta, timezone, date
-from modules import AUTH_DATABASE, FITBIT_ENGINE
+from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE
 
 FITBIT_DATATYPES = ['devices', 'activities-steps', 'sleep', 'activities-heart-intraday dataset',
                           'activities-steps-intraday dataset']
-WITHINGS_DATATYPES = ['sleep']
-
+WITHINGS_DATATYPES = {'hr': 'heart_rate', 'rr': 'respiration_rate', 'snoring': 'snoring_time'}
 AUTH_DB = connect_to_database(AUTH_DATABASE)
 
 class  Authorization(object):
@@ -48,36 +43,53 @@ class Update_Device(object):
         self.startDate = startDate
         self.endDate = endDate
         self.request_num = request_num
-        self.users = set()
+        self.users = self.generate_users()
 
     def increment_request_num(self):
         self.request_num += 1
         return self.request_num
 
     def generate_users(self):
+        users = set()
         for userid in report_db.get_all_user_ids(AUTH_DB):
             user = Authorization(userid=userid)
-            self.users.add(user)
-        return self.users
+            users.add(user)
+        return users
 
     def update_all(self):
-        self.generate_users()
         #no users
         if not self.users:
             print("No users")
             return False
 
         for user in self.users:
-            if user.device_type == 'fitbit':
-                self.update_fitbit(user)
+            # if user.device_type == 'fitbit':
+            #     self.update_fitbit(user)
+            if user.device_type == "withings":
+                self.update_withings(user)
         return True
+
+    def update_withings(self, user):
+        UserDataRetriever = withings_retrieve.DataGetter(user.access_token)
+        for data_key, data_value in WITHINGS_DATATYPES.items():
+            result = UserDataRetriever.api_map[data_value](self.startDate, self.endDate)
+            raw_data = result.json()
+            data = raw_data['body']['series']
+            self.request_num += 1
+            if len(data):
+                formatted_data = self.format_withings_data(data, data_key)
+                df = pd.DataFrame(formatted_data)
+                df['userid'] = user.userid
+                table = data_value.replace('-', '').replace(' dataset', '')
+                df.to_sql(con=WITHINGS_ENGINE, name=table, if_exists='append')
+
 
 
     def update_fitbit(self, user):
         UserDataRetriever = fitbit_retrieve.DataGetter(user.access_token)
 
         for dataType in FITBIT_DATATYPES:
-            result = UserDataRetriever.api_map[dataType](self.startDate, self.endDate)
+            result = UserDataRetriever.api_map[dataType.keys()](self.startDate, self.endDate)
             # Expired token
             if result.status_code == 401:
                 new_auth_info = user.get_refreshed_fitbit_auth_info()
@@ -99,7 +111,6 @@ class Update_Device(object):
 
                 # Get the first list
                 for key in dataType.split(' '):
-                    print(data)
                     data = data[key]
 
                 # Handle Intraday - selection includes 'dataset'... since intraday can only grab one day
@@ -126,6 +137,7 @@ class Update_Device(object):
                         self.request_num += 1
             if len(data):
                 data = [flatten_dictionary(d) for d in data]
+                print(data)
                 df = pd.DataFrame(data)
                 df['userid'] = user.userid
                 table = dataType.replace('-', '').replace(' dataset', '')
@@ -133,8 +145,21 @@ class Update_Device(object):
                     df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
                 except:
                     continue
-
-
+    def format_withings_data(self, data, data_key):
+        time = []
+        for d in data:
+            d.pop('startdate')
+            d.pop('state')
+            d.pop('enddate')
+            d.pop('hash_deviceid')
+            d.pop('model_id')
+            h = d[f'{data_key}']
+            for k,v in h.items():
+                time.append({
+                    'time': datetime.fromtimestamp(int(k)),
+                    'value': v
+                })
+        return time
 def range_dates(startDate, endDate, step=1):
     for i in range((endDate - startDate).days):
         yield startDate + timedelta(days=step * i)
@@ -151,3 +176,11 @@ def flatten_dictionary(some_dict, parent_key='', separator='_'):
         else:
             flat_dict[new_key] = v
     return flat_dict
+
+
+
+if __name__ == '__main__':
+    start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
+    end_date = date.today().strftime('%Y-%m-%d')  # today
+    update = Update_Device(startDate=start_date, endDate=end_date, request_num=0)
+    update.update_all()
