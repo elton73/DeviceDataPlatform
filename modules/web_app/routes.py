@@ -37,9 +37,18 @@ def addpatient():
     #Validate user input
     if form.validate_on_submit():
         device_type = form.device_type.data
+
+        #debugging with test databases
+        if device_type == "fitbit":
+            device_db = FITBIT_DATABASE
+        elif device_type == "withings":
+            device_db = WITHINGS_DATABASE
+        # elif device_type == "polar":
+        #     device_db = POLAR_DATABASE
+
         # check if auth_info is valid and if input device already exists. Return userid, auth_info, and success.
         auth_db = connect_to_database(AUTH_DATABASE)
-        db = connect_to_database(device_type)
+        db = connect_to_database(device_db)
         #check if valid data obtained from wearable's login form
         auth_info, success = check_auth_info_and_input_device(device_type, auth_db, db)
         if success:

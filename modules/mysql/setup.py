@@ -1,6 +1,7 @@
 '''Setup the DB to store authentication codes'''
 from sqlalchemy import create_engine
 from mysql import connector
+from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD
 
 SQL_CREATE_DEVICE_TABLE = '''
 CREATE TABLE IF NOT EXISTS patient_ids(
@@ -43,16 +44,8 @@ CREATE TABLE IF NOT EXISTS patient_ids(
     device_type VARCHAR(30) NOT NULL);
 '''
 
-TABLE_NAMES = ['patient_ids']
-
 # TODO: CREATE this mysql user and GRANT them ALL PRIVILEGES if you haven't
-USER = 'newwriter'
-PASSWORD = 'password'
-DATABASE_DEVICES = ['fitbit', 'withings', 'polar'] # add databases for new devices
-DATABASE_AUTH = ['authorization_info'] #add database for authorization info
-DATABASE_LOGIN = ['webapp_login_info'] #add database for login info
-DATABASE_EMAILS = ['email_list'] #add database for list of emails
-DATABASE_PATIENT_IDS = ['patient_ids']
+DEVICE_DATABASES = [FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE] # add databases for new devices
 
 def run_commands(engine, command_list):
     with engine.connect() as con:
@@ -65,6 +58,8 @@ def make_engine(database=''):
         f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{database}')
 
 def create_dbs(engine, database_names, create_table):
+    if not isinstance(database_names, list):
+        database_names = [database_names]
     for db in database_names:
         commands = [f"CREATE DATABASE IF NOT EXISTS {db};",
                     f"USE {db};",
@@ -72,6 +67,8 @@ def create_dbs(engine, database_names, create_table):
         run_commands(engine, commands)
 
 def create_table(engine, database_names, create_table):
+    if not isinstance(database_names, list):
+        database_names = [database_names]
     for db in database_names:
         commands = [f"CREATE DATABASE IF NOT EXISTS {db};",
                     f"USE {db};",
@@ -90,21 +87,21 @@ def connect_to_database(databasename):
 
 def setup_databases():
     engine = make_engine()
-    create_dbs(engine, DATABASE_AUTH, SQL_CREATE_AUTH_TABLE)
-    # create_dbs(engine, DATABASE_EMAILS, SQL_CREATE_EMAIL_LIST_TABLE)
-    create_dbs(engine, DATABASE_DEVICES, SQL_CREATE_PATIENT_DEVICE_TABLE)
-    create_dbs(engine, DATABASE_LOGIN, SQL_CREATE_WEBAPP_LOGIN_INFO_TABLE)
-    create_table(engine, DATABASE_LOGIN, SQL_CREATE_KEY_TABLE)
+    create_dbs(engine, AUTH_DATABASE, SQL_CREATE_AUTH_TABLE)
+    # create_dbs(engine, EMAILS_DATABASE, SQL_CREATE_EMAIL_LIST_TABLE)
+    create_dbs(engine, DEVICE_DATABASES, SQL_CREATE_PATIENT_DEVICE_TABLE)
+    create_dbs(engine, LOGIN_DATABASE, SQL_CREATE_WEBAPP_LOGIN_INFO_TABLE)
+    create_table(engine, LOGIN_DATABASE, SQL_CREATE_KEY_TABLE)
     create_key("12345")
     #debug
-    print('success')
+    # print('success')
 
 def create_key(key):
     if key.isnumeric():
         command = f"""
         INSERT IGNORE INTO registration_keys (user_key) VALUES ('{key}')
         """
-        db = connect_to_database(DATABASE_LOGIN[0])
+        db = connect_to_database(LOGIN_DATABASE)
         mycursor = db.cursor()
         mycursor.execute(command)
         db.commit()

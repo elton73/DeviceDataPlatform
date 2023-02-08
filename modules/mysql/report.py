@@ -83,7 +83,7 @@ def check_invalid_device(input_device, auth_db, fitbit_db):
     if cursor.fetchall():
         return True
 
-    #case 2 device already exists in fitbit database
+    #case 2 device already exists in fitbit database #todo: check for other databases
     cursor = fitbit_db.cursor()
     cursor.execute(f"SELECT * FROM patient_ids WHERE userid = '{input_device}'")
     if cursor.fetchall():
@@ -93,12 +93,14 @@ def check_invalid_device(input_device, auth_db, fitbit_db):
 
 
 def check_auth_info_and_input_device(device_type, auth_db, device_db):
+    auth_info = None
+    print(device_type)
     if device_type == 'fitbit':
         auth_info = get_fitbit_auth_info()
     elif device_type == 'withings':
         auth_info = get_withings_auth_info()
-    elif device_type == 'polar':
-        auth_info = get_polar_auth_info()
+    # elif device_type == 'polar':
+    #     auth_info = get_polar_auth_info()
 
     #check authentication info was received successfully
     if not auth_info:

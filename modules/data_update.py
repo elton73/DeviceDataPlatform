@@ -21,7 +21,7 @@ class  Authorization(object):
         self.refresh_token = report_db.get_data(AUTH_DB, userid, 'refresh_token')
 
     def get_refreshed_fitbit_auth_info(self):
-        CLIENT_ID = "23BHY7"
+        CLIENT_ID = "23BHY7"# who's client id is this?
         payload = {
             'grant_type': 'refresh_token',
             'refresh_token': self.refresh_token,
@@ -45,17 +45,6 @@ class Update_Device(object):
         self.request_num = request_num
         self.users = self.generate_users()
 
-    def increment_request_num(self):
-        self.request_num += 1
-        return self.request_num
-
-    def generate_users(self):
-        users = set()
-        for userid in report_db.get_all_user_ids(AUTH_DB):
-            user = Authorization(userid=userid)
-            users.add(user)
-        return users
-
     def update_all(self):
         #no users
         if not self.users:
@@ -63,33 +52,55 @@ class Update_Device(object):
             return False
 
         for user in self.users:
-            # if user.device_type == 'fitbit':
-            #     self.update_fitbit(user)
+            if user.device_type == 'fitbit':
+                self.update_fitbit(user)
             if user.device_type == "withings":
                 self.update_withings(user)
         return True
 
     def update_withings(self, user):
         UserDataRetriever = withings_retrieve.DataGetter(user.access_token)
+        device_data = []
         for data_key, data_value in WITHINGS_DATATYPES.items():
             result = UserDataRetriever.api_map[data_value](self.startDate, self.endDate)
             raw_data = result.json()
+            if str(raw_data['status']) == '401':
+                new_auth_info = user.get_refreshed_fitbit_auth_info()
+                if str(new_auth_info) == '400':
+                    break
+                print(new_auth_info)
+                if new_auth_info == '':
+                    break
+                # Update the database
+                modify_db.update_auth_token(AUTH_DB, user.userid, new_auth_info['access_token'])
+                modify_db.update_refresh_token(AUTH_DB, user.userid, new_auth_info['refresh_token'])
+                # Update the retriever
+                UserDataRetriever.token = new_auth_info['access_token']
+                raw_data = UserDataRetriever.api_map[data_value](self.startDate, self.endDate).json
             data = raw_data['body']['series']
             self.request_num += 1
             if len(data):
                 formatted_data = self.format_withings_data(data, data_key)
                 df = pd.DataFrame(formatted_data)
                 df['userid'] = user.userid
+
                 table = data_value.replace('-', '').replace(' dataset', '')
                 df.to_sql(con=WITHINGS_ENGINE, name=table, if_exists='append')
-
-
+            # Manually update device data to mysql
+            if not device_data:
+                device_data = [{
+                    'model': data[0][f'model']
+                }]
+                print(device_data)
+                device_df = pd.DataFrame(device_data)
+                device_df['userid'] = user.userid
+                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='append')
 
     def update_fitbit(self, user):
         UserDataRetriever = fitbit_retrieve.DataGetter(user.access_token)
 
         for dataType in FITBIT_DATATYPES:
-            result = UserDataRetriever.api_map[dataType.keys()](self.startDate, self.endDate)
+            result = UserDataRetriever.api_map[dataType](self.startDate, self.endDate)
             # Expired token
             if result.status_code == 401:
                 new_auth_info = user.get_refreshed_fitbit_auth_info()
@@ -160,6 +171,16 @@ class Update_Device(object):
                     'value': v
                 })
         return time
+    def generate_users(self):
+        users = set()
+        for userid in report_db.get_all_user_ids(AUTH_DB):
+            user = Authorization(userid=userid)
+            users.add(user)
+        return users
+
+    def increment_request_num(self):
+        self.request_num += 1
+        return self.request_num
 def range_dates(startDate, endDate, step=1):
     for i in range((endDate - startDate).days):
         yield startDate + timedelta(days=step * i)
