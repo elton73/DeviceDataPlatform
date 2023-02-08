@@ -2,7 +2,7 @@
 from bcrypt import checkpw
 from modules.fitbit.authentication import get_fitbit_auth_info
 from modules.withings.authentication import get_withings_auth_info
-from modules.polar.authentication import get_polar_auth_info
+# from modules.polar.authentication import get_polar_auth_info
 from modules.mysql.setup import connect_to_database
 
 def get_all_token_timeouts(connection):
@@ -44,12 +44,10 @@ def get_refresh_tokens(connection, selected_users):
     return {data[0]: data[1] for data in result}
 
 
-def get_device_type(connection, selected_users):
-    if not isinstance(selected_users, list):
-        selected_users = [selected_users]
+def get_data(connection, selected_user, datatype):
     command = f'''
-    SELECT device_type FROM auth_info
-        WHERE {format_OR_clause('userid', selected_users)};
+    SELECT {datatype} FROM auth_info
+        WHERE userid = "{selected_user}";
     '''
     cursor = connection.cursor()
     cursor.execute(command)

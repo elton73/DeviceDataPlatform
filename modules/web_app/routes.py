@@ -2,7 +2,7 @@ from flask import render_template, url_for, flash, redirect, session
 from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_device_users, \
-    check_auth_info_and_input_device, get_device_type
+    check_auth_info_and_input_device, get_data
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_patient, \
     export_device_to_auth_info
 from modules.web_app import app, login_db, bcrypt
@@ -64,13 +64,13 @@ def deletepatient(patient_id, user_id):
     if 'logged_in' not in session:
         return redirect(url_for('login'))
     auth_db = connect_to_database(AUTH_DATABASE)
-    device_type = get_device_type(auth_db, user_id)
+    device_type = get_data(auth_db, user_id, 'device_type')
     if device_type == 'fitbit':
-        device_db = FITBIT_DATABASE
+        device_db = connect_to_database(FITBIT_DATABASE)
     elif device_type == 'withings':
-        device_db = WITHINGS_DATABASE
+        device_db = connect_to_database( WITHINGS_DATABASE)
     elif device_type == 'polar':
-        device_db = POLAR_DATABASE
+        device_db = connect_to_database(POLAR_DATABASE)
 
     remove_patient(patient_id, user_id, device_db, auth_db)
     flash('Patient Deleted', 'success')

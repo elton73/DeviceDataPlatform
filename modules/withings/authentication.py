@@ -93,9 +93,11 @@ def get_refreshed_withings_auth_info(userid, refresh_token):
         return result.json()
 
 if __name__ == "__main__":
-    print(get_withings_auth_info())
-#     datagetter = DataGetter(auth_info['access_token'])
-#     print(datagetter.get_sleep('2023-01-01', '2023-01-24').json())
+    auth_info = get_withings_auth_info()
+    print(auth_info)
+    datagetter = DataGetter(auth_info['access_token'])
+    data = datagetter.get_sleep('2023-02-07', '2023-02-08').json()
+    print(datagetter.get_sleep('2023-02-06', '2023-02-08').json())
 
     # print('get_auth_info:', auth_info)
     # datagetter = DataGetter(auth_info['access_token'])
