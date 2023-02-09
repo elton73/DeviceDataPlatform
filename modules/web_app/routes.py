@@ -81,7 +81,7 @@ def deletepatient(patient_id, user_id):
     elif device_type == 'polar':
         device_db = connect_to_database(POLAR_DATABASE)
 
-    remove_patient(patient_id, user_id, device_db, auth_db)
+    remove_patient(patient_id, user_id,device_type, device_db, auth_db)
     flash('Patient Deleted', 'success')
     return redirect(url_for('home'))
 

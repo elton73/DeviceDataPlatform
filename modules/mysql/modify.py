@@ -1,6 +1,9 @@
 '''Insert data into table'''
+import copy
+
 from sqlalchemy import create_engine
 import pandas as pd
+from modules import FITBIT_TABLES, WITHINGS_TABLES
 
 def run_command(engine, command):
     with engine.connect() as con:
@@ -57,15 +60,15 @@ def remove_web_app_user(email, db):
     db.cursor().execute(f"DELETE FROM login_info WHERE email='{email}'")
     db.commit()
 
-def remove_patient(patient_id, user_id, device_db, auth_db):
+def remove_patient(patient_id, user_id,device_type, device_db, auth_db):
     # TODO: check if patient exists in both databases before running
-    # remove patient from fitbit database
+    # remove patient from device's database
     cursor = device_db.cursor(buffered=True)
     cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id='{patient_id}'")
     if cursor.fetchone():
         cursor.execute(f"DELETE FROM patient_ids WHERE patient_id='{patient_id}'")
         device_db.commit()
-    remove_heath_data(user_id, device_db)
+    remove_health_data(user_id, device_db, device_type)
 
     # remove patient from auth database
     user_id = user_id.replace(' ', '') #spaces must be removed from strings
@@ -105,24 +108,30 @@ def update_refresh_token(connection, userid, new_refresh_token):
     cursor.execute(command)
     connection.commit()
 
-def test_insertion():
-    data_to_insert = [['user_id', 'patientid', 'device_type',
-                       'access_token', 'refresh_token', '12345'], ]
-    engine = create_engine(
-        f'mysql+pymysql://writer:password@localhost/device_info')
-    insert_list_into('patient_ids', data_to_insert, engine)
-
 #Remove health data from fitbit database
-def remove_heath_data(user_id, fitbit_db):
-    list = ['devices', 'activitiessteps', 'weight', "activitiesheart", "activitiesheartintraday", "activitiesstepsintraday", "sleep"]
-
-    cursor = fitbit_db.cursor()
-    for data in list:
-        try:
-            cursor.execute(f"DELETE FROM {data} WHERE userid='{user_id}'")
-        except:
-            print(f"{data} table does not exist")
-    fitbit_db.commit()
+def remove_health_data(user_id, db, device_type):
+    cursor = db.cursor()
+    #remove data from fitbit database
+    if device_type == "fitbit":
+        for key in FITBIT_TABLES:
+            try:
+                cursor.execute(f"DELETE FROM {FITBIT_TABLES[key]} WHERE userid='{user_id}'")
+            except:
+                print(f"{FITBIT_TABLES[key]} table does not exist")
+        db.commit()
+        return
+    # remove data from withings database
+    if device_type == "withings":
+        #special case for devices table
+        cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
+        for key in WITHINGS_TABLES:
+            try:
+                cursor.execute(f"DELETE FROM {WITHINGS_TABLES[key]} WHERE userid='{user_id}'")
+            except:
+                print(f"{WITHINGS_TABLES[key]} table does not exist")
+        db.commit()
+        return
+    return False
 
 # Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
 def export_device_to_auth_info(auth_info, db):
@@ -140,7 +149,6 @@ def export_device_to_auth_info(auth_info, db):
     mycursor.execute(command)
     db.commit()
 
-if __name__ == "__main__":
-    test_insertion()
+# if __name__ == "__main__":
     #DELETE FROM auth_info WHERE userid='BD6RKR'
 
