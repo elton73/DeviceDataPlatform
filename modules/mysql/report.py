@@ -2,7 +2,7 @@
 from bcrypt import checkpw
 from modules.fitbit.authentication import get_fitbit_auth_info
 from modules.withings.authentication import get_withings_auth_info
-# from modules.polar.authentication import get_polar_auth_info
+from modules.polar.authentication import get_polar_auth_info
 from modules.mysql.setup import connect_to_database
 
 def get_all_token_timeouts(connection):
@@ -99,8 +99,8 @@ def check_auth_info_and_input_device(device_type, auth_db, device_db):
         auth_info = get_fitbit_auth_info()
     elif device_type == 'withings':
         auth_info = get_withings_auth_info()
-    # elif device_type == 'polar':
-    #     auth_info = get_polar_auth_info()
+    elif device_type == 'polar':
+        auth_info = get_polar_auth_info()
 
     #check authentication info was received successfully
     if not auth_info:

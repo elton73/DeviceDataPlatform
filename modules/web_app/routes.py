@@ -43,8 +43,8 @@ def addpatient():
             device_db = FITBIT_DATABASE
         elif device_type == "withings":
             device_db = WITHINGS_DATABASE
-        # elif device_type == "polar":
-        #     device_db = POLAR_DATABASE
+        elif device_type == "polar":
+            device_db = POLAR_DATABASE
 
         # check if auth_info is valid and if input device already exists. Return userid, auth_info, and success.
         auth_db = connect_to_database(AUTH_DATABASE)
