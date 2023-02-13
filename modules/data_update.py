@@ -76,9 +76,9 @@ class Update_Device(object):
             if user.device_type == "withings":
                 self.update_withings(user)
                 self.request_num += 1
-            if user.device_type == "polar":
-                self.update_polar(user)
-                self.request_num += 1
+            # if user.device_type == "polar":
+            #     self.update_polar(user)
+            #     self.request_num += 1
 
         return print(f"{self.request_num} users updated in {time()-start} seconds")
 
@@ -117,7 +117,7 @@ class Update_Device(object):
                 # print(device_data)
                 device_df = pd.DataFrame(device_data)
                 device_df['userid'] = user.userid
-                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='append')
+                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='replace')
 
 
     def update_fitbit(self, user):
@@ -137,7 +137,7 @@ class Update_Device(object):
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
             data = result.json()
-
+            print(data)
             if type(data) is dict:
                 if 'errors' in list(data.keys()):
                     errorFlag = True
@@ -172,13 +172,17 @@ class Update_Device(object):
                 data = [flatten_dictionary(d) for d in data]
                 df = pd.DataFrame(data)
                 df['userid'] = user.userid
-
                 table = data_value
-                print(table)
-                # try:
-                #     df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
-                # except:
-                #     continue
+
+                #Don't append for devices table
+                try:
+                    if table == "devices":
+                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
+                    else:
+                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
+                except:
+                    continue
+
 
    #Control how the Withings data is structured. This changes how the information will look on mysql
     def format_withings_data(self, data, data_key):
@@ -239,7 +243,7 @@ def flatten_dictionary(some_dict, parent_key='', separator='_'):
 
 
 if __name__ == '__main__':
-    start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
+    start_date = (date.today() - timedelta(days=1)).strftime('2023-02-09')  # yesterday
     end_date = date.today().strftime('%Y-%m-%d')  # today
     update = Update_Device(startDate=start_date, endDate=end_date)
     update.update_all()
