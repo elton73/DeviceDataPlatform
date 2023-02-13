@@ -11,7 +11,7 @@ from time import time
 
 AUTH_DB = connect_to_database(AUTH_DATABASE)
 
-class  Authorization(object):
+class Authorization(object):
     def __init__(self, userid):
         self.userid = userid
         self.device_type = report_db.get_data(AUTH_DB, userid, 'device_type')
@@ -75,6 +75,9 @@ class Update_Device(object):
                 self.request_num += 1
             if user.device_type == "withings":
                 self.update_withings(user)
+                self.request_num += 1
+            if user.device_type == "polar":
+                self.update_polar(user)
                 self.request_num += 1
 
         return print(f"{self.request_num} users updated in {time()-start} seconds")
