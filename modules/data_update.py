@@ -1,13 +1,15 @@
 import modules.fitbit.retrieve as fitbit_retrieve
 import modules.withings.retrieve as withings_retrieve
+import modules.polar.retrieve as polar_retrieve
 from modules.mysql.setup import connect_to_database
 import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
 import requests
 import pandas as pd
 from datetime import datetime, timedelta, date
-from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE, FITBIT_TABLES, WITHINGS_TABLES, WITHINGS_COLUMNS
+from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE, FITBIT_TABLES, WITHINGS_TABLES, WITHINGS_COLUMNS, POLAR_DATABASE
 from time import time
+import uuid
 
 AUTH_DB = connect_to_database(AUTH_DATABASE)
 
@@ -55,6 +57,53 @@ class Authorization(object):
         else:
             return result.json()
 
+    """
+    Polar API
+    """
+    def get_polar_member_id(self):
+        db = connect_to_database(POLAR_DATABASE)
+        command = f'''
+            SELECT member_id FROM member_ids WHERE userid = {self.userid}
+            '''
+        cursor = db.cursor()
+        cursor.execute(command)
+        #check if member_id already exists
+        member_id = cursor.fetchone()[0]
+        if not member_id:
+            member_id = self.register_polar_user(db)
+        return member_id
+
+
+    # Register user and upload member_id to mysql
+    def register_polar_user(self, db):
+        cursor = db.cursor()
+
+        #Check if member_id already exists
+        check_for_id = True
+        while check_for_id:
+            member_id = uuid.uuid4().hex
+            cursor.execute(f"SELECT member_id FROM member_ids WHERE member_id = '{member_id}'")
+            check_for_id = cursor.fetchone()
+            check_for_id = check_for_id[0] if check_for_id else check_for_id
+
+
+
+        result = requests.post('https://www.polaraccesslink.com/v3/users', headers={
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'},
+                               json={"member-id": member_id},
+                               )
+        # if unsuccessful post
+        if result.status_code != 200:
+            print(f"Couldn't Register User. Status code: {result.status_code}")
+            return False
+
+        cursor.execute(f"UPDATE member_ids SET member_id = '{member_id}' WHERE userid = '{self.userid}'")
+        db.commit()
+        return member_id
+
+
 
 class Update_Device(object):
     def __init__(self, startDate, endDate):
@@ -69,18 +118,23 @@ class Update_Device(object):
         if not self.users:
             print("No users")
             return False
+        #todo:
         for user in self.users:
-            if user.device_type == 'fitbit':
-                self.update_fitbit(user)
-                self.request_num += 1
-            if user.device_type == "withings":
-                self.update_withings(user)
-                self.request_num += 1
+            # if user.device_type == 'fitbit':
+            #     self.update_fitbit(user)
+            #     self.request_num += 1
+            # if user.device_type == "withings":
+            #     self.update_withings(user)
+            #     self.request_num += 1
             if user.device_type == "polar":
                 self.update_polar(user)
                 self.request_num += 1
 
         return print(f"{self.request_num} users updated in {time()-start} seconds")
+
+    def update_polar(self, user):
+        member_id = user.get_polar_member_id()
+        UserDataRetriever = polar_retrieve.DataGetter(user.access_token)
 
     def update_withings(self, user):
         UserDataRetriever = withings_retrieve.DataGetter(user.access_token)
@@ -114,11 +168,9 @@ class Update_Device(object):
                 device_data = [{
                     'model': data[0][f'model']
                 }]
-                # print(device_data)
                 device_df = pd.DataFrame(device_data)
                 device_df['userid'] = user.userid
-                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='append')
-
+                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='replace')
 
     def update_fitbit(self, user):
         UserDataRetriever = fitbit_retrieve.DataGetter(user.access_token)
@@ -172,13 +224,14 @@ class Update_Device(object):
                 data = [flatten_dictionary(d) for d in data]
                 df = pd.DataFrame(data)
                 df['userid'] = user.userid
-
                 table = data_value
-                print(table)
-                # try:
-                #     df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
-                # except:
-                #     continue
+                try:
+                    if table == "devices":
+                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
+                    else:
+                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
+                except:
+                    continue
 
    #Control how the Withings data is structured. This changes how the information will look on mysql
     def format_withings_data(self, data, data_key):

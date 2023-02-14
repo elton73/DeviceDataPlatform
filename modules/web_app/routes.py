@@ -59,7 +59,6 @@ def addpatient():
             auth_db = connect_to_database(AUTH_DATABASE)
             export_device_to_auth_info(auth_info, auth_db)
             export_patient_data(user_id, patient_id, device_type, db)
-
             flash('Patient Added', 'success')
             return redirect(url_for('home'))
         else:
@@ -80,7 +79,6 @@ def deletepatient(patient_id, user_id):
         device_db = connect_to_database( WITHINGS_DATABASE)
     elif device_type == 'polar':
         device_db = connect_to_database(POLAR_DATABASE)
-
     remove_patient(patient_id, user_id,device_type, device_db, auth_db)
     flash('Patient Deleted', 'success')
     return redirect(url_for('home'))

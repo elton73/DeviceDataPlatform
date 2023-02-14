@@ -1,9 +1,8 @@
 '''Insert data into table'''
-import copy
-
-from sqlalchemy import create_engine
+import requests
 import pandas as pd
-from modules import FITBIT_TABLES, WITHINGS_TABLES
+from modules import FITBIT_TABLES, WITHINGS_TABLES, POLAR_DATABASE
+from modules.mysql.setup import connect_to_database #todo: remove later
 
 def run_command(engine, command):
     with engine.connect() as con:
@@ -61,22 +60,43 @@ def remove_web_app_user(email, db):
     db.commit()
 
 def remove_patient(patient_id, user_id,device_type, device_db, auth_db):
-    # TODO: check if patient exists in both databases before running
+    user_id = user_id.replace(' ', '')  # spaces must be removed from strings
+    auth_cursor = auth_db.cursor()
+    device_cursor = device_db.cursor(buffered=True)
+
+    """
+        Remove polar user registration
+    """
+    if device_type == "polar":
+        # check if user has a member_id
+        device_cursor.execute(f"SELECT member_id FROM member_ids WHERE userid='{user_id}'")
+        member_id = device_cursor.fetchone()
+        #reformat incoming data
+        member_id = member_id[0] if member_id else member_id
+        if member_id:
+            result = auth_cursor.execute(f'SELECT auth_token FROM auth_info WHERE userid = "{user_id}"')
+            token = auth_cursor.fetchone()
+            #reformat incoming data
+            token = token[0] if token else token
+            # remove member_id from API
+            requests.delete(f'https://www.polaraccesslink.com/v3/users/{user_id}', headers={
+                'Authorization': f'Bearer {token}'})
+
     # remove patient from device's database
-    cursor = device_db.cursor(buffered=True)
-    cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id='{patient_id}'")
-    if cursor.fetchone():
-        cursor.execute(f"DELETE FROM patient_ids WHERE patient_id='{patient_id}'")
+    device_cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id='{patient_id}'")
+    if device_cursor.fetchone():
+        device_cursor.execute(f"DELETE FROM patient_ids WHERE patient_id='{patient_id}'")
         device_db.commit()
+
+    #remove health related data
     remove_health_data(user_id, device_db, device_type)
 
     # remove patient from auth database
-    user_id = user_id.replace(' ', '') #spaces must be removed from strings
-    cursor = auth_db.cursor()
-    cursor.execute(f"SELECT * FROM auth_info WHERE userid='{user_id}'")
-    if cursor.fetchone():
-        cursor.execute(f"DELETE FROM auth_info WHERE userid='{user_id}'")
+    auth_cursor.execute(f"SELECT * FROM auth_info WHERE userid='{user_id}'")
+    if auth_cursor.fetchone():
+        auth_cursor.execute(f"DELETE FROM auth_info WHERE userid='{user_id}'")
         auth_db.commit()
+
 
 def link_user_to_key(key, email, db):
     db.cursor().execute(f"UPDATE registration_keys SET email = '{email}' WHERE user_key = '{key}'")
@@ -86,6 +106,10 @@ def export_patient_data(userid, patient_id, device_type, db):
     mycursor = db.cursor()
     command = f"INSERT INTO patient_ids (userid, patient_id, device_type) VALUES ('{userid}', '{patient_id}', '{device_type}')"
     mycursor.execute(command)
+    #Create member_id row for Polar devices
+    if device_type == "polar":
+        command = f"INSERT INTO member_ids (userid) VALUES ('{userid}')"
+        mycursor.execute(command)
     db.commit()
 
 def update_auth_token(connection, userid, new_auth_token):
@@ -120,8 +144,9 @@ def remove_health_data(user_id, db, device_type):
                 print(f"{FITBIT_TABLES[key]} table does not exist")
         db.commit()
         return
+
     # remove data from withings database
-    if device_type == "withings":
+    elif device_type == "withings":
         #special case for devices table
         cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
         for key in WITHINGS_TABLES:
@@ -131,6 +156,19 @@ def remove_health_data(user_id, db, device_type):
                 print(f"{WITHINGS_TABLES[key]} table does not exist")
         db.commit()
         return
+
+    # remove data from polar database
+    elif device_type == "polar":
+        # remove member_id
+        cursor.execute(f"DELETE FROM member_ids WHERE userid='{user_id}'")
+
+        # for key in POLAR_TABLES:
+        #     try:
+        #         cursor.execute(f"DELETE FROM {POLAR_TABLES[key]} WHERE userid='{user_id}'")
+        #     except:
+        #         print(f"{POLAR_TABLES[key]} table does not exist")
+        db.commit()
+        return
     return False
 
 # Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
@@ -138,10 +176,7 @@ def export_device_to_auth_info(auth_info, db):
     userid = auth_info['user_id']
     device_type = auth_info['device_type']
     auth_token = auth_info['access_token']
-    if device_type != "polar":
-        refresh_token = auth_info['refresh_token']
-    else:
-        refresh_token = None
+    refresh_token = auth_info['refresh_token']
     expires_by = auth_info['expires_in']  #todo: change to expires by later
 
     mycursor = db.cursor()
@@ -150,5 +185,9 @@ def export_device_to_auth_info(auth_info, db):
     db.commit()
 
 # if __name__ == "__main__":
-    #DELETE FROM auth_info WHERE userid='BD6RKR'
+#     device_db = connect_to_database(POLAR_DATABASE)
+
+
+
+
 
