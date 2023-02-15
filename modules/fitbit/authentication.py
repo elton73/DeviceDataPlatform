@@ -6,6 +6,7 @@ import chromedriver_autoinstaller
 import numpy as np
 import sys
 import re
+import os
 # Hashing
 import base64
 import hashlib
@@ -18,7 +19,7 @@ else:
     from .retrieve import DataGetter
 
 SYS_DEFAULT_ENCODING = sys.getdefaultencoding()
-CLIENT_ID = "23BHY7"
+CLIENT_ID = os.environ.get('FITBIT_CLIENT_ID')
 
 def generate_challenge_code(verifier=''):
     if verifier == '':

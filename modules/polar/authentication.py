@@ -3,25 +3,15 @@ import requests
 from selenium import webdriver
 import selenium.webdriver.support.ui as ui
 import chromedriver_autoinstaller
-import numpy as np
+import os
 import sys
 import re
 # Hashing
 import base64
-import uuid
-import hashlib
-
-from urllib.parse import urlencode
-
-# retrieve data
-# if __name__ == "__main__":
-#     from retrieve import DataGetter
-# else:
-#     from .retrieve import DataGetter
 
 SYS_DEFAULT_ENCODING = sys.getdefaultencoding()
-CLIENT_ID = "bb5b7afd-8a82-4bd2-a9d0-075298f069c0"
-CLIENT_SECRET = "3b975aa7-3a29-44a2-8d58-4f3ad5d2a63d"
+CLIENT_ID = os.environ.get('POLAR_CLIENT_ID')
+CLIENT_SECRET = os.environ.get('POLAR_CLIENT_SECRET')
 
 def generate_challenge_code():
     code = f"""{CLIENT_ID}:{CLIENT_SECRET}""".encode(SYS_DEFAULT_ENCODING)
@@ -60,6 +50,7 @@ def get_polar_auth_info():
         }
         token_json = requests.post(token_exchange_url, headers=headers, data=payload)
         result = token_json.json()
+        #Format data
         result['device_type'] = 'polar'
         result['user_id'] = result.pop('x_user_id')
         result['refresh_token'] = None
@@ -68,57 +59,15 @@ def get_polar_auth_info():
         print(e)
         return False
 
-def delete_polar_user(user_id):
+def delete_polar_user(user_id, token):
     r = requests.delete(f'https://www.polaraccesslink.com/v3/users/{user_id}', headers={
-        'Authorization': 'Bearer 1d5cee4c5ccfbbaab9d1a13579730990'},
+        'Authorization': f'Bearer {token}'},
         )
+    print(r)
     return r
 
 if __name__=="__main__":
-    # print(get_polar_auth_info())
-    # token = '78e0f1fcf7472c4b344e1d206f7f0c81'
     user_id = '59745643'
-    # member_id = uuid.uuid4().hex
+    token = '549532da63f628c155edf2d30045297b'
+    delete_polar_user(user_id, token)
 
-    # r = requests.post('https://www.polaraccesslink.com/v3/users', headers = {
-    #     'Content-Type': 'application/json',
-    #     'Accept': 'application/json',
-    #     'Authorization': f'Bearer {token}'},
-    #     json={"member-id": member_id},
-    #     )
-    #
-    r = requests.delete(f'https://www.polaraccesslink.com/v3/users/{user_id}', headers = {
-        'Authorization': 'Bearer 25f0d87c0a3c65826c3884261696c6ec'},
-        )
-    # print(r.json())
-    print(r)
-    # print(r.json())
-
-    # h = requests.post(f'https://www.polaraccesslink.com/v3/users/{user_id}/physical-information-transactions',headers = {
-    #     'Accept': 'application/json',
-    #     'Authorization': f'Bearer {token}'},
-    #     )
-    # print(h)
-    # print(h.json())
-    # tid = '18821591'
-    # pid1 = '13383488'
-    # pid2 = '13389385'
-    # pid3 = '13389386'
-
-    # r = requests.get(
-    #     f'https://www.polaraccesslink.com/v3/users/{user_id}/physical-information-transactions/{tid}',
-    #     headers={
-    #         'Accept': 'application/json', 'Authorization': f'Bearer {token}'
-    #     }
-    #     )
-    # print(r)
-    # print(r.json())
-
-    # headers = {
-    #   'Accept': 'application/json',  'Authorization': f'Bearer {token}'
-    # };
-    #
-    # r = requests.get(f'https://www.polaraccesslink.com/v3/users/{user_id}/physical-information-transactions/{tid}/physical-informations/{pid3}', headers = headers
-    #     )
-    # print(r)
-    # print(r.json())
