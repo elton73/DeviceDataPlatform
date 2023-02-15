@@ -1,13 +1,21 @@
-from flask import render_template, url_for, flash, redirect, session
+from flask import render_template, url_for, flash, redirect, session, request
 from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_device_users, \
-    check_auth_info_and_input_device, get_data
+    check_invalid_device, get_data
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_patient, \
     export_device_to_auth_info
 from modules.web_app import app, login_db, bcrypt
 from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE
 from scheduled import runschedule
+from modules.polar.authorization import PolarAccess
+from modules.fitbit.authorization import FitbitAccess
+from modules.withings.authorization import WithingsAccess
+
+
+polar = PolarAccess()
+fitbit = FitbitAccess()
+withings = WithingsAccess()
 
 @app.route('/home')
 def home():
@@ -37,32 +45,22 @@ def addpatient():
     #Validate user input
     if form.validate_on_submit():
         device_type = form.device_type.data
+        patient_id = form.patient.data
 
-        #debugging with test databases
+        # save data for other routes
+        session['device_type'] = device_type
+        session['patient_id'] = patient_id
+
+        # debugging with test databases
         if device_type == "fitbit":
-            device_db = FITBIT_DATABASE
+            session['database'] = FITBIT_DATABASE
+            return redirect(fitbit.authorization_url)
         elif device_type == "withings":
-            device_db = WITHINGS_DATABASE
+            session['database'] = WITHINGS_DATABASE
+            return redirect(withings.authorization_url)
         elif device_type == "polar":
-            device_db = POLAR_DATABASE
-
-        # check if auth_info is valid and if input device already exists. Return userid, auth_info, and success.
-        auth_db = connect_to_database(AUTH_DATABASE)
-        db = connect_to_database(device_db)
-        #check if valid data obtained from wearable's login form
-        auth_info, success = check_auth_info_and_input_device(device_type, auth_db, db)
-        if success:
-            #export userid, patient and device type to fitbit database
-            user_id = auth_info['user_id']
-            patient_id = form.patient.data
-            # export data to sql database
-            auth_db = connect_to_database(AUTH_DATABASE)
-            export_device_to_auth_info(auth_info, auth_db)
-            export_patient_data(user_id, patient_id, device_type, db)
-            flash('Patient Added', 'success')
-            return redirect(url_for('home'))
-        else:
-            flash(f'{auth_info}', 'danger')
+            session['database'] = POLAR_DATABASE
+            return redirect(polar.authorization_url)
     return render_template('addpatient.html', title='Add', form=form)
 
 @app.route('/patient/<string:patient_id>/<string:user_id>/delete', methods = ['POST'])
@@ -138,3 +136,32 @@ def updatenow():
     flash('Data Updated', 'info')
     return redirect(url_for('home'))
 
+@app.route("/oauth2_callback")
+def callback():
+    authorization_code = request.args.get('code')
+    if session['device_type'] == "fitbit":
+        auth_info = fitbit.exchange_token(authorization_code)
+    elif session['device_type'] == "withings":
+        auth_info = withings.exchange_token(authorization_code)
+    elif session['device_type'] == "polar":
+        auth_info = polar.exchange_token(authorization_code)
+    #check if authentication was successful
+    if not auth_info:
+        flash('Authentication Failed', 'danger')
+        return redirect(url_for('addpatient'))
+
+    #setup database connections
+    auth_db = connect_to_database(AUTH_DATABASE)
+    device_db = connect_to_database(session.get('database'))
+
+    user_id = auth_info['user_id']
+    #check if device already exists
+    if check_invalid_device(user_id, auth_db, device_db):
+        flash('Device Already Exists', 'danger')
+        return redirect(url_for('addpatient'))
+
+    # export data to sql database
+    export_device_to_auth_info(auth_info, auth_db)
+    export_patient_data(user_id, session.get('patient_id'), session.get('device_type'), device_db)
+    flash('Patient Added', 'success')
+    return redirect(url_for('home'))

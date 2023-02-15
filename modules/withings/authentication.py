@@ -26,12 +26,7 @@ def get_withings_auth_info():
 
     try: 
         login_url = f'''https://account.withings.com/new_workflow/'''
-        auth_code_request_url = f'''https://account.withings.com/oauth2_user/authorize2''' \
-                            + '''?response_type=code'''\
-                            + f"&client_id={CLIENT_ID}" \
-                            + f"&state=12345" \
-                            + f"&scope=user.activity" \
-                            + f"&redirect_uri={callback_url}"
+        auth_code_request_url = f'''https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id={CLIENT_ID}&state=12345&scope=user.activity&redirect_uri={callback_url}'''
         chromedriver_autoinstaller.install(cwd=True)
         chrome_options = webdriver.chrome.options.Options()
         chrome_options.add_argument("log-level=3")

@@ -57,7 +57,6 @@ class DataGetter():
                 transaction_id = r.json()['transaction-id']
             except:
                 print("Cannot get transaction id")
-        print(transaction_id) #debug
         return transaction_id
 
     def get_exercise_ids(self):

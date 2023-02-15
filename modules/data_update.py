@@ -300,7 +300,7 @@ class Update_Device(object):
             if len(data):
                 data = [flatten_dictionary(d) for d in data]
                 df = pd.DataFrame(data)
-                df['userid'] = user.userid
+                df['userid'] = user.user_id
                 table = data_value
 
                 #Don't append for devices table

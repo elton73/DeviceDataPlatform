@@ -75,43 +75,21 @@ def check_input_key(input_key, db):
         return True
     return False
 
-#Check if there is an available input key to register
-def check_invalid_device(input_device, auth_db, fitbit_db):
+#Check if device already exists
+def check_invalid_device(user_id, auth_db, fitbit_db):
     #case 1 device already exists is auth_info
     cursor = auth_db.cursor()
-    cursor.execute(f"SELECT * FROM auth_info WHERE userid = '{input_device}'")
+    cursor.execute(f"SELECT * FROM auth_info WHERE userid = '{user_id}'")
     if cursor.fetchall():
         return True
 
     #case 2 device already exists in fitbit database #todo: check for other databases
     cursor = fitbit_db.cursor()
-    cursor.execute(f"SELECT * FROM patient_ids WHERE userid = '{input_device}'")
+    cursor.execute(f"SELECT * FROM patient_ids WHERE userid = '{user_id}'")
     if cursor.fetchall():
         return True
 
     return False
-
-
-def check_auth_info_and_input_device(device_type, auth_db, device_db):
-    auth_info = None
-    if device_type == 'fitbit':
-        auth_info = get_fitbit_auth_info()
-    elif device_type == 'withings':
-        auth_info = get_withings_auth_info()
-    elif device_type == 'polar':
-        auth_info = get_polar_auth_info()
-
-    #check authentication info was received successfully
-    if not auth_info:
-        return "Authentication Failed", False
-
-    #check if device is available
-    user_id = auth_info['user_id']
-    invalid_device = check_invalid_device(user_id, auth_db, device_db)
-    if invalid_device:
-       return "Device Already Exists", False
-
-    return auth_info, True
 
 #Get all current fitbit users from fitbit database
 def get_device_users(db):
