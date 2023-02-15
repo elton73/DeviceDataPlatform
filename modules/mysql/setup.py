@@ -1,13 +1,8 @@
 '''Setup the DB to store authentication codes'''
 from sqlalchemy import create_engine
 from mysql import connector
-from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD
-
-SQL_CREATE_DEVICE_TABLE = '''
-CREATE TABLE IF NOT EXISTS patient_ids(
-    userid VARCHAR(30) NOT NULL PRIMARY KEY,
-    patientid VARCHAR(30) NOT NULL);
-'''
+from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD, \
+    DATABASE_USERS
 
 SQL_CREATE_AUTH_TABLE = '''
 CREATE TABLE IF NOT EXISTS Auth_info(
@@ -42,6 +37,18 @@ CREATE TABLE IF NOT EXISTS patient_ids(
     patient_id VARCHAR(30),
     userid VARCHAR(30) NOT NULL PRIMARY KEY,
     device_type VARCHAR(30) NOT NULL);
+'''
+
+SQL_CREATE_POLAR_MEMBER_ID_TABLE = '''
+CREATE TABLE IF NOT EXISTS member_ids(
+    userid VARCHAR(30) NOT NULL PRIMARY KEY,
+    member_id VARCHAR(254));
+'''
+
+SQL_CREATE_DATABASE_USERS = '''
+CREATE TABLE IF NOT EXISTS users(
+    username VARCHAR(30) NOT NULL PRIMARY KEY,
+    password VARCHAR(30));
 '''
 
 # TODO: CREATE this mysql user and GRANT them ALL PRIVILEGES if you haven't
@@ -91,10 +98,11 @@ def setup_databases():
     # create_dbs(engine, EMAILS_DATABASE, SQL_CREATE_EMAIL_LIST_TABLE)
     create_dbs(engine, DEVICE_DATABASES, SQL_CREATE_PATIENT_DEVICE_TABLE)
     create_dbs(engine, LOGIN_DATABASE, SQL_CREATE_WEBAPP_LOGIN_INFO_TABLE)
+    create_dbs(engine, DATABASE_USERS, SQL_CREATE_DATABASE_USERS)
+
     create_table(engine, LOGIN_DATABASE, SQL_CREATE_KEY_TABLE)
     create_key("12345")
-    #debug
-    # print('success')
+    create_table(engine, POLAR_DATABASE, SQL_CREATE_POLAR_MEMBER_ID_TABLE)
 
 def create_key(key):
     if key.isnumeric():

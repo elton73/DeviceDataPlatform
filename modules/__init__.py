@@ -1,16 +1,22 @@
 from sqlalchemy import create_engine
+from secret_keys import secrets
 
-USER = 'newwriter'
-PASSWORD = 'password'
+#Database user
+USER = secrets.get('SECRET_USER')
+PASSWORD = secrets.get('SECRET_PASSWORD')
+
+#Databases
 FITBIT_DATABASE = 'fitbit_test'
 WITHINGS_DATABASE = 'withings_test'
 POLAR_DATABASE = 'polar_test'
 AUTH_DATABASE = 'authorization_info_test'
 LOGIN_DATABASE = 'webapp_login_info'
+DATABASE_USERS = 'USERS' #database readers and wriers
 # EMAILS_DATABASE = ['email_list'] #add database for list of emails
-FITBIT_ENGINE = create_engine('mysql+pymysql://newwriter:password@localhost/fitbit_test')
-WITHINGS_ENGINE = create_engine('mysql+pymysql://newwriter:password@localhost/withings_test')
-POLAR_ENGINE = create_engine('mysql+pymysql://newwriter:password@localhost/polar_test')
+
+FITBIT_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{FITBIT_DATABASE}')
+WITHINGS_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{WITHINGS_DATABASE}')
+POLAR_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{POLAR_DATABASE}')
 
 # fitbit data
 FITBIT_TABLES = {'devices': 'devices',
@@ -26,3 +32,7 @@ WITHINGS_TABLES = {'hr': 'heart_rate', 'rr': 'respiration_rate',
 # {withings_column_name: mysql_column_name}
 WITHINGS_COLUMNS = {'total_sleep_time': "minutesAsleep",
                     "waso": "minutesAwake"}
+
+# polar data
+POLAR_TABLES = {'exercise_summary': "exercise_summary",
+                'heart_rate': "heart_rate"}

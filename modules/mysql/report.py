@@ -94,7 +94,6 @@ def check_invalid_device(input_device, auth_db, fitbit_db):
 
 def check_auth_info_and_input_device(device_type, auth_db, device_db):
     auth_info = None
-    print(device_type)
     if device_type == 'fitbit':
         auth_info = get_fitbit_auth_info()
     elif device_type == 'withings':

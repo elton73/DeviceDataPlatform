@@ -1,22 +1,25 @@
 import modules.fitbit.retrieve as fitbit_retrieve
 import modules.withings.retrieve as withings_retrieve
+import modules.polar.retrieve as polar_retrieve
 from modules.mysql.setup import connect_to_database
 import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
 import requests
 import pandas as pd
 from datetime import datetime, timedelta, date
-from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE, FITBIT_TABLES, WITHINGS_TABLES, WITHINGS_COLUMNS
+from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE, FITBIT_TABLES, WITHINGS_TABLES, \
+    WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, POLAR_ENGINE
 from time import time
+import uuid
 
 AUTH_DB = connect_to_database(AUTH_DATABASE)
 
-class  Authorization(object):
-    def __init__(self, userid):
-        self.userid = userid
-        self.device_type = report_db.get_data(AUTH_DB, userid, 'device_type')
-        self.access_token = report_db.get_data(AUTH_DB, userid, 'auth_token')
-        self.refresh_token = report_db.get_data(AUTH_DB, userid, 'refresh_token')
+class Authorization(object):
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.device_type = report_db.get_data(AUTH_DB, user_id, 'device_type')
+        self.access_token = report_db.get_data(AUTH_DB, user_id, 'auth_token')
+        self.refresh_token = report_db.get_data(AUTH_DB, user_id, 'refresh_token')
 
     def get_refreshed_fitbit_auth_info(self):
         CLIENT_ID = "23BHY7"# who's client id is this?
@@ -30,7 +33,7 @@ class  Authorization(object):
         result = requests.post(token_exchange_url, headers=headers, data=payload)
         if result.status_code == 400:
             # Handling of bad refresh token
-            print(f'Bad refresh token, enter credentials for userid: {self.userid}')
+            print(f'Bad refresh token, enter credentials for userid: {self.user_id}')
             return 400
         else:
             return result.json()
@@ -50,11 +53,54 @@ class  Authorization(object):
         result = requests.post(token_exchange_url, headers=headers, data=payload)
         if result.status_code == 400:
             # Handling of bad refresh token
-            print(f'Bad refresh token, enter credentials for userid: {self.userid}')
+            print(f'Bad refresh token, enter credentials for userid: {self.user_id}')
             return 400
         else:
             return result.json()
 
+    """
+    Polar API
+    """
+    def check_polar_member_id(self):
+        db = connect_to_database(POLAR_DATABASE)
+        command = f'''
+            SELECT member_id FROM member_ids WHERE userid = {self.user_id}
+            '''
+        cursor = db.cursor()
+        cursor.execute(command)
+        #check if member_id already exists
+        member_id = cursor.fetchone()[0]
+        if not member_id:
+            member_id = self.register_polar_user(db)
+        return member_id
+
+
+    # Register user and upload member_id to mysql
+    def register_polar_user(self, db):
+        cursor = db.cursor()
+
+        #Check if member_id already exists
+        check_for_id = True
+        while check_for_id:
+            member_id = uuid.uuid4().hex
+            cursor.execute(f"SELECT member_id FROM member_ids WHERE member_id = '{member_id}'")
+            check_for_id = cursor.fetchone()
+            check_for_id = check_for_id[0] if check_for_id else check_for_id
+
+        result = requests.post('https://www.polaraccesslink.com/v3/users', headers={
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'},
+                               json={"member-id": member_id},
+                               )
+        # if unsuccessful post
+        if result.status_code != 200:
+            print(f"Couldn't Register User. Status code: {result.status_code}")
+            return False
+
+        cursor.execute(f"UPDATE member_ids SET member_id = '{member_id}' WHERE userid = '{self.user_id}'")
+        db.commit()
+        return member_id
 
 class Update_Device(object):
     def __init__(self, startDate, endDate):
@@ -63,6 +109,7 @@ class Update_Device(object):
         self.request_num = 0
         self.users = self.generate_users()
 
+    #update all devices
     def update_all(self):
         #no users
         start = time()
@@ -76,9 +123,67 @@ class Update_Device(object):
             if user.device_type == "withings":
                 self.update_withings(user)
                 self.request_num += 1
-
+            if user.device_type == "polar":
+                self.update_polar(user)
+                self.request_num += 1
         return print(f"{self.request_num} users updated in {time()-start} seconds")
 
+    """
+    Polar API
+    """
+    def update_polar(self, user):
+        member_id = user.check_polar_member_id()
+        UserDataRetriever = polar_retrieve.DataGetter(user.access_token, user.user_id)
+        for data_key, data_value in POLAR_TABLES.items():
+            data = UserDataRetriever.api_map[data_value]()
+            #break if no data
+            if not data:
+                break
+            #format data
+            if data_key == 'exercise_summary':
+                formatted_data = self.format_exercise_summary(data, user.user_id)
+            elif data_key == 'heart_rate':
+                formatted_data = self.format_heart_rate(data, user.user_id)
+            df = pd.DataFrame(formatted_data)
+            table = data_value.replace('-', '').replace(' dataset', '')
+            df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
+            #commit transaction. Old data will be deleted
+            UserDataRetriever.commit_transaction()
+
+    #Format polar_data
+    def format_exercise_summary(self, data, user_id):
+        for exercise_summary in data:
+            #remove data columns
+            pop_columns = ['upload-time', 'polar-user', 'transaction-id', 'start-time-utc-offset', 'has-route',
+                           'detailed-sport-info']
+            for column in pop_columns:
+                exercise_summary.pop(column)
+
+            heart_rate = exercise_summary.pop('heart-rate')
+            exercise_summary['hr_average'] = heart_rate['average']
+            exercise_summary['hr_max'] = heart_rate['maximum']
+            exercise_summary['user_id'] = user_id
+        return data
+
+    def format_heart_rate(self, data, user_id):
+        output = []
+        index = 0
+        for heart_rates in data:
+            current_time = 1
+            recording_rate = heart_rates['recording-rate']
+            for heart_rate in heart_rates['data'].split(","):
+                output.append({})
+                output[index]['id'] = heart_rates['id']
+                output[index]['time'] = current_time
+                output[index]['value'] = heart_rate
+                output[index]['userid'] = user_id
+                index += 1
+                current_time += recording_rate
+        return output
+
+    """
+    Withings API
+    """
     def update_withings(self, user):
         UserDataRetriever = withings_retrieve.DataGetter(user.access_token)
         device_data = []
@@ -93,8 +198,8 @@ class Update_Device(object):
                 if new_auth_info == '':
                     break
                 # Update the database
-                modify_db.update_auth_token(AUTH_DB, user.userid, new_auth_info['access_token'])
-                modify_db.update_refresh_token(AUTH_DB, user.userid, new_auth_info['refresh_token'])
+                modify_db.update_auth_token(AUTH_DB, user.user_id, new_auth_info['access_token'])
+                modify_db.update_refresh_token(AUTH_DB, user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
                 raw_data = UserDataRetriever.api_map[data_value](self.startDate, self.endDate).json()
@@ -102,8 +207,10 @@ class Update_Device(object):
             if len(data):
                 #df.to_sql needs a very specific data structure so we reformat our data
                 formatted_data = self.format_withings_data(data, data_key)
+
+                print(formatted_data) # debug
                 df = pd.DataFrame(formatted_data)
-                df['userid'] = user.userid
+                df['userid'] = user.user_id
                 table = data_value.replace('-', '').replace(' dataset', '')
                 df.to_sql(con=WITHINGS_ENGINE, name=table, if_exists='append')
             # Manually update device data to mysql
@@ -111,12 +218,37 @@ class Update_Device(object):
                 device_data = [{
                     'model': data[0][f'model']
                 }]
-                # print(device_data)
                 device_df = pd.DataFrame(device_data)
-                device_df['userid'] = user.userid
-                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='append')
+                device_df['userid'] = user.user_id
+                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='replace')
 
+    # Control how the Withings data is structured. This changes how the information will look on mysql
+    def format_withings_data(self, data, data_key):
+        time = []
+        index = 0
+        for dict in data:
+            time.append({})
+            # search the dictionary by key for the data we want
+            data_dict = dict[f'{data_key}']
+            # Different data has different formats, so we format data accordingly
+            if "data" not in dict:
+                for k, v in data_dict.items():
+                    time[index]['time'] = datetime.fromtimestamp(int(k))
+                    time[index]['value'] = v
+            else:
+                for k, v in data_dict.items():
+                    time[index]['sleep_start'] = datetime.fromtimestamp(int(dict['startdate']))
+                    time[index]['sleep_end'] = datetime.fromtimestamp(int(dict['enddate']))
+                    if k == "total_sleep_time" or k == "waso":
+                        # convert seconds to minutes
+                        v = round(v / 60)
+                    time[index][f'{WITHINGS_COLUMNS[k]}'] = v
+            index += 1
+        return time
 
+    """
+    Fitbit API
+    """
     def update_fitbit(self, user):
         UserDataRetriever = fitbit_retrieve.DataGetter(user.access_token)
 
@@ -129,12 +261,12 @@ class Update_Device(object):
                 if new_auth_info == '':
                     break
                 # Update the database
-                modify_db.update_auth_token(AUTH_DB, user.userid, new_auth_info['access_token'])
-                modify_db.update_refresh_token(AUTH_DB, user.userid, new_auth_info['refresh_token'])
+                modify_db.update_auth_token(AUTH_DB, user.user_id, new_auth_info['access_token'])
+                modify_db.update_refresh_token(AUTH_DB, user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
             data = result.json()
-
+            print(data)
             if type(data) is dict:
                 if 'errors' in list(data.keys()):
                     errorFlag = True
@@ -169,40 +301,16 @@ class Update_Device(object):
                 data = [flatten_dictionary(d) for d in data]
                 df = pd.DataFrame(data)
                 df['userid'] = user.userid
-
                 table = data_value
-                print(table)
-                # try:
-                #     df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
-                # except:
-                #     continue
 
-   #Control how the Withings data is structured. This changes how the information will look on mysql
-    def format_withings_data(self, data, data_key):
-        time = []
-        index = 0
-        for dict in data:
-            time.append({})
-            #search the dictionary by key for the data we want
-            data_dict = dict[f'{data_key}']
-            # Different data has different formats, so we format data accordingly
-            if "data" not in dict:
-                for k,v in data_dict.items():
-                    time[index]['time']= datetime.fromtimestamp(int(k))
-                    time[index]['value']= v
-            else:
-                for k, v in data_dict.items():
-                    time[index]['sleep_start']= datetime.fromtimestamp(int(dict['startdate']))
-                    time[index]['sleep_end'] = datetime.fromtimestamp(int(dict['enddate']))
-                    if k == "total_sleep_time" or k == "waso":
-                        #convert seconds to minutes
-                        v = round(v/60)
-                    time[index][f'{WITHINGS_COLUMNS[k]}']= v
-
-            index += 1
-
-
-        return time
+                #Don't append for devices table
+                try:
+                    if table == "devices":
+                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
+                    else:
+                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
+                except:
+                    continue
 
     def pop_data(self, keys, dict):
         for key in keys:
@@ -212,7 +320,7 @@ class Update_Device(object):
     def generate_users(self):
         users = set()
         for userid in report_db.get_all_user_ids(AUTH_DB):
-            user = Authorization(userid=userid)
+            user = Authorization(user_id=userid)
             users.add(user)
         return users
 
@@ -236,7 +344,12 @@ def flatten_dictionary(some_dict, parent_key='', separator='_'):
 
 
 if __name__ == '__main__':
+    # date1 = '2023-02-01'
+    # date2 = '2023-02-13'
     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
     end_date = date.today().strftime('%Y-%m-%d')  # today
+    #debug
+    # print(start_date)
+    # print(end_date)
     update = Update_Device(startDate=start_date, endDate=end_date)
     update.update_all()

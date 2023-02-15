@@ -33,3 +33,4 @@ class DataGetter():
     # def get_sleep_awake_time(self, startDate, endDate):
     #     return requests.get(f'https://wbsapi.withings.net/v2/sleep?action=getsummary&startdateymd=2023-02-07&enddateymd=2023-02-08&data_fields=waso',
     #                         headers={'Authorization': f'Bearer {self.token}'})
+

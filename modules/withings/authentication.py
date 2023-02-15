@@ -6,6 +6,7 @@ import selenium.webdriver.support.ui as ui
 import chromedriver_autoinstaller
 import sys
 import re
+import os
 
 # API Retrieiver
 # retrieve data
@@ -15,8 +16,9 @@ else:
     from .retrieve import DataGetter
 
 SYS_DEFAULT_ENCODING = sys.getdefaultencoding()
-CLIENT_ID = "d96eba460244559633e00680cddde41a26a13ebc0dc79a579cc94821479453f5"
-CLIENT_SECRET = "b6d749ee51bcb761afd8b0ca02d16cdd148fd39e2e03eac05334465e85f04d25"
+#Store API keys as environment variables
+CLIENT_ID = os.environ.get('WITHINGS_CLIENT_ID')
+CLIENT_SECRET = os.environ.get('WITHINGS_CLIENT_SECRET')
 
 def get_withings_auth_info():
     response_type = 'code'
@@ -92,14 +94,5 @@ def get_refreshed_withings_auth_info(userid, refresh_token):
     else:
         return result.json()
 
-if __name__ == "__main__":
-    auth_info = get_withings_auth_info()
-    print(auth_info)
-    datagetter = DataGetter(auth_info['access_token'])
-    data = datagetter.get_sleep('2023-02-07', '2023-02-08').json()
-    print(datagetter.get_sleep('2023-02-06', '2023-02-08').json())
-
-    # print('get_auth_info:', auth_info)
-    # datagetter = DataGetter(auth_info['access_token'])
-    # print(datagetter.get_sleep('2023-01-01', '2023-01-24').json())
-    # print('get_refreshed_auth_info:', get_refreshed_auth_info(auth_info['user_id'], auth_info['refresh_token']))
+# if __name__ == "__main__":
+#     print()
