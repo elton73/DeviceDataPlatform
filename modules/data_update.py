@@ -266,7 +266,7 @@ class Update_Device(object):
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
             data = result.json()
-
+            print(data)
             if type(data) is dict:
                 if 'errors' in list(data.keys()):
                     errorFlag = True
@@ -300,8 +300,10 @@ class Update_Device(object):
             if len(data):
                 data = [flatten_dictionary(d) for d in data]
                 df = pd.DataFrame(data)
-                df['userid'] = user.user_id
+                df['userid'] = user.userid
                 table = data_value
+
+                #Don't append for devices table
                 try:
                     if table == "devices":
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
