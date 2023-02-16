@@ -67,7 +67,7 @@ def delete_polar_user(user_id, token):
     return r
 
 if __name__=="__main__":
-    user_id = '59745643'
-    token = '549532da63f628c155edf2d30045297b'
+    user_id = '59782107'
+    token = '59175313cae9f2eeb71804eb7eaf329b'
     delete_polar_user(user_id, token)
 

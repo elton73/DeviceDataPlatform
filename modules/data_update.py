@@ -118,6 +118,7 @@ class Update_Device(object):
             print("No users")
             return False
         for user in self.users:
+            #todo: update request_num only if data is written to database
             if user.device_type == 'fitbit':
                 self.update_fitbit(user)
                 self.request_num += 1
@@ -216,10 +217,12 @@ class Update_Device(object):
                 UserDataRetriever.token = new_auth_info['access_token']
                 raw_data = UserDataRetriever.api_map[data_value](self.startDate, self.endDate).json()
             data = raw_data['body']['series']
+            #if there is no data, move on
+            if not data:
+                break
             if len(data):
-                #df.to_sql needs a very specific data structure so we reformat our data
+                # reformat data before creating dataframe
                 formatted_data = self.format_withings_data(data, data_key)
-
                 df = pd.DataFrame(formatted_data)
                 df['userid'] = user.user_id
                 table = data_value.replace('-', '').replace(' dataset', '')
