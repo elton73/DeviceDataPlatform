@@ -8,7 +8,7 @@ class DataGetter():
     def __init__(self, token, user_id):
         self.token = token
         self.user_id = user_id
-        self.transaction_id = self.get_transaction_id()
+        self.transaction_id = '265934071' #self.get_transaction_id()
         self.exercise_ids = self.get_exercise_ids()
         self.api_map = {
             'exercise_summary': self.get_exercise_summary,
@@ -55,6 +55,7 @@ class DataGetter():
         if r.status_code >= 200 and r.status_code < 400:
             try:
                 transaction_id = r.json()['transaction-id']
+                print(transaction_id)#debug
             except:
                 print("Cannot get transaction id")
         return transaction_id

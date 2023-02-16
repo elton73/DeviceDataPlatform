@@ -11,6 +11,7 @@ from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE, FITBIT_TABLES
     WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, POLAR_ENGINE
 from time import time
 import uuid
+import os
 
 AUTH_DB = connect_to_database(AUTH_DATABASE)
 
@@ -22,7 +23,7 @@ class Authorization(object):
         self.refresh_token = report_db.get_data(AUTH_DB, user_id, 'refresh_token')
 
     def get_refreshed_fitbit_auth_info(self):
-        CLIENT_ID = "23BHY7"# who's client id is this?
+        CLIENT_ID = os.environ.get('FITBIT_CLIENT_ID')
         payload = {
             'grant_type': 'refresh_token',
             'refresh_token': self.refresh_token,
@@ -39,8 +40,8 @@ class Authorization(object):
             return result.json()
 
     def get_refreshed_withings_auth_info(self):
-        CLIENT_ID = "d96eba460244559633e00680cddde41a26a13ebc0dc79a579cc94821479453f5"
-        CLIENT_SECRET = "b6d749ee51bcb761afd8b0ca02d16cdd148fd39e2e03eac05334465e85f04d25"
+        CLIENT_ID = os.environ.get('WITHINGS_CLIENT_ID')
+        CLIENT_SECRET = os.environ.get('WITHINGS_CLIENT_SECRET')
         payload = {
             'action': 'requesttoken',
             'grant_type': 'refresh_token',
@@ -148,7 +149,7 @@ class Update_Device(object):
             table = data_value.replace('-', '').replace(' dataset', '')
             df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
             #commit transaction. Old data will be deleted
-            UserDataRetriever.commit_transaction()
+            # UserDataRetriever.commit_transaction()
 
     #Format polar_data
     def format_exercise_summary(self, data, user_id):
@@ -160,6 +161,7 @@ class Update_Device(object):
                 exercise_summary.pop(column)
 
             heart_rate = exercise_summary.pop('heart-rate')
+            exercise_summary['start_time'] = exercise_summary.pop('start-time')
             exercise_summary['hr_average'] = heart_rate['average']
             exercise_summary['hr_max'] = heart_rate['maximum']
             exercise_summary['userid'] = user_id
@@ -169,16 +171,26 @@ class Update_Device(object):
         output = []
         index = 0
         for heart_rates in data:
-            current_time = 1
+            id = heart_rates['id']
+
+            #format our own time since polar doesn't provide it
+            db = connect_to_database(POLAR_DATABASE)
+            cursor = db.cursor()
+            cursor.execute(f"SELECT start_time FROM exercise_summary WHERE id='{id}'")
+            raw_time = cursor.fetchone()
+            formatted_time = raw_time[0].replace("T", " ") if raw_time else raw_time
+            current_time = datetime.strptime(formatted_time, "%Y-%m-%d %H:%M:%S")
+
+            #create rows
             recording_rate = heart_rates['recording-rate']
             for heart_rate in heart_rates['data'].split(","):
                 output.append({})
-                output[index]['id'] = heart_rates['id']
+                output[index]['id'] = id
                 output[index]['time'] = current_time
-                output[index]['value'] = heart_rate
+                output[index]['value'] = int(heart_rate)
                 output[index]['userid'] = user_id
                 index += 1
-                current_time += recording_rate
+                current_time = current_time + timedelta(seconds=recording_rate)
         return output
 
     """
@@ -208,7 +220,6 @@ class Update_Device(object):
                 #df.to_sql needs a very specific data structure so we reformat our data
                 formatted_data = self.format_withings_data(data, data_key)
 
-                print(formatted_data) # debug
                 df = pd.DataFrame(formatted_data)
                 df['userid'] = user.user_id
                 table = data_value.replace('-', '').replace(' dataset', '')
@@ -266,7 +277,6 @@ class Update_Device(object):
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
             data = result.json()
-            print(data)
             if type(data) is dict:
                 if 'errors' in list(data.keys()):
                     errorFlag = True
@@ -344,12 +354,8 @@ def flatten_dictionary(some_dict, parent_key='', separator='_'):
 
 
 if __name__ == '__main__':
-    # date1 = '2023-02-01'
-    # date2 = '2023-02-13'
     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
     end_date = date.today().strftime('%Y-%m-%d')  # today
-    #debug
-    # print(start_date)
-    # print(end_date)
     update = Update_Device(startDate=start_date, endDate=end_date)
     update.update_all()
+
