@@ -162,7 +162,7 @@ class Update_Device(object):
             heart_rate = exercise_summary.pop('heart-rate')
             exercise_summary['hr_average'] = heart_rate['average']
             exercise_summary['hr_max'] = heart_rate['maximum']
-            exercise_summary['user_id'] = user_id
+            exercise_summary['userid'] = user_id
         return data
 
     def format_heart_rate(self, data, user_id):

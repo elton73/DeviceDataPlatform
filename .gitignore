@@ -1,2 +1,3 @@
 #ignore secrets
-*.secrets
+*.secret_keys
+#test

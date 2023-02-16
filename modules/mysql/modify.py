@@ -1,7 +1,7 @@
 '''Insert data into table'''
 import requests
 import pandas as pd
-from modules import FITBIT_TABLES, WITHINGS_TABLES, POLAR_DATABASE
+from modules import FITBIT_TABLES, WITHINGS_TABLES, POLAR_TABLES
 from modules.mysql.setup import connect_to_database #todo: remove later
 
 def run_command(engine, command):
@@ -162,11 +162,11 @@ def remove_health_data(user_id, db, device_type):
         # remove member_id
         cursor.execute(f"DELETE FROM member_ids WHERE userid='{user_id}'")
 
-        # for key in POLAR_TABLES:
-        #     try:
-        #         cursor.execute(f"DELETE FROM {POLAR_TABLES[key]} WHERE userid='{user_id}'")
-        #     except:
-        #         print(f"{POLAR_TABLES[key]} table does not exist")
+        for key in POLAR_TABLES:
+            try:
+                cursor.execute(f"DELETE FROM {POLAR_TABLES[key]} WHERE userid='{user_id}'")
+            except:
+                print(f"{POLAR_TABLES[key]} table does not exist")
         db.commit()
         return
     return False
@@ -184,8 +184,9 @@ def export_device_to_auth_info(auth_info, db):
     mycursor.execute(command)
     db.commit()
 
-# if __name__ == "__main__":
-#     device_db = connect_to_database(POLAR_DATABASE)
+if __name__ == "__main__":
+    for key in FITBIT_TABLES:
+        print(FITBIT_TABLES[key])
 
 
 
