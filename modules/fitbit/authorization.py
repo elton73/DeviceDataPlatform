@@ -6,6 +6,7 @@ import numpy as np
 import hashlib
 
 CLIENT_ID = os.environ.get('FITBIT_CLIENT_ID')
+CLIENT_SECRET = os.environ.get('FITBIT_CLIENT_SECRET')
 ACCESS_TOKEN_URL = 'https://polarremote.com/v2/oauth2/token'
 
 SYS_DEFAULT_ENCODING = sys.getdefaultencoding()
@@ -15,6 +16,7 @@ class FitbitAccess(object):
         self.response_type = 'code'
         self.challenge_method = 'S256'
         self.verifier, self.challenge_code = self.generate_challenge_code()
+        self.base64 = self.generate_base64()
         self.authorization_url = self.build_auth_url()
         self.access_token_url = ACCESS_TOKEN_URL
 
@@ -28,16 +30,19 @@ class FitbitAccess(object):
                 code_element = np.random.randint(0, 10)
                 verifier += str(code_element)
         verifier = verifier.encode(SYS_DEFAULT_ENCODING)
-
         challenge_code = base64.urlsafe_b64encode(hashlib.sha256(verifier).digest())
-
         return verifier.decode(SYS_DEFAULT_ENCODING), challenge_code.decode(SYS_DEFAULT_ENCODING).replace('=', '')
+
+    def generate_base64(self):
+        code = f"""{CLIENT_ID}:{CLIENT_SECRET}""".encode(SYS_DEFAULT_ENCODING)
+        return "Basic " + base64.urlsafe_b64encode(code).decode("utf-8")
 
     def exchange_token(self, authorization_code):
         try:
             # Exchange the code for a token
             token_exchange_url = f'https://api.fitbit.com/oauth2/token'
-            headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+            headers = {'Content-Type': 'application/x-www-form-urlencoded',
+                       'Authorization': self.base64}
             payload = {
                 'code': authorization_code,
                 'client_id': CLIENT_ID,
@@ -52,3 +57,9 @@ class FitbitAccess(object):
         except Exception as e:
             print(e)
         return False
+
+if __name__=="__main__":
+    fitbit = FitbitAccess()
+    code = 'bfe7e796b085bf75a33dd2d7d7093cdfa2ae2c0a'
+    output = fitbit.exchange_token(code)
+    print(output)

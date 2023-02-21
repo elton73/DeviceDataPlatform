@@ -14,12 +14,12 @@ class PolarAccess(object):
         self.response_type = 'code'
         self.authorization_url = self.build_auth_url()
         self.access_token_url = ACCESS_TOKEN_URL
-        self.challenge_code = self.generate_challenge_code()
+        self.challenge_code = self.generate_base64()
 
     def build_auth_url(self):
         return f'''https://flow.polar.com/oauth2/authorization?response_type={self.response_type}&client_id={CLIENT_ID}'''
 
-    def generate_challenge_code(self):
+    def generate_base64(self):
         code = f"""{CLIENT_ID}:{CLIENT_SECRET}""".encode(SYS_DEFAULT_ENCODING)
         return "Basic " + base64.urlsafe_b64encode(code).decode("utf-8")
 
@@ -30,7 +30,7 @@ class PolarAccess(object):
             headers = {
                 'Accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': self.challenge_code}
+                'Authorization': self.base64}
             payload = {
                 'grant_type': 'authorization_code',
                 'code': authorization_code

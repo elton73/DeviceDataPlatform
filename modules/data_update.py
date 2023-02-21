@@ -138,6 +138,7 @@ class Update_Device(object):
         UserDataRetriever = polar_retrieve.DataGetter(user.access_token, user.user_id)
         for data_key, data_value in POLAR_TABLES.items():
             data = UserDataRetriever.api_map[data_value]()
+            print(data)
             #break if no data
             if not data:
                 break
@@ -147,6 +148,7 @@ class Update_Device(object):
             elif data_key == 'heart_rate':
                 formatted_data = self.format_heart_rate(data, user.user_id)
             df = pd.DataFrame(formatted_data)
+            print(formatted_data)
             table = data_value.replace('-', '').replace(' dataset', '')
             df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
             #commit transaction. Old data will be deleted
@@ -217,6 +219,7 @@ class Update_Device(object):
                 UserDataRetriever.token = new_auth_info['access_token']
                 raw_data = UserDataRetriever.api_map[data_value](self.startDate, self.endDate).json()
             data = raw_data['body']['series']
+            print(data)
             #if there is no data, move on
             if not data:
                 break
@@ -225,15 +228,17 @@ class Update_Device(object):
                 formatted_data = self.format_withings_data(data, data_key)
                 df = pd.DataFrame(formatted_data)
                 df['userid'] = user.user_id
+                print(formatted_data)
                 table = data_value.replace('-', '').replace(' dataset', '')
                 df.to_sql(con=WITHINGS_ENGINE, name=table, if_exists='append')
             # Manually update device data to mysql
             if not device_data:
                 device_data = [{
-                    'model': data[0][f'model']
+                    'model': data[0][f'model'],
                 }]
                 device_df = pd.DataFrame(device_data)
                 device_df['userid'] = user.user_id
+                device_df['last_update'] = self.endDate
                 device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='replace')
 
     # Control how the Withings data is structured. This changes how the information will look on mysql
@@ -280,6 +285,7 @@ class Update_Device(object):
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
             data = result.json()
+            print(data)
             if type(data) is dict:
                 if 'errors' in list(data.keys()):
                     errorFlag = True
@@ -319,6 +325,7 @@ class Update_Device(object):
                 #Don't append for devices table
                 try:
                     if table == "devices":
+                        df['last_update'] = self.endDate
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
                     else:
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
@@ -358,7 +365,7 @@ def flatten_dictionary(some_dict, parent_key='', separator='_'):
 
 if __name__ == '__main__':
     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
-    end_date = date.today().strftime('%Y-%m-%d')  # today
+    end_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
     update = Update_Device(startDate=start_date, endDate=end_date)
     update.update_all()
 
