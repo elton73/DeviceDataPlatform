@@ -152,6 +152,7 @@ class Update_Device(object):
             else:
                 data_flag = True
             #format data
+            print(data)
             if data_key == 'exercise_summary':
                 formatted_data = self.format_exercise_summary(data, user.user_id)
             elif data_key == 'heart_rate':
@@ -160,7 +161,7 @@ class Update_Device(object):
             table = data_value.replace('-', '').replace(' dataset', '')
             df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
             #commit transaction. Old data will be deleted
-            UserDataRetriever.commit_transaction()
+            # UserDataRetriever.commit_transaction()
         if data_flag:
             self.users_updated.append(user.user_id)
             self.request_num += 1
@@ -205,7 +206,7 @@ class Update_Device(object):
                 output.append({})
                 output[index]['id'] = id
                 output[index]['time'] = current_time
-                output[index]['value'] = int(heart_rate)
+                output[index]['value'] = int(float(heart_rate))
                 output[index]['userid'] = user_id
                 index += 1
                 current_time = current_time + timedelta(seconds=recording_rate)
