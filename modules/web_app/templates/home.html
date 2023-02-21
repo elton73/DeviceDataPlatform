@@ -16,9 +16,32 @@
         <a class="btn btn-outline-success add-button ml-3" href="{{ url_for('addpatient') }}">
           Add Patient
         </a>
-         <a class="btn btn-outline-info update-button" href="{{ url_for('updatenow') }}">
+         <a class="btn btn-outline-info update-button" data-toggle="modal" data-target="#updateModal">
           Update Now
         </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- updateModal -->
+  <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" id="updateNow">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateModalLabel">Update Users?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Note: Only Users With New Data Will Be Updated
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('updatenow') }}">
+            <input class="btn btn-primary" type="submit" value="Update">
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -48,7 +71,7 @@
 
 {% for patient in patients %}
     <div class="container-fluid" style="border-radius: 0 !important;">
-      <button type="button" style="padding: 0 !important" class=" btn btn-primary-outline" data-toggle="modal" data-target="#exampleModal{{ patient['patient_id'] }}">
+      <button type="button" style="padding: 0 !important" class=" btn btn-primary-outline" data-toggle="modal" data-target="#deleteModal{{ patient['patient_id'] }}">
       <div class="row no-gutters justify-content-center">
         <div class="col-4" style="text-align: center">
           <div class="content-section2">
@@ -71,12 +94,12 @@
       </div>
       </button>
     </div>
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal{{ patient['patient_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <!-- deleteModal -->
+  <div class="modal fade" id="deleteModal{{ patient['patient_id'] }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document" id="{{ patient['patient_id'] }}">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel{{ patient['patient_id'] }}">Delete User?</h5>
+          <h5 class="modal-title" id="deleteModalLabel{{ patient['patient_id'] }}">Delete User?</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>

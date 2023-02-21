@@ -2,7 +2,7 @@ from flask import render_template, url_for, flash, redirect, session, request
 from modules.mysql.setup import connect_to_database
 from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_device_users, \
-    check_invalid_device, get_data
+    check_valid_device, get_data
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_patient, \
     export_device_to_auth_info
 from modules.web_app import app, login_db, bcrypt
@@ -132,8 +132,8 @@ def after_request(response):
 
 @app.route('/updatenow')
 def updatenow():
-    runschedule()
-    flash('Data Updated', 'info')
+    request_num = runschedule()
+    flash(f'Users Updated: {request_num}', 'info')
     return redirect(url_for('home'))
 
 @app.route("/oauth2_callback")
@@ -153,11 +153,13 @@ def callback():
     #setup database connections
     auth_db = connect_to_database(AUTH_DATABASE)
     device_db = connect_to_database(session.get('database'))
+    patient_id = session.get('patient_id')
 
     user_id = auth_info['user_id']
     #check if device already exists
-    if check_invalid_device(user_id, auth_db, device_db):
-        flash('Device Already Exists', 'danger')
+    valid_device, message = check_valid_device(user_id, patient_id, auth_db, device_db)
+    if not valid_device:
+        flash(f'{message}', 'danger')
         return redirect(url_for('addpatient'))
 
     # export data to sql database

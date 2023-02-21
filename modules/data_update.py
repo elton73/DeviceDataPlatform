@@ -8,19 +8,18 @@ import requests
 import pandas as pd
 from datetime import datetime, timedelta, date
 from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE, FITBIT_TABLES, WITHINGS_TABLES, \
-    WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, POLAR_ENGINE
+    WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, POLAR_ENGINE, FITBIT_DATABASE, WITHINGS_DATABASE
 from time import time
 import uuid
 import os
 
-AUTH_DB = connect_to_database(AUTH_DATABASE)
-
 class Authorization(object):
     def __init__(self, user_id):
+        self.db = connect_to_database(AUTH_DATABASE)
         self.user_id = user_id
-        self.device_type = report_db.get_data(AUTH_DB, user_id, 'device_type')
-        self.access_token = report_db.get_data(AUTH_DB, user_id, 'auth_token')
-        self.refresh_token = report_db.get_data(AUTH_DB, user_id, 'refresh_token')
+        self.device_type = report_db.get_data(self.db, user_id, 'device_type')
+        self.access_token = report_db.get_data(self.db, user_id, 'auth_token')
+        self.refresh_token = report_db.get_data(self.db, user_id, 'refresh_token')
 
     def get_refreshed_fitbit_auth_info(self):
         CLIENT_ID = os.environ.get('FITBIT_CLIENT_ID')
@@ -109,6 +108,8 @@ class Update_Device(object):
         self.endDate = endDate
         self.request_num = 0
         self.users = self.generate_users()
+        self.users_updated = []
+        self.users_skipped = []
 
     #update all devices
     def update_all(self):
@@ -116,43 +117,57 @@ class Update_Device(object):
         start = time()
         if not self.users:
             print("No users")
-            return False
+            return self.request_num
+
         for user in self.users:
-            #todo: update request_num only if data is written to database
+            print(user.user_id)
+            """
+            Skip user if their data has been already updated. Polar does not use this check.
+            """
+            if self.already_updated(user):
+                continue
             if user.device_type == 'fitbit':
                 self.update_fitbit(user)
-                self.request_num += 1
-            if user.device_type == "withings":
+            elif user.device_type == "withings":
                 self.update_withings(user)
-                self.request_num += 1
-            if user.device_type == "polar":
+            elif user.device_type == "polar":
                 self.update_polar(user)
-                self.request_num += 1
-        return print(f"{self.request_num} users updated in {time()-start} seconds")
+
+        print(f"Users updated: {self.users_updated}")
+        print(f"User skipped: {self.users_skipped}")
+        print(f"{self.request_num} users updated in {time() - start} seconds")
+        return self.request_num
 
     """
     Polar API
     """
     def update_polar(self, user):
         member_id = user.check_polar_member_id()
+        data_flag = False #Flag for if user has data to be uploaded to mysql
         UserDataRetriever = polar_retrieve.DataGetter(user.access_token, user.user_id)
         for data_key, data_value in POLAR_TABLES.items():
             data = UserDataRetriever.api_map[data_value]()
-            print(data)
-            #break if no data
             if not data:
                 break
+            else:
+                data_flag = True
             #format data
             if data_key == 'exercise_summary':
                 formatted_data = self.format_exercise_summary(data, user.user_id)
             elif data_key == 'heart_rate':
                 formatted_data = self.format_heart_rate(data, user.user_id)
             df = pd.DataFrame(formatted_data)
-            print(formatted_data)
             table = data_value.replace('-', '').replace(' dataset', '')
             df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
             #commit transaction. Old data will be deleted
-            # UserDataRetriever.commit_transaction()
+            UserDataRetriever.commit_transaction()
+        if data_flag:
+            self.users_updated.append(user.user_id)
+            self.request_num += 1
+            return True
+        else:
+            self.users_skipped.append(user.user_id)
+            return False
 
     #Format polar_data
     def format_exercise_summary(self, data, user_id):
@@ -202,6 +217,7 @@ class Update_Device(object):
     def update_withings(self, user):
         UserDataRetriever = withings_retrieve.DataGetter(user.access_token)
         device_data = []
+        data_flag = False  # Flag for if user has data to be uploaded to mysql
         for data_key, data_value in WITHINGS_TABLES.items():
             result = UserDataRetriever.api_map[data_value](self.startDate, self.endDate)
             raw_data = result.json()
@@ -213,22 +229,22 @@ class Update_Device(object):
                 if new_auth_info == '':
                     break
                 # Update the database
-                modify_db.update_auth_token(AUTH_DB, user.user_id, new_auth_info['access_token'])
-                modify_db.update_refresh_token(AUTH_DB, user.user_id, new_auth_info['refresh_token'])
+                modify_db.update_auth_token(user.db, user.user_id, new_auth_info['access_token'])
+                modify_db.update_refresh_token(user.db, user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
                 raw_data = UserDataRetriever.api_map[data_value](self.startDate, self.endDate).json()
             data = raw_data['body']['series']
-            print(data)
             #if there is no data, move on
             if not data:
                 break
+            else:
+                data_flag += 1
             if len(data):
                 # reformat data before creating dataframe
                 formatted_data = self.format_withings_data(data, data_key)
                 df = pd.DataFrame(formatted_data)
                 df['userid'] = user.user_id
-                print(formatted_data)
                 table = data_value.replace('-', '').replace(' dataset', '')
                 df.to_sql(con=WITHINGS_ENGINE, name=table, if_exists='append')
             # Manually update device data to mysql
@@ -238,8 +254,15 @@ class Update_Device(object):
                 }]
                 device_df = pd.DataFrame(device_data)
                 device_df['userid'] = user.user_id
-                device_df['last_update'] = self.endDate
+                device_df['lastUpdate'] = self.endDate
                 device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='replace')
+        if data_flag:
+            self.users_updated.append(user.user_id)
+            self.request_num += 1
+            return True
+        else:
+            self.users_skipped.append(user.user_id)
+            return False
 
     # Control how the Withings data is structured. This changes how the information will look on mysql
     def format_withings_data(self, data, data_key):
@@ -270,7 +293,7 @@ class Update_Device(object):
     """
     def update_fitbit(self, user):
         UserDataRetriever = fitbit_retrieve.DataGetter(user.access_token)
-
+        data_flag = False  # Flag for if user has data to be uploaded to mysql
         for data_key, data_value in FITBIT_TABLES.items():
             result = UserDataRetriever.api_map[data_key](self.startDate, self.endDate)
             # Expired token
@@ -280,12 +303,14 @@ class Update_Device(object):
                 if new_auth_info == '':
                     break
                 # Update the database
-                modify_db.update_auth_token(AUTH_DB, user.user_id, new_auth_info['access_token'])
-                modify_db.update_refresh_token(AUTH_DB, user.user_id, new_auth_info['refresh_token'])
+                modify_db.update_auth_token(user.db, user.user_id, new_auth_info['access_token'])
+                modify_db.update_refresh_token(user.db, user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
             data = result.json()
-            print(data)
+            #break if there is no device
+            if data_key == "devices" and data == []:
+                break
             if type(data) is dict:
                 if 'errors' in list(data.keys()):
                     errorFlag = True
@@ -317,6 +342,7 @@ class Update_Device(object):
                         # There should only be a list left
                         data += next_day_data
             if len(data):
+                data_flag = True
                 data = [flatten_dictionary(d) for d in data]
                 df = pd.DataFrame(data)
                 df['userid'] = user.user_id
@@ -325,13 +351,19 @@ class Update_Device(object):
                 #Don't append for devices table
                 try:
                     if table == "devices":
-                        df['last_update'] = self.endDate
+                        df['lastUpdate'] = self.endDate
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
                     else:
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
                 except:
                     continue
-
+        if data_flag:
+            self.users_updated.append(user.user_id)
+            self.request_num += 1
+            return True
+        else:
+            self.users_skipped.append(user.user_id)
+            return False
     def pop_data(self, keys, dict):
         for key in keys:
             if key in dict:
@@ -339,10 +371,31 @@ class Update_Device(object):
         return dict
     def generate_users(self):
         users = set()
-        for userid in report_db.get_all_user_ids(AUTH_DB):
+        db = connect_to_database(AUTH_DATABASE)
+        for userid in report_db.get_all_user_ids(db):
             user = Authorization(user_id=userid)
             users.add(user)
         return users
+
+    def already_updated(self, user):
+        if user.device_type == "fitbit":
+            db = connect_to_database(FITBIT_DATABASE)
+        elif user.device_type == "withings":
+            db = connect_to_database(WITHINGS_DATABASE)
+        #Polar won't have duplicate data
+        else:
+            return False
+        cursor = db.cursor()
+        try:
+            cursor.execute(f"SELECT * FROM devices WHERE userid = '{user.user_id}' AND lastUpdate = '{self.endDate}'")
+            if cursor.fetchone():
+                self.users_skipped.append(user.user_id)
+                return True
+            return False
+        except Exception as e:
+            print(e)
+            return False
+
 
 def range_dates(startDate, endDate, step=1):
     for i in range((endDate - startDate).days):

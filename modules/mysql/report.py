@@ -1,8 +1,5 @@
 '''Functions to generate reports from the database'''
 from bcrypt import checkpw
-from modules.fitbit.authentication import get_fitbit_auth_info
-from modules.withings.authentication import get_withings_auth_info
-from modules.polar.authentication import get_polar_auth_info
 from modules.mysql.setup import connect_to_database
 
 def get_all_token_timeouts(connection):
@@ -76,20 +73,22 @@ def check_input_key(input_key, db):
     return False
 
 #Check if device already exists
-def check_invalid_device(user_id, auth_db, fitbit_db):
-    #case 1 device already exists is auth_info
+def check_valid_device(user_id, patient_id, auth_db, db):
+    #case 1 device already exists in auth_info
     cursor = auth_db.cursor()
     cursor.execute(f"SELECT * FROM auth_info WHERE userid = '{user_id}'")
     if cursor.fetchall():
-        return True
+        message = "Device Already Exists"
+        return False, message
 
-    #case 2 device already exists in fitbit database #todo: check for other databases
-    cursor = fitbit_db.cursor()
-    cursor.execute(f"SELECT * FROM patient_ids WHERE userid = '{user_id}'")
+    #case 2 patient already exists in database
+    cursor = db.cursor()
+    cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id = '{patient_id}'")
     if cursor.fetchall():
-        return True
+        message = "Please Choose Different Patient ID"
+        return False, message
 
-    return False
+    return True, None
 
 #Get all current fitbit users from fitbit database
 def get_device_users(db):

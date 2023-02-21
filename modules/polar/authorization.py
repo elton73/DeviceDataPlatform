@@ -14,7 +14,7 @@ class PolarAccess(object):
         self.response_type = 'code'
         self.authorization_url = self.build_auth_url()
         self.access_token_url = ACCESS_TOKEN_URL
-        self.challenge_code = self.generate_base64()
+        self.base64 = self.generate_base64()
 
     def build_auth_url(self):
         return f'''https://flow.polar.com/oauth2/authorization?response_type={self.response_type}&client_id={CLIENT_ID}'''

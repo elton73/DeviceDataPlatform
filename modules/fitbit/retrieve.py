@@ -30,7 +30,7 @@ class DataGetter():
                             headers={'authorization': f'Bearer {self.token}'})
 
     def get_steps(self, startDate, endDate):
-        return requests.get(f'https://api.fitbit.com/1/user/-/activities/steps/date/{startDate}/{endDate}.json',
+        return requests.get(f'https://api.fitbit.com/1/user/-/activities/steps/date/{startDate}/{startDate}.json',
                             headers={'authorization': f'Bearer {self.token}'})
 
     def get_heartrate(self, startDate, endDate):

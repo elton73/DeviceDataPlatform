@@ -57,15 +57,14 @@ class DataGetter():
                 'Authorization': f'Bearer {self.token}'}
             )
         if r.status_code == 204:
-            print(f"No Transaction Data: {r}")
+            return None
         elif r.status_code >= 200 and r.status_code < 400:
             try:
                 transaction_id = r.json()['transaction-id']
-                print(transaction_id)
             except:
-                print(f"Transaction Failed: {r}")
+                print(f"Could not get transaction id: {r}")
         else:
-            print(f"Transaction Failed: {r}")
+            print(f"Could not get transaction id: {r}")
         return transaction_id
 
     def get_exercise_ids(self):
