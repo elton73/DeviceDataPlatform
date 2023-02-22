@@ -21,6 +21,9 @@ class Authorization(object):
         self.access_token = report_db.get_data(self.db, user_id, 'auth_token')
         self.refresh_token = report_db.get_data(self.db, user_id, 'refresh_token')
 
+    """
+    FITBIT API
+    """
     def get_refreshed_fitbit_auth_info(self):
         CLIENT_ID = os.environ.get('FITBIT_CLIENT_ID')
         payload = {
@@ -38,6 +41,9 @@ class Authorization(object):
         else:
             return result.json()
 
+    """
+    Withings API
+    """
     def get_refreshed_withings_auth_info(self):
         CLIENT_ID = os.environ.get('WITHINGS_CLIENT_ID')
         CLIENT_SECRET = os.environ.get('WITHINGS_CLIENT_SECRET')
@@ -73,7 +79,6 @@ class Authorization(object):
         if not member_id:
             member_id = self.register_polar_user(db)
         return member_id
-
 
     # Register user and upload member_id to mysql
     def register_polar_user(self, db):
@@ -120,7 +125,6 @@ class Update_Device(object):
             return self.request_num
 
         for user in self.users:
-            print(user.user_id)
             """
             Skip user if their data has been already updated. Polar does not use this check.
             """
@@ -152,7 +156,7 @@ class Update_Device(object):
             else:
                 data_flag = True
             #format data
-            print(data)
+            # print(data) #debug
             if data_key == 'exercise_summary':
                 formatted_data = self.format_exercise_summary(data, user.user_id)
             elif data_key == 'heart_rate':
@@ -161,7 +165,7 @@ class Update_Device(object):
             table = data_value.replace('-', '').replace(' dataset', '')
             df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
             #commit transaction. Old data will be deleted
-            # UserDataRetriever.commit_transaction()
+            UserDataRetriever.commit_transaction()
         if data_flag:
             self.users_updated.append(user.user_id)
             self.request_num += 1
@@ -170,12 +174,11 @@ class Update_Device(object):
             self.users_skipped.append(user.user_id)
             return False
 
-    #Format polar_data
+    #Format polar exerise summary data
     def format_exercise_summary(self, data, user_id):
         for exercise_summary in data:
             #remove data columns
-            pop_columns = ['upload-time', 'polar-user', 'transaction-id', 'start-time-utc-offset', 'has-route',
-                           'detailed-sport-info']
+            pop_columns = ['upload-time', 'polar-user', 'has-route', 'detailed-sport-info']
             for column in pop_columns:
                 exercise_summary.pop(column)
 
@@ -186,6 +189,7 @@ class Update_Device(object):
             exercise_summary['userid'] = user_id
         return data
 
+    #format polar heart_rate data
     def format_heart_rate(self, data, user_id):
         output = []
         index = 0
@@ -236,6 +240,7 @@ class Update_Device(object):
                 UserDataRetriever.token = new_auth_info['access_token']
                 raw_data = UserDataRetriever.api_map[data_value](self.startDate, self.endDate).json()
             data = raw_data['body']['series']
+            # print(data) #debug
             #if there is no data, move on
             if not data:
                 break
@@ -309,6 +314,7 @@ class Update_Device(object):
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
             data = result.json()
+            # print(data) #debug
             #break if there is no device
             if data_key == "devices" and data == []:
                 break
@@ -365,11 +371,14 @@ class Update_Device(object):
         else:
             self.users_skipped.append(user.user_id)
             return False
+
     def pop_data(self, keys, dict):
         for key in keys:
             if key in dict:
                 dict.pop(key)
         return dict
+
+    #generate list of all users in auth database
     def generate_users(self):
         users = set()
         db = connect_to_database(AUTH_DATABASE)
@@ -378,12 +387,13 @@ class Update_Device(object):
             users.add(user)
         return users
 
+    #check if device was updated today
     def already_updated(self, user):
         if user.device_type == "fitbit":
             db = connect_to_database(FITBIT_DATABASE)
         elif user.device_type == "withings":
             db = connect_to_database(WITHINGS_DATABASE)
-        #Polar won't have duplicate data
+        #Polar checks for duplicate data differently
         else:
             return False
         cursor = db.cursor()
@@ -420,6 +430,13 @@ def flatten_dictionary(some_dict, parent_key='', separator='_'):
 if __name__ == '__main__':
     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
     end_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
+
+    # start_date = (date.today() - timedelta(days=9)).strftime('%Y-%m-%d')  # yesterday
+    # end_date = (date.today() - timedelta(days=8)).strftime('%Y-%m-%d')  # today %Y-%m-%d
+
+    # start_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
+    # end_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
+
     update = Update_Device(startDate=start_date, endDate=end_date)
     update.update_all()
 

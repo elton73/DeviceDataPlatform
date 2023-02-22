@@ -4,15 +4,16 @@
 <!--  Title, update and add buttons-->
   <div class="container-fluid">
     <div class="row no-gutters justify-content-center">
-      <div class="col-2">
-        <h1 style="width: 100%;">
-          Patients
-        </h1>
-      </div>
 
-      <div class="col-7">
-      </div>
-      <div class="col-3">
+      <form class="form-inline col-7" method="GET">
+        <input class="form-control w-75 mr-sm-2 searchbar"
+          type="search" placeholder="Search" name="q">
+        <button type=""submit class="btn btn-success" style="border-radius: 50px;">
+          <i class="fa fa-search"></i>
+        </button>
+      </form>
+
+      <div class="col-5">
         <a class="btn btn-outline-success add-button ml-3" href="{{ url_for('addpatient') }}">
           Add Patient
         </a>

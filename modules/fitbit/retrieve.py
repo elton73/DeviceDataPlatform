@@ -26,7 +26,7 @@ class DataGetter():
                             headers={'authorization': f'Bearer {self.token}'})
 
     def get_sleep(self, startDate, endDate):
-        return requests.get(f'https://api.fitbit.com/1.2/user/-/sleep/date/{startDate}/{endDate}.json',
+        return requests.get(f'https://api.fitbit.com/1.2/user/-/sleep/date/{startDate}/{startDate}.json',
                             headers={'authorization': f'Bearer {self.token}'})
 
     def get_steps(self, startDate, endDate):

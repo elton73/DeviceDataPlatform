@@ -45,12 +45,6 @@ CREATE TABLE IF NOT EXISTS member_ids(
     member_id VARCHAR(254));
 '''
 
-SQL_CREATE_DATABASE_USERS = '''
-CREATE TABLE IF NOT EXISTS users(
-    username VARCHAR(30) NOT NULL PRIMARY KEY,
-    password VARCHAR(30));
-'''
-
 # TODO: CREATE this mysql user and GRANT them ALL PRIVILEGES if you haven't
 DEVICE_DATABASES = [FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE] # add databases for new devices
 
@@ -92,18 +86,18 @@ def connect_to_database(databasename):
     )
     return database
 
+#setup all databases
 def setup_databases():
     engine = make_engine()
     create_dbs(engine, AUTH_DATABASE, SQL_CREATE_AUTH_TABLE)
     # create_dbs(engine, EMAILS_DATABASE, SQL_CREATE_EMAIL_LIST_TABLE)
     create_dbs(engine, DEVICE_DATABASES, SQL_CREATE_PATIENT_DEVICE_TABLE)
     create_dbs(engine, LOGIN_DATABASE, SQL_CREATE_WEBAPP_LOGIN_INFO_TABLE)
-    create_dbs(engine, DATABASE_USERS, SQL_CREATE_DATABASE_USERS)
-
     create_table(engine, LOGIN_DATABASE, SQL_CREATE_KEY_TABLE)
     create_key("12345")
     create_table(engine, POLAR_DATABASE, SQL_CREATE_POLAR_MEMBER_ID_TABLE)
 
+#Generate sign up key
 def create_key(key):
     if key.isnumeric():
         command = f"""

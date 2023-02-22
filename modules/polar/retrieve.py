@@ -36,18 +36,26 @@ class DataGetter():
             return
         samples = []
         for exercise_id in self.exercise_ids:
-            r = requests.get(f'https://www.polaraccesslink.com/v3/users/{self.user_id}/exercise-transactions/{self.transaction_id}/exercises/{exercise_id}/samples/1',
+            r = requests.get(f'https://www.polaraccesslink.com/v3/users/{self.user_id}/exercise-transactions/{self.transaction_id}/exercises/{exercise_id}/samples/0',
                 headers={
                     'Accept': 'application/json',
                     'Authorization': f'Bearer {self.token}'}
             )
-            if r.status_code >= 200 and r.status_code < 400:
+            #sometimes request fails with type 0, so try type 1
+            if r.status_code == 204:
+                r = requests.get(
+                    f'https://www.polaraccesslink.com/v3/users/{self.user_id}/exercise-transactions/{self.transaction_id}/exercises/{exercise_id}/samples/1',
+                    headers={
+                        'Accept': 'application/json',
+                        'Authorization': f'Bearer {self.token}'}
+                    )
+            if r.status_code >= 200 and r.status_code < 400 and r.status_code != 204:
                 data = r.json()
                 #add exercise_id to data
                 data['id'] = exercise_id
                 samples.append(data)
             else:
-                print(f"Exercise Summary Fail {r}")
+                print(f"Samples Fail {r}")
         return samples
     def get_transaction_id(self):
         transaction_id = None
@@ -57,7 +65,7 @@ class DataGetter():
                 'Authorization': f'Bearer {self.token}'}
             )
         if r.status_code == 204:
-            print(f"Transaction ID: {transaction_id}")
+            print(f"Transaction ID: {transaction_id}. Status code: {r.status_code}")
             return None
         elif r.status_code >= 200 and r.status_code < 400:
             try:

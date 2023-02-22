@@ -1,11 +1,12 @@
 import os
 import sys
 import requests
+from modules.web_app import DATAPLATFORM_URL
 
 CLIENT_ID = os.environ.get('WITHINGS_CLIENT_ID')
 CLIENT_SECRET = os.environ.get('WITHINGS_CLIENT_SECRET')
 ACCESS_TOKEN_URL = 'https://wbsapi.withings.net/v2/oauth2'
-CALLBACK_URL = "http://localhost:5000/oauth2_callback" #todo: change this to ngrok site
+CALLBACK_URL = f"{DATAPLATFORM_URL}/oauth2_callback" #todo: change this to ngrok site
 
 SYS_DEFAULT_ENCODING = sys.getdefaultencoding()
 

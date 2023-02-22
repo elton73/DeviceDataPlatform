@@ -11,6 +11,7 @@ def get_all_token_timeouts(connection):
     result = cursor.fetchall()
     return {data[0]: data[1] for data in result}
 
+#get userids from auth database
 def get_all_user_ids(connection):
     command = '''
     SELECT userid FROM Auth_info;
@@ -40,7 +41,7 @@ def get_refresh_tokens(connection, selected_users):
     result = cursor.fetchall()
     return {data[0]: data[1] for data in result}
 
-
+#get data for a selected userid from a database
 def get_data(connection, selected_user, datatype):
     command = f'''
     SELECT {datatype} FROM auth_info
@@ -68,11 +69,11 @@ def check_login_details(email, password, db):
 def check_input_key(input_key, db):
     cursor = db.cursor()
     cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{input_key}' AND email IS NULL")
-    if cursor.fetchall():
+    if cursor.fetchone():
         return True
     return False
 
-#Check if device already exists
+#Check if device already exists and return a message to flash
 def check_valid_device(user_id, patient_id, auth_db, db):
     #case 1 device already exists in auth_info
     cursor = auth_db.cursor()
@@ -87,10 +88,9 @@ def check_valid_device(user_id, patient_id, auth_db, db):
     if cursor.fetchall():
         message = "Please Choose Different Patient ID"
         return False, message
-
     return True, None
 
-#Get all current fitbit users from fitbit database
+#Get all current device users from the database
 def get_device_users(db):
     cursor = db.cursor(dictionary=True)
     command = f'''
@@ -130,5 +130,4 @@ def format_OR_clause(column: str, condition: list):
         print(where_clause)
         return where_clause
 
-if __name__ == "__main__":
-    print(get_device_type(connect_to_database("authorization_info"), '33192922'))
+# if __name__ == "__main__":

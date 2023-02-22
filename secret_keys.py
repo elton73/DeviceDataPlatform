@@ -1,4 +1,4 @@
 secrets = {
     'SECRET_USER': 'newwriter',
-    'SECRET_PASSWORD': 'password'
+    'SECRET_PASSWORD': 'Pass%%word73'
 }

@@ -1,4 +1,6 @@
-'''This package will open up a browser and retrieve the Access token'''
+'''
+Deprecated
+'''
 import requests
 from selenium import webdriver
 import selenium.webdriver.support.ui as ui
@@ -67,7 +69,7 @@ def delete_polar_user(user_id, token):
     return r
 
 if __name__=="__main__":
-    user_id = '59782107'
-    token = '59175313cae9f2eeb71804eb7eaf329b'
+    user_id = '59745643'
+    token = 'a48ebf068cc456644af7ced859756c31'
     delete_polar_user(user_id, token)
 

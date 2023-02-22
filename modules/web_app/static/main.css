@@ -87,6 +87,11 @@ h1, h2, h3, h4, h5, h6 {
 
 }
 
+.searchbar{
+    border-color: #59B274;
+    border-radius: 25px;
+    width: 80%;
+    }
 
 
 .content-button {

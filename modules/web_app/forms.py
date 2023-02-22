@@ -63,9 +63,7 @@ class PatientForm(FlaskForm):
 
     device_type = SelectField('Device Type',
                               choices=choices)
-
     submit = SubmitField('Submit')
-
 
 if __name__ == '__main__':
     db = connect_to_database("webapp_login_info")

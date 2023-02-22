@@ -148,7 +148,10 @@ def remove_health_data(user_id, db, device_type):
     # remove data from withings database
     elif device_type == "withings":
         #special case for devices table
-        cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
+        try:
+            cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
+        except Exception as e:
+            print(e)
         for key in WITHINGS_TABLES:
             try:
                 cursor.execute(f"DELETE FROM {WITHINGS_TABLES[key]} WHERE userid='{user_id}'")

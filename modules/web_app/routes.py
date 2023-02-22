@@ -5,13 +5,12 @@ from modules.mysql.report import check_login_details, check_input_key, get_devic
     check_valid_device, get_data
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_patient, \
     export_device_to_auth_info
-from modules.web_app import app, login_db, bcrypt
+from modules.web_app import app, login_db, bcrypt, GRAFANA_URL
 from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE
 from scheduled import runschedule
 from modules.polar.authorization import PolarAccess
 from modules.fitbit.authorization import FitbitAccess
 from modules.withings.authorization import WithingsAccess
-
 
 polar = PolarAccess()
 fitbit = FitbitAccess()
@@ -28,8 +27,22 @@ def home():
             connect_to_database(WITHINGS_DATABASE),
             connect_to_database(POLAR_DATABASE)
         ]
-        #Add all patients using different devices into a list
-        all_patients = [user for db in databases for user in get_device_users(db)]
+
+        # Add all patients using different devices into a list.
+        all_patients = []
+        # search function
+        search = request.args.get('q')
+        if search:
+            search = search.lower()
+            for db in databases:
+                for user in get_device_users(db):
+                    if (search in user['patient_id'].lower()) or \
+                            (search in user['userid'].lower()) or \
+                            (search in user['device_type'].lower()):
+                        all_patients.append(user)
+        else:
+            all_patients = [user for db in databases for user in get_device_users(db)]
+
         return render_template('home.html', patients=all_patients)
     else:
         #return to login page if user is not logged in
@@ -167,3 +180,7 @@ def callback():
     export_patient_data(user_id, session.get('patient_id'), session.get('device_type'), device_db)
     flash('Patient Added', 'success')
     return redirect(url_for('home'))
+
+@app.route("/grafana")
+def data():
+    return redirect(f"{GRAFANA_URL}")

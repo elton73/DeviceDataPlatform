@@ -1,5 +1,6 @@
-'''Script to query the Withings WebAPI'''
-'''This package will open up a browser and retrieve the Access token'''
+'''
+Deprecated
+'''
 import requests
 from selenium import webdriver
 import selenium.webdriver.support.ui as ui
