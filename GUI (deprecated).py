@@ -2,7 +2,7 @@
 '''
 import modules.gui.pyqtapp as gui_pyqtapp
 import modules.mysql.setup as setup_db
-from modules.main_app.setup import create_data_folder, resource_path
+from modules.gui.setup import create_data_folder, resource_path
 from modules import FITBIT_DATABASE
 
 if __name__ == '__main__':
