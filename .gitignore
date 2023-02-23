@@ -1,9 +1,6 @@
 #ignore secrets
 secret_keys.py
-cronlog.txt
 *.ngrok
-package-lock.json
-package.json
-.node_modules
-.resources
+
+
 #test
