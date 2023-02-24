@@ -1,6 +1,6 @@
 '''Functions to generate reports from the database'''
 from bcrypt import checkpw
-from modules.mysql.setup import connect_to_database
+from modules.mysql.setup import select_database
 
 def get_all_token_timeouts(connection):
     command = '''
@@ -88,6 +88,19 @@ def check_valid_device(user_id, patient_id, auth_db, db):
     if cursor.fetchall():
         message = "Please Choose Different Patient ID"
         return False, message
+    return True, None
+
+def check_patient_id(patient_id, device_type):
+    #patient already exists in database
+    dbs = select_database(device_type)
+    if not isinstance(dbs, list):
+        dbs = [dbs]
+    for db in dbs:
+        cursor = db.cursor()
+        cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id = '{patient_id}'")
+        if cursor.fetchall():
+            message = "Please Choose Different Patient ID"
+            return False, message
     return True, None
 
 #Get all current device users from the database

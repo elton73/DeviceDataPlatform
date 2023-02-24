@@ -1,8 +1,7 @@
 '''Setup the DB to store authentication codes'''
 from sqlalchemy import create_engine
 from mysql import connector
-from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD, \
-    DATABASE_USERS
+from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD
 
 SQL_CREATE_AUTH_TABLE = '''
 CREATE TABLE IF NOT EXISTS Auth_info(
@@ -85,6 +84,18 @@ def connect_to_database(databasename):
         database=databasename
     )
     return database
+
+def select_database(device_type):
+    if device_type == "fitbit":
+        return connect_to_database(FITBIT_DATABASE)
+    elif device_type == "withings":
+        return connect_to_database(WITHINGS_DATABASE)
+    elif device_type == "polar":
+        return connect_to_database(POLAR_DATABASE)
+    elif device_type == "all":
+        return [connect_to_database(FITBIT_DATABASE),
+                connect_to_database(WITHINGS_DATABASE),
+                connect_to_database(POLAR_DATABASE)]
 
 #setup all databases
 def setup_databases():

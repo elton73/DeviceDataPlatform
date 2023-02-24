@@ -2,7 +2,7 @@
 {% block content %}
 <main>
 <!--  Title, update and add buttons-->
-  <div class="container-fluid">
+  <div class="container-fluid mb-2">
     <div class="row no-gutters justify-content-center">
 
       <form class="form-inline col-7" method="GET">
@@ -72,7 +72,8 @@
 
 {% for patient in patients %}
     <div class="container-fluid" style="border-radius: 0 !important;">
-      <button type="button" style="padding: 0 !important" class=" btn btn-primary-outline" data-toggle="modal" data-target="#deleteModal{{ patient['patient_id'] }}">
+      <a style="padding: 0 !important" class=" btn btn-primary-outline"
+         href="{{ url_for('editpatient', patient_id=patient['patient_id'].replace(' ', '_'), user_id=patient['userid'], device_type=patient['device_type']) }}">
       <div class="row no-gutters justify-content-center">
         <div class="col-4" style="text-align: center">
           <div class="content-section2">
@@ -93,30 +94,9 @@
         </div>
 
       </div>
-      </button>
+      </a>
     </div>
-  <!-- deleteModal -->
-  <div class="modal fade" id="deleteModal{{ patient['patient_id'] }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document" id="{{ patient['patient_id'] }}">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteModalLabel{{ patient['patient_id'] }}">Delete User?</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          Delete {{ patient['patient_id'] }}
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <form action="{{ url_for('deletepatient', patient_id=patient['patient_id'], user_id=patient['userid']) }}" method="POST">
-            <input class="btn btn-danger" type="submit" value="Delete">
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+
 {% endfor %}
 </main>
 

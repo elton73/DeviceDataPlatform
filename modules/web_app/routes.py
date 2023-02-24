@@ -1,10 +1,10 @@
 from flask import render_template, url_for, flash, redirect, session, request
 from modules.mysql.setup import connect_to_database
-from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm
+from modules.web_app.forms import RegistrationForm, LoginForm, PatientForm, EditPatientForm
 from modules.mysql.report import check_login_details, check_input_key, get_device_users, \
-    check_valid_device, get_data
+    check_valid_device, get_data, check_patient_id
 from modules.mysql.modify import add_web_app_user, link_user_to_key, export_patient_data, remove_patient, \
-    export_device_to_auth_info
+    export_device_to_auth_info, update_patientid
 from modules.web_app import app, login_db, bcrypt, GRAFANA_URL
 from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE
 from scheduled import runschedule
@@ -64,7 +64,6 @@ def addpatient():
         session['device_type'] = device_type
         session['patient_id'] = patient_id
 
-        # debugging with test databases
         if device_type == "fitbit":
             session['database'] = FITBIT_DATABASE
             return redirect(fitbit.authorization_url)
@@ -84,6 +83,7 @@ def deletepatient(patient_id, user_id):
         return redirect(url_for('login'))
     auth_db = connect_to_database(AUTH_DATABASE)
     device_type = get_data(auth_db, user_id, 'device_type')
+    #todo: use select_database function
     if device_type == 'fitbit':
         device_db = connect_to_database(FITBIT_DATABASE)
     elif device_type == 'withings':
@@ -93,6 +93,30 @@ def deletepatient(patient_id, user_id):
     remove_patient(patient_id, user_id,device_type, device_db, auth_db)
     flash('Patient Deleted', 'success')
     return redirect(url_for('home'))
+
+@app.route('/patient/<string:patient_id>/<string:user_id>/<string:device_type>', methods = ['GET', 'POST'])
+def editpatient(patient_id, user_id, device_type):
+    # user must be logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    form = EditPatientForm()
+    patient_id = patient_id.replace("_", " ")
+    if form.validate_on_submit():
+        # update only the current patient_id. Check if new id is already in use.
+        if form.change_all.data:
+            device_type = "all"
+        else:
+            device_type = device_type
+        success, message = check_patient_id(form.patient.data, device_type)
+        if success:
+            update_patientid(device_type, patient_id, form.patient.data)
+            flash("Patient ID updated to 'form.patient.data'", 'success')
+            return redirect(url_for('home'))
+        else:
+            flash(message, 'danger')
+
+    return render_template('editpatient.html', title='Edit', form=form,
+                           patient_id=patient_id.replace(" ", "_"), user_id=user_id, device_type=device_type)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
@@ -184,3 +208,4 @@ def callback():
 @app.route("/grafana")
 def data():
     return redirect(f"{GRAFANA_URL}")
+

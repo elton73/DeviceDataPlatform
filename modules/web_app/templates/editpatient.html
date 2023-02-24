@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="post" action="" onsubmit="loading()">
+            {{ form.hidden_tag() }}
+            <fieldset class="form_group">
+                <legend class="border-bottom mb-4">Edit Patient</legend>
+<!--                Edit form group-->
+                <div class="form-group form-inline" >
+                    <label for="static_patient_id" class="form-control-label col-sm-4 justify-content-start">Old Patient ID:</label>
+                        <input type="text" readonly class ="form-control-plaintext col-sm-8" id="static_patient_id" value="   {{ patient_id.replace('_', ' ') }}">
+                </div>
+
+                <div class="form-group form-inline">
+                    {{ form.patient.label(class="form-control-label col-sm-4 justify-content-start") }}
+                    {% if form.patient.errors %}
+                        {{ form.patient(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.patient.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                    {% else %}
+                        {{ form.patient(class="form-control") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="mt-2 mb-3">
+                {{ form.change_one(class="btn btn-outline-info", style="margin-left: 5px") }}
+                {{ form.change_all(class="btn btn-outline-info") }}
+                 <a class="btn btn-danger float-right" data-toggle="modal" data-target="#deleteModal{{ patient_id }}">
+                     Delete
+                 </a>
+            </div>
+            <div class="spinner-border" id="loading" >
+                <span class="sr-only"></span>
+            </div>
+        </form>
+        <script type="text/javascript">// <![CDATA[
+                // Loading Spinner
+                function loading(){
+                    $("#loading").show();
+                    $("#content").hide();
+                }
+        // ]]></script>
+    </div>
+<!-- deleteModal-->
+  <div class="modal fade" id="deleteModal{{ patient_id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" id="{{ patient_id }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel{{ patient_id.replace('_', ' ') }}">Delete User?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Delete {{ patient_id.replace('_', ' ') }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('deletepatient', patient_id=patient_id.replace('_', ' '), user_id=user_id) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+

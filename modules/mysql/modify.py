@@ -2,7 +2,7 @@
 import requests
 import pandas as pd
 from modules import FITBIT_TABLES, WITHINGS_TABLES, POLAR_TABLES
-from modules.mysql.setup import connect_to_database #todo: remove later
+from modules.mysql.setup import select_database
 
 def run_command(engine, command):
     with engine.connect() as con:
@@ -32,12 +32,17 @@ def insert_list_into(table: str, items: list, engine):
     print(f"{len(items)} new rows were inserted.")
 
 
-def update_patientid(engine, userid, new_patient_id):
-    command = f'''
-    INSERT INTO patient_ids (userid, patient_id) VALUES ('{userid}', '{new_patient_id}') 
-    ON DUPLICATE KEY UPDATE device_type=VALUES(device_type);
-    '''
-    run_command(engine, command)
+#todo: check if patient_id already exists before updating
+def update_patientid(device_type, patient_id, new_patient_id):
+    dbs = select_database(device_type)
+    if not isinstance(dbs, list):
+        dbs = [dbs]
+    for db in dbs:
+        cursor = db.cursor()
+        cursor.execute(f'''
+                        UPDATE patient_ids SET patient_id = '{new_patient_id}' where patient_id = '{patient_id}';
+                        ''')
+        db.commit()
 
 def get_patientid(engine, userid):
     command = f'''

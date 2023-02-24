@@ -65,5 +65,12 @@ class PatientForm(FlaskForm):
                               choices=choices)
     submit = SubmitField('Submit')
 
+class EditPatientForm(FlaskForm):
+    patient = StringField('New Patient ID:',
+                          validators=[DataRequired(), Length(min=2, max=20)])
+    change_one = SubmitField('Change')
+    change_all = SubmitField('Change All')
+
+
 if __name__ == '__main__':
     db = connect_to_database("webapp_login_info")

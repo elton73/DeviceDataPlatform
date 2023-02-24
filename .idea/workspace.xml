@@ -13,8 +13,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -52,6 +52,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/run_web_app.py" />
@@ -62,12 +63,13 @@
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\calga\Documents\GitHub\DeviceDataPlatform\modules\gui" />
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform\batch" />
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform\modules\web_app" />
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.data_update">
+  <component name="RunManager" selected="Python.run_web_app">
     <configuration name="authentication" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="DeviceDataPlatform" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -160,9 +162,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.setup" />
         <item itemvalue="Python.data_update" />
         <item itemvalue="Python.authentication" />
-        <item itemvalue="Python.setup" />
       </list>
     </recent_temporary>
   </component>
