@@ -1,3 +1,5 @@
+'''Launch Web App Here
+'''
 from modules.web_app import app
 from waitress import serve
 

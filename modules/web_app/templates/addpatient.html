@@ -25,20 +25,33 @@
                     {{ form.device_type(class="form-control") }}
                 </div>
             </fieldset>
-            <div class="form-group mt-2">
-                {{ form.submit(class="btn btn-outline-info") }}
-            </div>
-            <div class="spinner-border" id="loading" >
-                <span class="sr-only"></span>
+            <div class="form-inline mt-2">
+                {{ form.submit(class="btn btn-outline-info mr-3") }}
+                <div class="spinner-border" id="loading" >
+                    <span class="sr-only"></span>
+                </div>
             </div>
         </form>
         <script type="text/javascript">// <![CDATA[
+
                 // Loading Spinner
                 function loading(){
                     $("#loading").show();
                     $("#content").hide();
                 }
-        // ]]></script>
+        // ]]>
+            /* Reload page on back submission */
+            window.addEventListener( "pageshow", function ( event ) {
+                  var historyTraversal = event.persisted ||
+                                         ( typeof window.performance != "undefined" &&
+                                              window.performance.navigation.type === 2 );
+                  if ( historyTraversal ) {
+                    // Handle page restore.
+                    window.location.reload();
+                  }
+                });
+
+</script>
     </div>
 {% endblock content %}
 

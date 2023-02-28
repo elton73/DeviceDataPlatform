@@ -1,8 +1,8 @@
 import os
 import sys
 import requests
-from modules.web_app import DATAPLATFORM_URL
 
+DATAPLATFORM_URL = "http://localhost:5000"
 CLIENT_ID = os.environ.get('WITHINGS_CLIENT_ID')
 CLIENT_SECRET = os.environ.get('WITHINGS_CLIENT_SECRET')
 ACCESS_TOKEN_URL = 'https://wbsapi.withings.net/v2/oauth2'

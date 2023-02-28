@@ -14,7 +14,7 @@
       </form>
 
       <div class="col-5">
-        <a class="btn btn-outline-success add-button ml-3" href="{{ url_for('addpatient') }}">
+        <a class="btn btn-outline-success add-button ml-3" href="{{ url_for('patients.addpatient') }}">
           Add Patient
         </a>
          <a class="btn btn-outline-info update-button" data-toggle="modal" data-target="#updateModal">
@@ -37,11 +37,14 @@
         <div class="modal-body">
           Note: Only Users With New Data Will Be Updated
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer justify-content-start">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <form action="{{ url_for('updatenow') }}">
+          <form action="{{ url_for('patients.updatenow') }}" onsubmit="loading()">
             <input class="btn btn-primary" type="submit" value="Update">
           </form>
+          <div class="spinner-border" id="loading" >
+                <span class="sr-only"></span>
+            </div>
         </div>
       </div>
     </div>
@@ -73,7 +76,7 @@
 {% for patient in patients %}
     <div class="container-fluid" style="border-radius: 0 !important;">
       <a style="padding: 0 !important" class=" btn btn-primary-outline"
-         href="{{ url_for('editpatient', patient_id=patient['patient_id'].replace(' ', '_'), user_id=patient['userid'], device_type=patient['device_type']) }}">
+         href="{{ url_for('patients.editpatient', patient_id=patient['patient_id'].replace(' ', '_'), user_id=patient['userid'], device_type=patient['device_type']) }}">
       <div class="row no-gutters justify-content-center">
         <div class="col-4" style="text-align: center">
           <div class="content-section2">
@@ -98,8 +101,12 @@
     </div>
 
 {% endfor %}
+  <script type="text/javascript">// <![CDATA[
+                // Loading Spinner
+                function loading(){
+                    $("#loading").show();
+                    $("#content").hide();
+                }
+        // ]]></script>
 </main>
-
-
-
 {% endblock content %}

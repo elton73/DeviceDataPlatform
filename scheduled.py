@@ -1,4 +1,4 @@
-'''Launch the Main Application here
+'''Update All Devices Here
 '''
 from modules.data_update import Update_Device
 from datetime import timedelta, date

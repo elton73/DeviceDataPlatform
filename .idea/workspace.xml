@@ -4,7 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="" />
+    <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/main/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/main/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/patients/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/patients/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/patients/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/patients/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/templates/addpatient.html" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/templates/addpatient.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/templates/editpatient.html" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/templates/editpatient.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/templates/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/templates/layout.html" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/templates/layout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/templates/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/templates/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/users/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/users/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/users/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/users/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/withings/authorization.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/withings/authorization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_web_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_web_app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduled.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduled.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,8 +31,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -56,7 +74,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/run_web_app.py" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="CodeWithMe" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -155,10 +173,10 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.authentication" />
+      <item itemvalue="Python.data_update" />
       <item itemvalue="Python.run_web_app" />
       <item itemvalue="Python.setup" />
-      <item itemvalue="Python.data_update" />
-      <item itemvalue="Python.authentication" />
     </list>
     <recent_temporary>
       <list>
@@ -233,5 +251,16 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

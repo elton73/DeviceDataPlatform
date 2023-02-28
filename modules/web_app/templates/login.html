@@ -45,9 +45,22 @@
 
     <div class="border-top mt-3 pt-3" style="width: 500px">
       <small class="text-muted">
-        Need An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up</a>
+        Need An Account? <a class="ml-2" href="{{ url_for('users.register') }}">Sign Up</a>
       </small>
     </div>
+
+<script>
+    /* Reload page on back submission */
+    window.addEventListener( "pageshow", function ( event ) {
+          var historyTraversal = event.persisted ||
+                                 ( typeof window.performance != "undefined" &&
+                                      window.performance.navigation.type === 2 );
+          if ( historyTraversal ) {
+            // Handle page restore.
+            window.location.reload();
+          }
+        });
+</script>
 {% endblock content %}
 
 
