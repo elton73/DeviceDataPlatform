@@ -2,7 +2,7 @@ import os
 import sys
 import requests
 
-DATAPLATFORM_URL = "http://localhost:5000"
+DATAPLATFORM_URL = "https://5cc0-142-244-4-194.ngrok.io"
 CLIENT_ID = os.environ.get('WITHINGS_CLIENT_ID')
 CLIENT_SECRET = os.environ.get('WITHINGS_CLIENT_SECRET')
 ACCESS_TOKEN_URL = 'https://wbsapi.withings.net/v2/oauth2'

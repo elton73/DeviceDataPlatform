@@ -7,8 +7,8 @@ import modules.mysql.report as report_db
 import requests
 import pandas as pd
 from datetime import datetime, timedelta, date
-from modules import AUTH_DATABASE, FITBIT_ENGINE, WITHINGS_ENGINE, FITBIT_TABLES, WITHINGS_TABLES, \
-    WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, POLAR_ENGINE, FITBIT_DATABASE, WITHINGS_DATABASE
+from modules import AUTH_DATABASE, FITBIT_TABLES, WITHINGS_TABLES, POLAR_ENGINE, WITHINGS_ENGINE, FITBIT_ENGINE, \
+    WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, FITBIT_DATABASE, WITHINGS_DATABASE
 from time import time
 import uuid
 import os
@@ -108,13 +108,14 @@ class Authorization(object):
         return member_id
 
 class Update_Device(object):
-    def __init__(self, startDate, endDate):
+    def __init__(self, startDate, endDate, path):
         self.startDate = startDate
         self.endDate = endDate
         self.request_num = 0
         self.users = self.generate_users()
         self.users_updated = []
         self.users_skipped = []
+        self.path = path
 
     #update all devices
     def update_all(self):
@@ -155,17 +156,25 @@ class Update_Device(object):
                 break
             else:
                 data_flag = True
+                self.directory = self.make_dir(user.device_type)  # set output path
             #format data
-            # print(data) #debug
             if data_key == 'exercise_summary':
                 formatted_data = self.format_exercise_summary(data, user.user_id)
-            elif data_key == 'heart_rate':
+            if data_key == 'heart_rate':
                 formatted_data = self.format_heart_rate(data, user.user_id)
+
+            #create panda dataframe
             df = pd.DataFrame(formatted_data)
             table = data_value.replace('-', '').replace(' dataset', '')
+
+            #store data in database and csv
+            filepath = os.path.join(self.directory, table)
+            with open(filepath, 'a') as f:
+                df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
             df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
             #commit transaction. Old data will be deleted
             UserDataRetriever.commit_transaction()
+
         if data_flag:
             self.users_updated.append(user.user_id)
             self.request_num += 1
@@ -178,14 +187,20 @@ class Update_Device(object):
     def format_exercise_summary(self, data, user_id):
         for exercise_summary in data:
             #remove data columns
-            pop_columns = ['upload-time', 'polar-user', 'has-route', 'detailed-sport-info']
+            pop_columns = ['upload-time', 'polar-user', 'has-route', 'detailed-sport-info', 'distance']
             for column in pop_columns:
-                exercise_summary.pop(column)
-
+                exercise_summary.pop(column, None)
             heart_rate = exercise_summary.pop('heart-rate')
             exercise_summary['start_time'] = exercise_summary.pop('start-time')
+
+            #Catch if data is missing. Polar excludes these if they don't exist so we set it ourselves
+            if not heart_rate:
+                heart_rate['average'] = 0
+                heart_rate['maximum'] = 0
+
             exercise_summary['hr_average'] = heart_rate['average']
             exercise_summary['hr_max'] = heart_rate['maximum']
+
             exercise_summary['userid'] = user_id
         return data
 
@@ -245,13 +260,18 @@ class Update_Device(object):
             if not data:
                 break
             else:
+                self.directory = self.make_dir(user.device_type)  # set output path
                 data_flag += 1
-            if len(data):
                 # reformat data before creating dataframe
                 formatted_data = self.format_withings_data(data, data_key)
                 df = pd.DataFrame(formatted_data)
                 df['userid'] = user.user_id
                 table = data_value.replace('-', '').replace(' dataset', '')
+
+                # Export data
+                filepath = os.path.join(self.directory, table)
+                with open(filepath, 'a') as f:
+                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 df.to_sql(con=WITHINGS_ENGINE, name=table, if_exists='append')
             # Manually update device data to mysql
             if not device_data:
@@ -261,7 +281,13 @@ class Update_Device(object):
                 device_df = pd.DataFrame(device_data)
                 device_df['userid'] = user.user_id
                 device_df['lastUpdate'] = self.endDate
+
+                #Export data
+                filepath = os.path.join(self.directory, table)
+                with open(filepath, 'a') as f:
+                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='replace')
+
         if data_flag:
             self.users_updated.append(user.user_id)
             self.request_num += 1
@@ -350,18 +376,23 @@ class Update_Device(object):
                         data += next_day_data
             if len(data):
                 data_flag = True
+                self.directory = self.make_dir(user.device_type)  # set output path
                 data = [flatten_dictionary(d) for d in data]
                 df = pd.DataFrame(data)
                 df['userid'] = user.user_id
                 table = data_value
 
                 #Don't append for devices table
+                file_name = date.today().strftime('%Y-%m-%d') + "_fitbit_" + table
                 try:
                     if table == "devices":
                         df['lastUpdate'] = self.endDate
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
                     else:
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
+                    filepath = os.path.join(self.directory, table)
+                    with open(filepath, 'a') as f:
+                        df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 except:
                     continue
         if data_flag:
@@ -406,6 +437,13 @@ class Update_Device(object):
         except Exception as e:
             print(e)
             return False
+    def make_dir(self, device):
+        new_path = os.path.join(self.path, f"exported_data/{device}")
+        output_path = os.path.join(new_path, self.startDate)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        return output_path
+
 
 
 def range_dates(startDate, endDate, step=1):
@@ -426,7 +464,6 @@ def flatten_dictionary(some_dict, parent_key='', separator='_'):
     return flat_dict
 
 
-
 if __name__ == '__main__':
     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
     end_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
@@ -439,4 +476,8 @@ if __name__ == '__main__':
 
     update = Update_Device(startDate=start_date, endDate=end_date)
     update.update_all()
+
+
+
+
 

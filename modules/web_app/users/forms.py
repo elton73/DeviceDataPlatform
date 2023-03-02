@@ -2,11 +2,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from modules.mysql.setup import connect_to_database
+from modules import LOGIN_DATABASE
 
 # Check if email exists in database
 def validate_email(FlaskForm, email):
     # Connect to database
-    database = "webapp_login_info"
+    database = LOGIN_DATABASE
     db = connect_to_database(database)
     cursor = db.cursor()
     cursor.execute(f"SELECT * FROM login_info WHERE email = '{email.data}'")
@@ -16,7 +17,7 @@ def validate_email(FlaskForm, email):
 # Check if they have a registration key
 def validate_key(FlaskForm, key):
     # Connect to database
-    database = "webapp_login_info"
+    database = LOGIN_DATABASE
     db = connect_to_database(database)
     cursor = db.cursor()
     cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{key.data}' AND email IS NULL")

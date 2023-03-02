@@ -6,12 +6,11 @@ USER = secrets.get('SECRET_USER')
 PASSWORD = secrets.get('SECRET_PASSWORD')
 
 #Databases
-FITBIT_DATABASE = 'fitbit_test'
-WITHINGS_DATABASE = 'withings_test'
-POLAR_DATABASE = 'polar_test'
-AUTH_DATABASE = 'authorization_info_test'
-LOGIN_DATABASE = 'webapp_login_info'
-DATABASE_USERS = 'USERS' #database readers and wriers
+FITBIT_DATABASE = 'fitbit_2'
+WITHINGS_DATABASE = 'withings_2'
+POLAR_DATABASE = 'polar_2'
+AUTH_DATABASE = 'authorization_info_2'
+LOGIN_DATABASE = 'webapp_login_info_2'
 # EMAILS_DATABASE = ['email_list'] #add database for list of emails
 
 FITBIT_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{FITBIT_DATABASE}')

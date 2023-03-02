@@ -10,6 +10,7 @@ class DataGetter():
         self.user_id = user_id
         self.transaction_id = self.get_transaction_id()
         self.exercise_ids = self.get_exercise_ids()
+        self.success = True
         self.api_map = {
             'exercise_summary': self.get_exercise_summary,
             'heart_rate': self.get_heart_rate_samples
@@ -32,7 +33,7 @@ class DataGetter():
         return exercise_summary
 
     def get_heart_rate_samples(self):
-        if not self.exercise_ids:
+        if not self.exercise_ids and not self.success:
             return
         samples = []
         for exercise_id in self.exercise_ids:
@@ -55,7 +56,7 @@ class DataGetter():
                 data['id'] = exercise_id
                 samples.append(data)
             else:
-                print(f"Samples Fail {r}")
+                print(f"Exercise ID: {exercise_id} has no samples")
         return samples
     def get_transaction_id(self):
         transaction_id = None
@@ -106,6 +107,9 @@ class DataGetter():
         if not r.status_code >= 200 and not r.status_code < 400:
             print(r)
         return
+
+    def not_enough_data(self):
+        self.success = False
 
 
 

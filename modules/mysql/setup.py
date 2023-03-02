@@ -81,7 +81,7 @@ def connect_to_database(databasename):
         host='localhost',
         user=USER,
         passwd=PASSWORD,
-        database=databasename
+        database=databasename,
     )
     return database
 
@@ -122,7 +122,7 @@ def create_key(key):
         print("Invalid Key")
 
 if __name__ == "__main__":
-    setup_databases()
+    create_key("1234567")
 
 
 
