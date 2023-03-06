@@ -7,22 +7,20 @@ from modules import LOGIN_DATABASE
 # Check if email exists in database
 def validate_email(FlaskForm, email):
     # Connect to database
-    database = LOGIN_DATABASE
-    db = connect_to_database(database)
-    cursor = db.cursor()
-    cursor.execute(f"SELECT * FROM login_info WHERE email = '{email.data}'")
-    if cursor.fetchall():
-        raise ValidationError("Email Already Exists")
+    with connect_to_database(LOGIN_DATABASE) as db:
+        cursor = db.cursor()
+        cursor.execute(f"SELECT * FROM login_info WHERE email = '{email.data}'")
+        if cursor.fetchall():
+            raise ValidationError("Email Already Exists")
 
 # Check if they have a registration key
 def validate_key(FlaskForm, key):
     # Connect to database
-    database = LOGIN_DATABASE
-    db = connect_to_database(database)
-    cursor = db.cursor()
-    cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{key.data}' AND email IS NULL")
-    if not cursor.fetchall():
-        raise ValidationError("Invalid Key")
+    with connect_to_database(LOGIN_DATABASE) as db:
+        cursor = db.cursor()
+        cursor.execute(f"SELECT * FROM registration_keys WHERE user_key = '{key.data}' AND email IS NULL")
+        if not cursor.fetchall():
+            raise ValidationError("Invalid Key")
 
 class RegistrationForm(FlaskForm):
     key = StringField('Key',
@@ -31,7 +29,7 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email(), validate_email])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=32)])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')

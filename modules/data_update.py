@@ -15,11 +15,11 @@ import os
 
 class Authorization(object):
     def __init__(self, user_id):
-        self.db = connect_to_database(AUTH_DATABASE)
         self.user_id = user_id
-        self.device_type = report_db.get_data(self.db, user_id, 'device_type')
-        self.access_token = report_db.get_data(self.db, user_id, 'auth_token')
-        self.refresh_token = report_db.get_data(self.db, user_id, 'refresh_token')
+        with connect_to_database(AUTH_DATABASE) as auth_db:
+            self.device_type = report_db.get_data(auth_db, user_id, 'device_type')
+            self.access_token = report_db.get_data(auth_db, user_id, 'auth_token')
+            self.refresh_token = report_db.get_data(auth_db, user_id, 'refresh_token')
 
     """
     FITBIT API
@@ -68,17 +68,17 @@ class Authorization(object):
     Polar API
     """
     def check_polar_member_id(self):
-        db = connect_to_database(POLAR_DATABASE)
         command = f'''
             SELECT member_id FROM member_ids WHERE userid = {self.user_id}
             '''
-        cursor = db.cursor()
-        cursor.execute(command)
-        #check if member_id already exists
-        member_id = cursor.fetchone()[0]
-        if not member_id:
-            member_id = self.register_polar_user(db)
-        return member_id
+        with connect_to_database(POLAR_DATABASE) as db:
+            cursor = db.cursor()
+            cursor.execute(command)
+            #check if member_id already exists
+            member_id = cursor.fetchone()[0]
+            if not member_id:
+                member_id = self.register_polar_user(db)
+            return member_id
 
     # Register user and upload member_id to mysql
     def register_polar_user(self, db):
@@ -212,23 +212,23 @@ class Update_Device(object):
             id = heart_rates['id']
 
             #format our own time since polar doesn't provide it
-            db = connect_to_database(POLAR_DATABASE)
-            cursor = db.cursor()
-            cursor.execute(f"SELECT start_time FROM exercise_summary WHERE id='{id}'")
-            raw_time = cursor.fetchone()
-            formatted_time = raw_time[0].replace("T", " ") if raw_time else raw_time
-            current_time = datetime.strptime(formatted_time, "%Y-%m-%d %H:%M:%S")
+            with connect_to_database(POLAR_DATABASE) as db:
+                cursor = db.cursor()
+                cursor.execute(f"SELECT start_time FROM exercise_summary WHERE id='{id}'")
+                raw_time = cursor.fetchone()
+                formatted_time = raw_time[0].replace("T", " ") if raw_time else raw_time
+                current_time = datetime.strptime(formatted_time, "%Y-%m-%d %H:%M:%S")
 
-            #create rows
-            recording_rate = heart_rates['recording-rate']
-            for heart_rate in heart_rates['data'].split(","):
-                output.append({})
-                output[index]['id'] = id
-                output[index]['time'] = current_time
-                output[index]['value'] = int(float(heart_rate))
-                output[index]['userid'] = user_id
-                index += 1
-                current_time = current_time + timedelta(seconds=recording_rate)
+                #create rows
+                recording_rate = heart_rates['recording-rate']
+                for heart_rate in heart_rates['data'].split(","):
+                    output.append({})
+                    output[index]['id'] = id
+                    output[index]['time'] = current_time
+                    output[index]['value'] = int(float(heart_rate))
+                    output[index]['userid'] = user_id
+                    index += 1
+                    current_time = current_time + timedelta(seconds=recording_rate)
         return output
 
     """
@@ -412,31 +412,32 @@ class Update_Device(object):
     #generate list of all users in auth database
     def generate_users(self):
         users = set()
-        db = connect_to_database(AUTH_DATABASE)
-        for userid in report_db.get_all_user_ids(db):
-            user = Authorization(user_id=userid)
-            users.add(user)
+        with connect_to_database(AUTH_DATABASE) as db:
+            for userid in report_db.get_all_user_ids(db):
+                user = Authorization(user_id=userid)
+                users.add(user)
         return users
 
     #check if device was updated today
     def already_updated(self, user):
         if user.device_type == "fitbit":
-            db = connect_to_database(FITBIT_DATABASE)
+            db_name = FITBIT_DATABASE
         elif user.device_type == "withings":
-            db = connect_to_database(WITHINGS_DATABASE)
+            db_name = WITHINGS_DATABASE
         #Polar checks for duplicate data differently
         else:
             return False
-        cursor = db.cursor()
-        try:
-            cursor.execute(f"SELECT * FROM devices WHERE userid = '{user.user_id}' AND lastUpdate = '{self.endDate}'")
-            if cursor.fetchone():
-                self.users_skipped.append(user.user_id)
-                return True
-            return False
-        except Exception as e:
-            print(e)
-            return False
+        with connect_to_database(db_name) as db:
+            cursor = db.cursor()
+            try:
+                cursor.execute(f"SELECT * FROM devices WHERE userid = '{user.user_id}' AND lastUpdate = '{self.endDate}'")
+                if cursor.fetchone():
+                    self.users_skipped.append(user.user_id)
+                    return True
+                return False
+            except Exception as e:
+                print(e)
+                return False
     def make_dir(self, device):
         new_path = os.path.join(self.path, f"exported_data/{device}")
         output_path = os.path.join(new_path, self.startDate)

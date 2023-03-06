@@ -5,17 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/DeviceDataPlatform.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DeviceDataPlatform.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/polar/2023-03-01/exercise_summary" beforeDir="false" afterPath="$PROJECT_DIR$/exported_data/polar/2023-03-01/exercise_summary" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/data_update.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/data_update.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/fitbit/authentication.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mysql/modify.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mysql/modify.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mysql/report.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mysql/report.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mysql/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mysql/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/polar/109/chromedriver.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/polar/authentication.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/polar/retrieve.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/polar/retrieve.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/web_app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/main/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/main/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/patients/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/patients/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/patients/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/patients/routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/web_app/users/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/users/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/users/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/users/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/withings/109/chromedriver.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/withings/authentication.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/withings/authorization.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/withings/authorization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scheduled.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduled.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/refresh_connection.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +95,7 @@
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.run_web_app">
     <configuration name="authentication" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="DeviceDataPlatform" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -310,6 +319,15 @@
       <workItem from="1677781955461" duration="1475000" />
       <workItem from="1677788340549" duration="6320000" />
       <workItem from="1677794987439" duration="1893000" />
+      <workItem from="1677796985657" duration="49000" />
+      <workItem from="1677797887404" duration="90000" />
+      <workItem from="1677798020856" duration="6000" />
+      <workItem from="1677798106617" duration="61000" />
+      <workItem from="1678118015199" duration="4746000" />
+      <workItem from="1678127885240" duration="2866000" />
+      <workItem from="1678133384575" duration="68000" />
+      <workItem from="1678133498300" duration="415000" />
+      <workItem from="1678133942946" duration="1518000" />
     </task>
     <servers />
   </component>
@@ -329,9 +347,10 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$scheduled.coverage" NAME="scheduled Coverage Results" MODIFIED="1677796862962" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$run_web_app.coverage" NAME="run_web_app Coverage Results" MODIFIED="1677600558735" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$run_web_app.coverage" NAME="run_web_app Coverage Results" MODIFIED="1678136009500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$send_email.coverage" NAME="send-email Coverage Results" MODIFIED="1677782675652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$data_update.coverage" NAME="data_update Coverage Results" MODIFIED="1677795375055" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$routes.coverage" NAME="routes Coverage Results" MODIFIED="1678128492440" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/web_app/main" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$setup.coverage" NAME="setup Coverage Results" MODIFIED="1677602433948" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/mysql" />
   </component>
 </project>

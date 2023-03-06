@@ -50,12 +50,14 @@ def get_data(connection, selected_user, datatype):
     cursor = connection.cursor()
     cursor.execute(command)
     result = cursor.fetchone()
+
     if result:
         return result[0]
     return False
 
 def check_login_details(email, password, db):
     #navigate the database
+
     cursor = db.cursor(dictionary=True) #allows us to access data by name
     cursor.execute(f"SELECT * FROM login_info WHERE email = '{email}'")
     #if user exists, check if password is correct
@@ -90,12 +92,11 @@ def check_valid_device(user_id, patient_id, auth_db, db):
         return False, message
     return True, None
 
-def check_patient_id(patient_id, device_type):
+def check_patient_id(patient_id, device_db):
     #patient already exists in database
-    dbs = select_database(device_type)
-    if not isinstance(dbs, list):
-        dbs = [dbs]
-    for db in dbs:
+    if not isinstance(device_db, list):
+        device_db = [device_db]
+    for db in device_db:
         cursor = db.cursor()
         cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id = '{patient_id}'")
         if cursor.fetchall():

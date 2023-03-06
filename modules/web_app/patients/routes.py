@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask import render_template, url_for, flash, redirect, session
-from modules.mysql.setup import connect_to_database
+from modules.mysql.setup import connect_to_database, select_database
 from modules.web_app.patients.forms import PatientForm, EditPatientForm
 from modules.mysql.report import get_data, check_patient_id
 from modules.mysql.modify import remove_patient, update_patientid
@@ -12,8 +12,13 @@ patients = Blueprint('patients', __name__)
 
 @patients.route('/updatenow')
 def updatenow():
+    if 'logged_in' not in session:
+        return redirect(url_for('users.login'))
     request_num = runschedule()
-    flash(f'Users Updated: {request_num}', 'info')
+    if request_num == 0:
+        flash(f'All Users Are Up To Date', 'info')
+    else:
+        flash(f'Users Updated: {request_num}', 'info')
     return redirect(url_for('main.home'))
 
 @patients.route('/patient/<string:patient_id>/<string:user_id>/delete', methods = ['POST'])
@@ -22,16 +27,11 @@ def deletepatient(patient_id, user_id):
     # user must be logged in
     if 'logged_in' not in session:
         return redirect(url_for('users.login'))
-    auth_db = connect_to_database(AUTH_DATABASE)
-    device_type = get_data(auth_db, user_id, 'device_type')
-    #todo: use select_database function
-    if device_type == 'fitbit':
-        device_db = connect_to_database(FITBIT_DATABASE)
-    elif device_type == 'withings':
-        device_db = connect_to_database( WITHINGS_DATABASE)
-    elif device_type == 'polar':
-        device_db = connect_to_database(POLAR_DATABASE)
-    remove_patient(patient_id, user_id,device_type, device_db, auth_db)
+    with connect_to_database(AUTH_DATABASE) as auth_db:
+        device_type = get_data(auth_db, user_id, 'device_type')
+        db_name = select_database(device_type)
+        with connect_to_database(db_name) as device_db:
+            remove_patient(patient_id, user_id, device_type, device_db, auth_db)
     flash('Patient Deleted', 'success')
     return redirect(url_for('main.home'))
 
@@ -44,18 +44,31 @@ def editpatient(patient_id, user_id, device_type):
     patient_id = patient_id.replace("_", " ")
     if form.validate_on_submit():
         # update only the current patient_id. Check if new id is already in use.
+        #change all
         if form.change_all.data:
-            device_type = "all"
+            db_names = select_database("all")
+            dbs = []
+            for db_name in db_names:
+                dbs.append(connect_to_database(db_name))
+            success, message = check_patient_id(form.patient.data, dbs)
+            if success:
+                update_patientid(patient_id, form.patient.data, dbs)
+                flash(f"Patient ID '{patient_id}' changed to '{form.patient.data}'", 'success')
+                for db in dbs:
+                    db.close()
+                return redirect(url_for('main.home'))
+            else:
+                flash(message, 'danger')
+        #change one
         else:
-            device_type = device_type
-        success, message = check_patient_id(form.patient.data, device_type)
-        if success:
-            update_patientid(device_type, patient_id, form.patient.data)
-            flash(f"Patient ID '{patient_id}' changed to '{form.patient.data}'", 'success')
-            return redirect(url_for('main.home'))
-        else:
-            flash(message, 'danger')
-
+            with connect_to_database(select_database(device_type)) as device_db:
+                success, message = check_patient_id(form.patient.data, device_db)
+                if success:
+                    update_patientid(patient_id, form.patient.data, device_db)
+                    flash(f"Patient ID '{patient_id}' changed to '{form.patient.data}'", 'success')
+                    return redirect(url_for('main.home'))
+                else:
+                    flash(message, 'danger')
     return render_template('editpatient.html', title='Edit', form=form,
                            patient_id=patient_id.replace(" ", "_"), user_id=user_id, device_type=device_type)
 

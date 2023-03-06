@@ -33,8 +33,7 @@ def insert_list_into(table: str, items: list, engine):
 
 
 #todo: check if patient_id already exists before updating
-def update_patientid(device_type, patient_id, new_patient_id):
-    dbs = select_database(device_type)
+def update_patientid(patient_id, new_patient_id, dbs):
     if not isinstance(dbs, list):
         dbs = [dbs]
     for db in dbs:

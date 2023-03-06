@@ -87,15 +87,15 @@ def connect_to_database(databasename):
 
 def select_database(device_type):
     if device_type == "fitbit":
-        return connect_to_database(FITBIT_DATABASE)
+        return FITBIT_DATABASE
     elif device_type == "withings":
-        return connect_to_database(WITHINGS_DATABASE)
+        return WITHINGS_DATABASE
     elif device_type == "polar":
-        return connect_to_database(POLAR_DATABASE)
+        return POLAR_DATABASE
     elif device_type == "all":
-        return [connect_to_database(FITBIT_DATABASE),
-                connect_to_database(WITHINGS_DATABASE),
-                connect_to_database(POLAR_DATABASE)]
+        return [FITBIT_DATABASE,
+                WITHINGS_DATABASE,
+                POLAR_DATABASE]
 
 #setup all databases
 def setup_databases():
@@ -114,10 +114,10 @@ def create_key(key):
         command = f"""
         INSERT IGNORE INTO registration_keys (user_key) VALUES ('{key}')
         """
-        db = connect_to_database(LOGIN_DATABASE)
-        mycursor = db.cursor()
-        mycursor.execute(command)
-        db.commit()
+        with connect_to_database(LOGIN_DATABASE) as db:
+            mycursor = db.cursor()
+            mycursor.execute(command)
+            db.commit()
     else:
         print("Invalid Key")
 

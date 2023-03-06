@@ -1,7 +1,5 @@
 import requests
 import re
-import time, datetime
-from modules import POLAR_ENGINE
 
 class DataGetter():
     ''' Class that use the withings Web Api to get data, returns the entire response object'''
@@ -10,7 +8,6 @@ class DataGetter():
         self.user_id = user_id
         self.transaction_id = self.get_transaction_id()
         self.exercise_ids = self.get_exercise_ids()
-        self.success = True
         self.api_map = {
             'exercise_summary': self.get_exercise_summary,
             'heart_rate': self.get_heart_rate_samples
@@ -33,7 +30,7 @@ class DataGetter():
         return exercise_summary
 
     def get_heart_rate_samples(self):
-        if not self.exercise_ids and not self.success:
+        if not self.exercise_ids:
             return
         samples = []
         for exercise_id in self.exercise_ids:
@@ -107,9 +104,6 @@ class DataGetter():
         if not r.status_code >= 200 and not r.status_code < 400:
             print(r)
         return
-
-    def not_enough_data(self):
-        self.success = False
 
 
 
