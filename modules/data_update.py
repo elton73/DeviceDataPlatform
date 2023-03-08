@@ -249,8 +249,9 @@ class Update_Device(object):
                 if new_auth_info == '':
                     break
                 # Update the database
-                modify_db.update_auth_token(user.db, user.user_id, new_auth_info['access_token'])
-                modify_db.update_refresh_token(user.db, user.user_id, new_auth_info['refresh_token'])
+                with connect_to_database(AUTH_DATABASE) as auth_db:
+                    modify_db.update_auth_token(auth_db, user.user_id, new_auth_info['access_token'])
+                    modify_db.update_refresh_token(auth_db, user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
                 raw_data = UserDataRetriever.api_map[data_value](self.startDate, self.endDate).json()
@@ -335,8 +336,9 @@ class Update_Device(object):
                 if new_auth_info == '':
                     break
                 # Update the database
-                modify_db.update_auth_token(user.db, user.user_id, new_auth_info['access_token'])
-                modify_db.update_refresh_token(user.db, user.user_id, new_auth_info['refresh_token'])
+                with connect_to_database(AUTH_DATABASE) as auth_db:
+                    modify_db.update_auth_token(auth_db, user.user_id, new_auth_info['access_token'])
+                    modify_db.update_refresh_token(auth_db, user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
             data = result.json()
