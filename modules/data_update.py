@@ -168,7 +168,7 @@ class Update_Device(object):
             table = data_value.replace('-', '').replace(' dataset', '')
 
             #store data in database and csv
-            filepath = os.path.join(self.directory, table)
+            filepath = os.path.join(self.directory, f"{table}.csv")
             with open(filepath, 'a') as f:
                 df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
             df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
@@ -270,7 +270,7 @@ class Update_Device(object):
                 table = data_value.replace('-', '').replace(' dataset', '')
 
                 # Export data
-                filepath = os.path.join(self.directory, table)
+                filepath = os.path.join(self.directory, f"{table}.csv")
                 with open(filepath, 'a') as f:
                     df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 df.to_sql(con=WITHINGS_ENGINE, name=table, if_exists='append')
@@ -284,7 +284,7 @@ class Update_Device(object):
                 device_df['lastUpdate'] = self.endDate
 
                 #Export data
-                filepath = os.path.join(self.directory, table)
+                filepath = os.path.join(self.directory, f"{table}.csv")
                 with open(filepath, 'a') as f:
                     df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='replace')
@@ -392,7 +392,7 @@ class Update_Device(object):
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
                     else:
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
-                    filepath = os.path.join(self.directory, table)
+                    filepath = os.path.join(self.directory, f"{table}.csv")
                     with open(filepath, 'a') as f:
                         df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 except:

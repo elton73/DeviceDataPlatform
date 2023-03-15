@@ -6,7 +6,45 @@
   <component name="ChangeListManager">
     <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-01/activitiesheartintraday" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-01/activitiessteps" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-01/activitiesstepsintraday" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-01/devices" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-05/activitiesheartintraday" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-05/activitiessteps" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-05/activitiesstepsintraday" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-05/devices" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-07/activitiesheartintraday" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-07/activitiessteps" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-07/activitiesstepsintraday" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/fitbit/2023-03-07/devices" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/polar/2023-03-01/exercise_summary" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-01/heart_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-01/respiration_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-01/sleep_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-01/snoring_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-02/heart_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-02/respiration_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-02/sleep_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-02/snoring_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-03/heart_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-03/respiration_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-03/sleep_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-03/snoring_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-04/heart_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-04/respiration_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-04/sleep_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-04/snoring_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-05/heart_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-05/respiration_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-05/sleep_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-05/snoring_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-07/heart_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-07/respiration_rate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-07/sleep_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported_data/withings/2023-03-07/snoring_time" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/data_update.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/data_update.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/web_app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +95,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/ML-3/Documents/GitHub/DeviceDataPlatform",
+    "last_opened_file_path": "C:/Users/ML-3/Desktop/get-fitbit-data-app",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -77,7 +115,7 @@
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.send-email">
     <configuration name="authentication" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="DeviceDataPlatform" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -313,6 +351,14 @@
       <workItem from="1678204253626" duration="38000" />
       <workItem from="1678204309847" duration="137000" />
       <workItem from="1678289909617" duration="556000" />
+      <workItem from="1678295973728" duration="21000" />
+      <workItem from="1678717916554" duration="95000" />
+      <workItem from="1678806284889" duration="42000" />
+      <workItem from="1678808302585" duration="8000" />
+      <workItem from="1678808695146" duration="257000" />
+      <workItem from="1678809137944" duration="90000" />
+      <workItem from="1678891864785" duration="73000" />
+      <workItem from="1678901857503" duration="14000" />
     </task>
     <servers />
   </component>
@@ -331,11 +377,11 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$scheduled.coverage" NAME="scheduled Coverage Results" MODIFIED="1678290391812" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$scheduled.coverage" NAME="scheduled Coverage Results" MODIFIED="1678806305479" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$run_web_app.coverage" NAME="run_web_app Coverage Results" MODIFIED="1678136009500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$send_email.coverage" NAME="send-email Coverage Results" MODIFIED="1677782675652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$routes.coverage" NAME="routes Coverage Results" MODIFIED="1678128492440" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/web_app/main" />
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$data_update.coverage" NAME="data_update Coverage Results" MODIFIED="1678290008217" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$data_update.coverage" NAME="data_update Coverage Results" MODIFIED="1678806291656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$setup.coverage" NAME="setup Coverage Results" MODIFIED="1677602433948" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/mysql" />
   </component>
 </project>

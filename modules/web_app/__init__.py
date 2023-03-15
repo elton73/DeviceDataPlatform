@@ -2,8 +2,8 @@ from flask import Flask
 from flask_bcrypt import Bcrypt
 from secret_keys import secrets
 
-GRAFANA_URL = "https://1f5b-142-244-4-194.ngrok.io"
-DATAPLATFORM_URL = "https://5362-142-244-4-194.ngrok.io"
+GRAFANA_URL = "https://6cf8-142-244-4-196.ngrok.io"
+DATAPLATFORM_URL = "https://953c-142-244-4-196.ngrok.io"
 
 from modules.polar.authorization import PolarAccess
 from modules.fitbit.authorization import FitbitAccess
