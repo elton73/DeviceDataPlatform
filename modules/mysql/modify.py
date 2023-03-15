@@ -136,6 +136,25 @@ def update_refresh_token(connection, userid, new_refresh_token):
     cursor.execute(command)
     connection.commit()
 
+def remove_device_data(user_id, db, device_type):
+    cursor = db.cursor()
+    # remove data from fitbit database
+    if device_type == "fitbit":
+        try:
+            cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
+        except Exception as e:
+            print(e)
+        db.commit()
+        return
+    # remove data from withings database
+    elif device_type == "withings":
+        try:
+            cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
+        except Exception as e:
+            print(e)
+        db.commit()
+        return
+
 #Remove health data from fitbit database
 def remove_health_data(user_id, db, device_type):
     cursor = db.cursor()

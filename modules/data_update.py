@@ -287,7 +287,10 @@ class Update_Device(object):
                 filepath = os.path.join(self.directory, f"{table}.csv")
                 with open(filepath, 'a') as f:
                     df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
-                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='replace')
+                # remove last days device data
+                with connect_to_database(WITHINGS_DATABASE) as withings_db:
+                    modify_db.remove_device_data(user.user_id, withings_db, user.device_type)
+                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='append')
 
         if data_flag:
             self.users_updated.append(user.user_id)
@@ -388,8 +391,11 @@ class Update_Device(object):
                 file_name = date.today().strftime('%Y-%m-%d') + "_fitbit_" + table
                 try:
                     if table == "devices":
+                        #remove last days' device data
+                        with connect_to_database(FITBIT_DATABASE) as fitbit_db:
+                            modify_db.remove_device_data(user.user_id, fitbit_db, user.device_type)
                         df['lastUpdate'] = self.endDate
-                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='replace')
+                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
                     else:
                         df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
                     filepath = os.path.join(self.directory, f"{table}.csv")
@@ -467,18 +473,18 @@ def flatten_dictionary(some_dict, parent_key='', separator='_'):
     return flat_dict
 
 
-if __name__ == '__main__':
-    start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
-    end_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
-
-    # start_date = (date.today() - timedelta(days=9)).strftime('%Y-%m-%d')  # yesterday
-    # end_date = (date.today() - timedelta(days=8)).strftime('%Y-%m-%d')  # today %Y-%m-%d
-
-    # start_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
-    # end_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
-
-    update = Update_Device(startDate=start_date, endDate=end_date)
-    update.update_all()
+# if __name__ == '__main__':
+#     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
+#     end_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
+#
+#     # start_date = (date.today() - timedelta(days=9)).strftime('%Y-%m-%d')  # yesterday
+#     # end_date = (date.today() - timedelta(days=8)).strftime('%Y-%m-%d')  # today %Y-%m-%d
+#
+#     # start_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
+#     # end_date = date.today().strftime('%Y-%m-%d')  # today %Y-%m-%d
+#
+#     update = Update_Device(startDate=start_date, endDate=end_date)
+#     update.update_all()
 
 
 
