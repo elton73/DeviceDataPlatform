@@ -6,9 +6,10 @@ import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
 import requests
 import pandas as pd
-from datetime import datetime, timedelta, date
-from modules import AUTH_DATABASE, FITBIT_TABLES, WITHINGS_TABLES, POLAR_ENGINE, WITHINGS_ENGINE, FITBIT_ENGINE, \
-    WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, FITBIT_DATABASE, WITHINGS_DATABASE
+from sqlalchemy import text
+from datetime import datetime, timedelta
+from modules import AUTH_DATABASE, FITBIT_TABLES, WITHINGS_TABLES, WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, \
+    FITBIT_DATABASE, WITHINGS_DATABASE
 from time import time
 import uuid
 import os
@@ -73,7 +74,7 @@ class Authorization(object):
             '''
         with connect_to_database(POLAR_DATABASE) as db:
             cursor = db.cursor()
-            cursor.execute(command)
+            cursor.execute(text(command))
             #check if member_id already exists
             member_id = cursor.fetchone()[0]
             if not member_id:
@@ -88,7 +89,8 @@ class Authorization(object):
         check_for_id = True
         while check_for_id:
             member_id = uuid.uuid4().hex
-            cursor.execute(f"SELECT member_id FROM member_ids WHERE member_id = '{member_id}'")
+            command = f"SELECT member_id FROM member_ids WHERE member_id = '{member_id}'"
+            cursor.execute(text(command))
             check_for_id = cursor.fetchone()
             check_for_id = check_for_id[0] if check_for_id else check_for_id
 
@@ -102,8 +104,8 @@ class Authorization(object):
         if result.status_code != 200:
             print(f"Couldn't Register User. Status code: {result.status_code}")
             return False
-
-        cursor.execute(f"UPDATE member_ids SET member_id = '{member_id}' WHERE userid = '{self.user_id}'")
+        command = f"UPDATE member_ids SET member_id = '{member_id}' WHERE userid = '{self.user_id}'"
+        cursor.execute(text(command))
         db.commit()
         return member_id
 
@@ -168,10 +170,14 @@ class Update_Device(object):
             table = data_value.replace('-', '').replace(' dataset', '')
 
             #store data in database and csv
-            filepath = os.path.join(self.directory, f"{table}.csv")
-            with open(filepath, 'a') as f:
-                df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
-            df.to_sql(con=POLAR_ENGINE, name=table, if_exists='append')
+            try:
+                with connect_to_database(POLAR_DATABASE) as polar_db:
+                    df.to_sql(con=polar_db, name=table, if_exists='append')
+                filepath = os.path.join(self.directory, f"{table}.csv")
+                with open(filepath, 'a') as f:
+                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
+            except Exception as e:
+                print(e)
             #commit transaction. Old data will be deleted
             UserDataRetriever.commit_transaction()
 
@@ -213,8 +219,9 @@ class Update_Device(object):
 
             #format our own time since polar doesn't provide it
             with connect_to_database(POLAR_DATABASE) as db:
+                command = f"SELECT start_time FROM exercise_summary WHERE id='{id}'"
                 cursor = db.cursor()
-                cursor.execute(f"SELECT start_time FROM exercise_summary WHERE id='{id}'")
+                cursor.execute(text(command))
                 raw_time = cursor.fetchone()
                 formatted_time = raw_time[0].replace("T", " ") if raw_time else raw_time
                 current_time = datetime.strptime(formatted_time, "%Y-%m-%d %H:%M:%S")
@@ -268,12 +275,15 @@ class Update_Device(object):
                 df = pd.DataFrame(formatted_data)
                 df['userid'] = user.user_id
                 table = data_value.replace('-', '').replace(' dataset', '')
-
-                # Export data
-                filepath = os.path.join(self.directory, f"{table}.csv")
-                with open(filepath, 'a') as f:
-                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
-                df.to_sql(con=WITHINGS_ENGINE, name=table, if_exists='append')
+                try:
+                    with connect_to_database(WITHINGS_DATABASE) as withings_db:
+                        df.to_sql(con=withings_db, name=table, if_exists='append')
+                    # Export data
+                    filepath = os.path.join(self.directory, f"{table}.csv")
+                    with open(filepath, 'a') as f:
+                        df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
+                except Exception as e:
+                    print(e)
             # Manually update device data to mysql
             if not device_data:
                 device_data = [{
@@ -290,7 +300,7 @@ class Update_Device(object):
                 # remove last days device data
                 with connect_to_database(WITHINGS_DATABASE) as withings_db:
                     modify_db.remove_device_data(user.user_id, withings_db, user.device_type)
-                device_df.to_sql(con=WITHINGS_ENGINE, name="devices", if_exists='append')
+                    device_df.to_sql(con=withings_db, name="devices", if_exists='append')
 
         if data_flag:
             self.users_updated.append(user.user_id)
@@ -387,21 +397,19 @@ class Update_Device(object):
                 df['userid'] = user.user_id
                 table = data_value
 
-                #Don't append for devices table
-                file_name = date.today().strftime('%Y-%m-%d') + "_fitbit_" + table
                 try:
-                    if table == "devices":
-                        #remove last days' device data
-                        with connect_to_database(FITBIT_DATABASE) as fitbit_db:
+                    with connect_to_database(FITBIT_DATABASE) as fitbit_db:
+                        # remove last days' device data
+                        if table == "devices":
+                            df['lastUpdate'] = self.endDate
                             modify_db.remove_device_data(user.user_id, fitbit_db, user.device_type)
-                        df['lastUpdate'] = self.endDate
-                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
-                    else:
-                        df.to_sql(con=FITBIT_ENGINE, name=table, if_exists='append')
+                        df.to_sql(con=fitbit_db, name=table, if_exists='append')
+                    #write to csv
                     filepath = os.path.join(self.directory, f"{table}.csv")
                     with open(filepath, 'a') as f:
                         df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
-                except:
+                except Exception as e:
+                    print(e)
                     continue
         if data_flag:
             self.users_updated.append(user.user_id)
@@ -438,7 +446,8 @@ class Update_Device(object):
         with connect_to_database(db_name) as db:
             cursor = db.cursor()
             try:
-                cursor.execute(f"SELECT * FROM devices WHERE userid = '{user.user_id}' AND lastUpdate = '{self.endDate}'")
+                command = f"SELECT * FROM devices WHERE userid = '{user.user_id}' AND lastUpdate = '{self.endDate}'"
+                cursor.execute(text(command))
                 if cursor.fetchone():
                     self.users_skipped.append(user.user_id)
                     return True

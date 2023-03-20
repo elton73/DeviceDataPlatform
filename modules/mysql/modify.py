@@ -2,11 +2,11 @@
 import requests
 import pandas as pd
 from modules import FITBIT_TABLES, WITHINGS_TABLES, POLAR_TABLES
-from modules.mysql.setup import select_database
+from sqlalchemy import text
 
 def run_command(engine, command):
     with engine.connect() as con:
-        con.execute(command)
+        con.execute(text(command))
 
 def insert_list_into(table: str, items: list, engine):
 
@@ -34,13 +34,14 @@ def insert_list_into(table: str, items: list, engine):
 
 #todo: check if patient_id already exists before updating
 def update_patientid(patient_id, new_patient_id, dbs):
+    command = f'''
+                        UPDATE patient_ids SET patient_id = '{new_patient_id}' where patient_id = '{patient_id}';
+                        '''
     if not isinstance(dbs, list):
         dbs = [dbs]
     for db in dbs:
         cursor = db.cursor()
-        cursor.execute(f'''
-                        UPDATE patient_ids SET patient_id = '{new_patient_id}' where patient_id = '{patient_id}';
-                        ''')
+        cursor.execute(text(command))
         db.commit()
 
 def get_patientid(engine, userid):
@@ -50,17 +51,19 @@ def get_patientid(engine, userid):
     WHERE userid = '{userid}';
     '''
     with engine.connect() as con:
-        rs = con.execute(command)
+        rs = con.execute(text(command))
     id_list = list(rs)
     print(id_list)
     return id_list[0][0] if id_list else ''
 
 def add_web_app_user(email, hashed_password, username, db):
-    db.cursor().execute(f"INSERT INTO login_info VALUES ('{email}', '{hashed_password}', '{username}')")
+    command = f"INSERT INTO login_info VALUES ('{email}', '{hashed_password}', '{username}')"
+    db.cursor().execute(text(command))
     db.commit()
 
 def remove_web_app_user(email, db):
-    db.cursor().execute(f"DELETE FROM login_info WHERE email='{email}'")
+    command = f"DELETE FROM login_info WHERE email='{email}'"
+    db.cursor().execute(text(command))
     db.commit()
 
 def remove_patient(patient_id, user_id,device_type, device_db, auth_db):
@@ -72,13 +75,15 @@ def remove_patient(patient_id, user_id,device_type, device_db, auth_db):
         Remove polar user registration
     """
     if device_type == "polar":
+        command = f"SELECT member_id FROM member_ids WHERE userid='{user_id}'"
         # check if user has a member_id
-        device_cursor.execute(f"SELECT member_id FROM member_ids WHERE userid='{user_id}'")
+        device_cursor.execute(text(command))
         member_id = device_cursor.fetchone()
         #reformat incoming data
         member_id = member_id[0] if member_id else member_id
         if member_id:
-            result = auth_cursor.execute(f'SELECT auth_token FROM auth_info WHERE userid = "{user_id}"')
+            command = f'SELECT auth_token FROM auth_info WHERE userid = "{user_id}"'
+            result = auth_cursor.execute(text(command))
             token = auth_cursor.fetchone()
             #reformat incoming data
             token = token[0] if token else token
@@ -87,33 +92,38 @@ def remove_patient(patient_id, user_id,device_type, device_db, auth_db):
                 'Authorization': f'Bearer {token}'})
 
     # remove patient from device's database
-    device_cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id='{patient_id}'")
+    command = f"SELECT * FROM patient_ids WHERE patient_id='{patient_id}'"
+    device_cursor.execute(text(command))
     if device_cursor.fetchone():
-        device_cursor.execute(f"DELETE FROM patient_ids WHERE patient_id='{patient_id}'")
+        command = f"DELETE FROM patient_ids WHERE patient_id='{patient_id}'"
+        device_cursor.execute(text(command))
         device_db.commit()
 
     #remove health related data
     remove_health_data(user_id, device_db, device_type)
 
     # remove patient from auth database
-    auth_cursor.execute(f"SELECT * FROM auth_info WHERE userid='{user_id}'")
+    command = f"SELECT * FROM auth_info WHERE userid='{user_id}'"
+    auth_cursor.execute(text(command))
     if auth_cursor.fetchone():
-        auth_cursor.execute(f"DELETE FROM auth_info WHERE userid='{user_id}'")
+        command = f"DELETE FROM auth_info WHERE userid='{user_id}'"
+        auth_cursor.execute(text(command))
         auth_db.commit()
 
 
 def link_user_to_key(key, email, db):
-    db.cursor().execute(f"UPDATE registration_keys SET email = '{email}' WHERE user_key = '{key}'")
+    command = f"UPDATE registration_keys SET email = '{email}' WHERE user_key = '{key}'"
+    db.cursor().execute(text(command))
     db.commit()
 
 def export_patient_data(userid, patient_id, device_type, db):
     mycursor = db.cursor()
     command = f"INSERT INTO patient_ids (userid, patient_id, device_type) VALUES ('{userid}', '{patient_id}', '{device_type}')"
-    mycursor.execute(command)
+    mycursor.execute(text(command))
     #Create member_id row for Polar devices
     if device_type == "polar":
         command = f"INSERT INTO member_ids (userid) VALUES ('{userid}')"
-        mycursor.execute(command)
+        mycursor.execute(text(command))
     db.commit()
 
 def update_auth_token(connection, userid, new_auth_token):
@@ -123,7 +133,7 @@ def update_auth_token(connection, userid, new_auth_token):
     WHERE userid = '{userid}';
     '''
     cursor = connection.cursor()
-    cursor.execute(command)
+    cursor.execute(text(command))
     connection.commit()
 
 def update_refresh_token(connection, userid, new_refresh_token):
@@ -133,7 +143,7 @@ def update_refresh_token(connection, userid, new_refresh_token):
     WHERE userid = '{userid}';
     '''
     cursor = connection.cursor()
-    cursor.execute(command)
+    cursor.execute(text(command))
     connection.commit()
 
 def remove_device_data(user_id, db, device_type):
@@ -141,7 +151,8 @@ def remove_device_data(user_id, db, device_type):
     # remove data from fitbit database
     if device_type == "fitbit":
         try:
-            cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
+            command = f"DELETE FROM devices WHERE userid='{user_id}'"
+            cursor.execute(text(command))
         except Exception as e:
             print(e)
         db.commit()
@@ -149,7 +160,8 @@ def remove_device_data(user_id, db, device_type):
     # remove data from withings database
     elif device_type == "withings":
         try:
-            cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
+            command = f"DELETE FROM devices WHERE userid='{user_id}'"
+            cursor.execute(text(command))
         except Exception as e:
             print(e)
         db.commit()
@@ -162,7 +174,8 @@ def remove_health_data(user_id, db, device_type):
     if device_type == "fitbit":
         for key in FITBIT_TABLES:
             try:
-                cursor.execute(f"DELETE FROM {FITBIT_TABLES[key]} WHERE userid='{user_id}'")
+                command = f"DELETE FROM {FITBIT_TABLES[key]} WHERE userid='{user_id}'"
+                cursor.execute(text(command))
             except:
                 print(f"{FITBIT_TABLES[key]} table does not exist")
         db.commit()
@@ -172,12 +185,14 @@ def remove_health_data(user_id, db, device_type):
     elif device_type == "withings":
         #special case for devices table
         try:
-            cursor.execute(f"DELETE FROM devices WHERE userid='{user_id}'")
+            command = f"DELETE FROM devices WHERE userid='{user_id}'"
+            cursor.execute(text(command))
         except Exception as e:
             print(e)
         for key in WITHINGS_TABLES:
             try:
-                cursor.execute(f"DELETE FROM {WITHINGS_TABLES[key]} WHERE userid='{user_id}'")
+                command = f"DELETE FROM {WITHINGS_TABLES[key]} WHERE userid='{user_id}'"
+                cursor.execute(text(command))
             except:
                 print(f"{WITHINGS_TABLES[key]} table does not exist")
         db.commit()
@@ -186,11 +201,13 @@ def remove_health_data(user_id, db, device_type):
     # remove data from polar database
     elif device_type == "polar":
         # remove member_id
-        cursor.execute(f"DELETE FROM member_ids WHERE userid='{user_id}'")
+        command = f"DELETE FROM member_ids WHERE userid='{user_id}'"
+        cursor.execute(text(command))
 
         for key in POLAR_TABLES:
             try:
-                cursor.execute(f"DELETE FROM {POLAR_TABLES[key]} WHERE userid='{user_id}'")
+                command = f"DELETE FROM {POLAR_TABLES[key]} WHERE userid='{user_id}'"
+                cursor.execute(text(command))
             except:
                 print(f"{POLAR_TABLES[key]} table does not exist")
         db.commit()
@@ -207,12 +224,12 @@ def export_device_to_auth_info(auth_info, db):
 
     mycursor = db.cursor()
     command = f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')"
-    mycursor.execute(command)
+    mycursor.execute(text(command))
     db.commit()
 
-if __name__ == "__main__":
-    for key in FITBIT_TABLES:
-        print(FITBIT_TABLES[key])
+# if __name__ == "__main__":
+#     for key in FITBIT_TABLES:
+#         print(FITBIT_TABLES[key])
 
 
 

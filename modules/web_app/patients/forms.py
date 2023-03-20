@@ -1,17 +1,7 @@
-from modules import FITBIT_DATABASE
-from modules.mysql.setup import connect_to_database
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms.validators import DataRequired, Length
 from wtforms import StringField, SubmitField, SelectField
 
-
-# Check if patient_id exists in database (Deprecated)
-def validate_fitbit_patient_id(FlaskForm, patient):
-    with connect_to_database(FITBIT_DATABASE) as fitbit_db:
-        cursor = fitbit_db.cursor()
-        cursor.execute(f"SELECT * FROM patient_ids WHERE patient_id = '{patient.data}'")
-        if cursor.fetchall():
-            raise ValidationError("Patient Name Already Exists")
 
 class PatientForm(FlaskForm):
     choices = [('fitbit', 'Fitbit'), ('withings', 'Withings'), ('polar', 'Polar')]

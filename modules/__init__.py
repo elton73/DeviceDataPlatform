@@ -13,10 +13,6 @@ AUTH_DATABASE = 'authorization_info_2'
 LOGIN_DATABASE = 'webapp_login_info_2'
 # EMAILS_DATABASE = ['email_list'] #add database for list of emails
 
-FITBIT_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{FITBIT_DATABASE}')
-WITHINGS_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{WITHINGS_DATABASE}')
-POLAR_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{POLAR_DATABASE}')
-
 # fitbit data
 FITBIT_TABLES = {'devices': 'devices',
                  'activities-steps': 'activitiessteps',

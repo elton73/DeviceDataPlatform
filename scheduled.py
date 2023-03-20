@@ -3,6 +3,7 @@
 from modules.data_update import Update_Device
 from datetime import timedelta, date
 import pathlib
+import time
 
 try:
     import httplib  # python < 3.0
@@ -18,6 +19,7 @@ def runschedule():
 
 if __name__ == '__main__':
     runschedule()
+    time.sleep(10)
 
 
 
