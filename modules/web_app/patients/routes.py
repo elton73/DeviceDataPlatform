@@ -88,6 +88,7 @@ def addpatient():
         session['device_type'] = device_type
         session['patient_id'] = patient_id
 
+        #todo: check for open redirect vulnerability
         if device_type == "fitbit":
             session['database'] = FITBIT_DATABASE
             return redirect(fitbit.authorization_url)

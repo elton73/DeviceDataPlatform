@@ -1,5 +1,5 @@
 '''Setup the DB to store authentication codes'''
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from mysql import connector
 from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD
 
@@ -50,7 +50,7 @@ DEVICE_DATABASES = [FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE] # add da
 def run_commands(engine, command_list):
     with engine.connect() as con:
         for command in command_list:
-            rs = con.execute(text(command), multi=True)
+            rs = con.execute(command)
     return rs   # return result from last command in list
 
 def make_engine(database=''):
@@ -116,13 +116,13 @@ def create_key(key):
         """
         with connect_to_database(LOGIN_DATABASE) as db:
             mycursor = db.cursor()
-            mycursor.execute(text(command))
+            mycursor.execute(command)
             db.commit()
     else:
         print("Invalid Key")
 
 if __name__ == "__main__":
-    create_key("1234567")
+    create_key("123456789")
 
 
 

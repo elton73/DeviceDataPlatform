@@ -1,13 +1,12 @@
 '''Functions to generate reports from the database'''
 from bcrypt import checkpw
-from sqlalchemy import text
 
 def get_all_token_timeouts(connection):
     command = '''
     SELECT userid, expires_by FROM Auth_info;
     '''
     cursor = connection.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     result = cursor.fetchall()
     return {data[0]: data[1] for data in result}
 
@@ -17,7 +16,7 @@ def get_all_user_ids(connection):
     SELECT userid FROM Auth_info;
     '''
     cursor = connection.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     result = cursor.fetchall()
     return [element[0] for element in result]
 
@@ -27,7 +26,7 @@ def get_auth_tokens(connection, selected_users):
         WHERE {format_OR_clause('userid', selected_users)};
     '''
     cursor = connection.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     result = cursor.fetchall()
     return {data[0]: data[1] for data in result}
 
@@ -37,7 +36,7 @@ def get_refresh_tokens(connection, selected_users):
         WHERE {format_OR_clause('userid', selected_users)};
     '''
     cursor = connection.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     result = cursor.fetchall()
     return {data[0]: data[1] for data in result}
 
@@ -48,7 +47,7 @@ def get_data(connection, selected_user, datatype):
         WHERE userid = "{selected_user}";
     '''
     cursor = connection.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     result = cursor.fetchone()
 
     if result:
@@ -59,7 +58,7 @@ def check_login_details(email, password, db):
     #navigate the database
     command = f"SELECT * FROM login_info WHERE email = '{email}'"
     cursor = db.cursor(dictionary=True) #allows us to access data by name
-    cursor.execute(text(command))
+    cursor.execute(command)
     #if user exists, check if password is correct
     user_account = cursor.fetchone()
     if user_account:
@@ -71,7 +70,7 @@ def check_login_details(email, password, db):
 def check_input_key(input_key, db):
     command = f"SELECT * FROM registration_keys WHERE user_key = '{input_key}' AND email IS NULL"
     cursor = db.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     if cursor.fetchone():
         return True
     return False
@@ -81,7 +80,7 @@ def check_valid_device(user_id, patient_id, auth_db, db):
     #case 1 device already exists in auth_info
     command = f"SELECT * FROM auth_info WHERE userid = '{user_id}'"
     cursor = auth_db.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     if cursor.fetchall():
         message = "Device Already Exists"
         return False, message
@@ -89,7 +88,7 @@ def check_valid_device(user_id, patient_id, auth_db, db):
     #case 2 patient already exists in database
     command = f"SELECT * FROM patient_ids WHERE patient_id = '{patient_id}'"
     cursor = db.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     if cursor.fetchall():
         message = "Please Choose Different Patient ID"
         return False, message
@@ -102,7 +101,7 @@ def check_patient_id(patient_id, device_db):
     for db in device_db:
         command = f"SELECT * FROM patient_ids WHERE patient_id = '{patient_id}'"
         cursor = db.cursor()
-        cursor.execute(text(command))
+        cursor.execute(command)
         if cursor.fetchall():
             message = "Please Choose Different Patient ID"
             return False, message
@@ -114,7 +113,7 @@ def get_device_users(db):
     command = f'''
     SELECT * FROM patient_ids
     '''
-    cursor.execute(text(command))
+    cursor.execute(command)
     result = cursor.fetchall()
     return result
 
@@ -128,16 +127,16 @@ def capitalize_first_letter(string):
 def email_exists(db, email):
     command = f"SELECT * FROM login_info WHERE email = '{email}'"
     cursor = db.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     if cursor.fetchall():
         return True
     else:
         return False
 
 def key_is_valid(db, key):
-    command = f"SELECT * FROM registration_keys WHERE user_key = '{key.data}' AND email IS NULL"
+    command = f"SELECT * FROM registration_keys WHERE user_key = '{key}' AND email IS NULL"
     cursor = db.cursor()
-    cursor.execute(text(command))
+    cursor.execute(command)
     if cursor.fetchall():
         return True
     else:

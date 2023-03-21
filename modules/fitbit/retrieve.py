@@ -1,6 +1,5 @@
 import requests
 
-
 class DataGetter():
     ''' Class that use the fitbit Web Api to get data, returns the entire response object'''
 
