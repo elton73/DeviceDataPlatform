@@ -1,9 +1,10 @@
 from flask import Flask
 from flask_bcrypt import Bcrypt
-from secret_keys import secrets
+import secrets
+import os
 
-GRAFANA_URL = "https://6cf8-142-244-4-196.ngrok.io"
-DATAPLATFORM_URL = "https://953c-142-244-4-196.ngrok.io"
+GRAFANA_URL = os.environ.get("GRAFANA_URL")
+DATAPLATFORM_URL = os.environ.get("DATAPLATFORM_URL")
 
 from modules.polar.authorization import PolarAccess
 from modules.fitbit.authorization import FitbitAccess
@@ -14,7 +15,7 @@ fitbit = FitbitAccess()
 withings = WithingsAccess()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = secrets.get('SECRET_KEY')
+app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 bcrypt = Bcrypt(app)
 
 from modules.web_app.users.routes import users
