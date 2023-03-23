@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine
-from secret_keys import secrets
+import os
 
 #Database user
-USER = secrets.get('SECRET_USER')
-PASSWORD = secrets.get('SECRET_PASSWORD')
+USER = os.environ.get("SECRET_USER")
+PASSWORD = os.environ.get("SECRET_PASSWORD")
 
 #Databases
 FITBIT_DATABASE = 'fitbit_2'

@@ -1,1 +1,1 @@
-# Grab Fitbit data from the Fitbit cloud 
+# Grab device data from the cloud 

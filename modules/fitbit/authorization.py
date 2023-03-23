@@ -57,9 +57,3 @@ class FitbitAccess(object):
         except Exception as e:
             print(e)
         return False
-
-if __name__=="__main__":
-    fitbit = FitbitAccess()
-    code = 'bfe7e796b085bf75a33dd2d7d7093cdfa2ae2c0a'
-    output = fitbit.exchange_token(code)
-    print(output)

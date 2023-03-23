@@ -20,6 +20,7 @@ def runschedule():
 if __name__ == '__main__':
     runschedule()
     time.sleep(10)
+    print("Done")
 
 
 
