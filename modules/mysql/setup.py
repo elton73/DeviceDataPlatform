@@ -110,7 +110,7 @@ def setup_databases():
 
 #Generate sign up key
 def create_key(key):
-    if key.isnumeric():
+    if key.isalnum():
         command = f"""
         INSERT IGNORE INTO registration_keys (user_key) VALUES ('{key}')
         """
@@ -121,8 +121,8 @@ def create_key(key):
     else:
         print("Invalid Key")
 
-if __name__ == "__main__":
-    create_key("123456789")
+# if __name__ == "__main__":
+#     create_key("123456789")
 
 
 
