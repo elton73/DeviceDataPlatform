@@ -1,8 +1,10 @@
+'''
+Class that use the polar Web Api to get data, returns the entire response object
+'''
 import requests
 import re
 
 class DataGetter():
-    ''' Class that use the withings Web Api to get data, returns the entire response object'''
     def __init__(self, token, user_id):
         self.token = token
         self.user_id = user_id

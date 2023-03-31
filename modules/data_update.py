@@ -1,3 +1,7 @@
+"""
+Class for updating all devices here
+"""
+
 from modules.mysql.setup import connect_to_database
 import modules.mysql.report as report_db
 import requests
@@ -11,6 +15,9 @@ from modules.fitbit.update import Fitbit_Update
 from modules.polar.update import Polar_Update
 from modules.withings.update import Withings_Update
 
+"""
+User class with auth info
+"""
 class User(object):
     def __init__(self, user_id):
         self.user_id = user_id
@@ -106,6 +113,7 @@ class User(object):
         db.commit()
         return member_id
 
+"""Update class to update all devices"""
 class Update_Device(object):
     def __init__(self, startDate, endDate, path):
         self.startDate = startDate

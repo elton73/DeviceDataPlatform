@@ -1,4 +1,4 @@
-'''Update All Devices Here
+'''Update All Devices Here. Used with task scheduler.
 '''
 from modules.data_update import Update_Device
 from datetime import timedelta, date

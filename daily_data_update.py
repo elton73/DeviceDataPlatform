@@ -1,4 +1,4 @@
-'''Update All Devices Here
+'''Update All Devices Here Daily. Constantly running loop.
 '''
 from modules.data_update import Update_Device
 from datetime import timedelta, date
@@ -19,6 +19,6 @@ def runschedule():
 
 if __name__ == '__main__':
     while True:
-        if time.localtime().tm_hour == 8 and time.localtime().tm_min == 0 and time.localtime().tm_sec == 0:
+        if time.localtime().tm_hour == 9 and time.localtime().tm_min == 26 and time.localtime().tm_sec == 0:
             runschedule()
             time.sleep(60)

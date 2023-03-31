@@ -1,3 +1,6 @@
+"""
+Update class for updating a user information
+"""
 import modules.fitbit.retrieve as fitbit_retrieve
 from modules.mysql.setup import connect_to_database
 import modules.mysql.modify as modify_db
