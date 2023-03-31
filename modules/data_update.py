@@ -1,15 +1,9 @@
-import modules.fitbit.retrieve as fitbit_retrieve
-import modules.withings.retrieve as withings_retrieve
-import modules.polar.retrieve as polar_retrieve
 from modules.mysql.setup import connect_to_database
-import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
 import requests
 from sqlalchemy import create_engine
-import pandas as pd
-from datetime import datetime, timedelta
-from modules import AUTH_DATABASE, FITBIT_TABLES, WITHINGS_TABLES, WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, \
-    FITBIT_DATABASE, WITHINGS_DATABASE, USER, PASSWORD
+from modules import AUTH_DATABASE, POLAR_DATABASE, FITBIT_DATABASE, WITHINGS_DATABASE, USER, PASSWORD
+from datetime import date
 from time import time
 import uuid
 import os
@@ -177,7 +171,7 @@ class Update_Device(object):
 
         print(f"Users updated: {self.users_updated}")
         print(f"User skipped: {self.users_skipped}")
-        print(f"{self.request_num} users updated in {time() - start} seconds")
+        print(f"{self.request_num} users updated in {time() - start} seconds on {date.today()}")
         return self.request_num
 
     #generate list of all users in auth database

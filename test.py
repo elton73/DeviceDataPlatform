@@ -18,7 +18,7 @@ def runschedule():
     return update.update_all()
 
 if __name__ == '__main__':
-    runschedule()
-
-
-
+    while True:
+        if time.localtime().tm_hour == 8 and time.localtime().tm_min == 0 and time.localtime().tm_sec == 0:
+            runschedule()
+            time.sleep(60)

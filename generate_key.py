@@ -1,3 +1,7 @@
+"""
+Generate a Registration Key
+"""
+
 from modules.mysql.setup import create_key, connect_to_database
 from time import sleep
 import random
