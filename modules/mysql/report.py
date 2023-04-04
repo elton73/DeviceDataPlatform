@@ -157,11 +157,11 @@ def format_OR_clause(column: str, condition: list):
         if len(condition) == 0:
             return where_clause
 
-        where_clause += f'{column} = "{condition[0]}"'
+        where_clause += f"{column} = {condition[0]}"
 
         if len(condition) > 1:
             for i in range(1, len(condition)):
-                where_clause += f" OR {column} = '{condition[i]}'"
+                where_clause += f" OR {column} = {condition[i]}"
         print(where_clause)
         return where_clause
 

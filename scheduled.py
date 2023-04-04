@@ -12,6 +12,10 @@ except:
 
 def runschedule():
     path = pathlib.Path(__file__).parent.resolve()
+    #get data for a specific day
+    # start_date = (date.today() - timedelta(days=3)).strftime('%Y-%m-%d')  # yesterday
+    # end_date = (date.today() - timedelta(days=2)).strftime('%Y-%m-%d')  # yesterday
+
     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
     end_date = date.today().strftime('%Y-%m-%d')  # today
     update = Update_Device(startDate=start_date, endDate=end_date, path=path)

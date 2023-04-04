@@ -207,6 +207,8 @@ class Update_Device(object):
                 cursor.execute(command)
                 if cursor.fetchone():
                     self.users_skipped.append(user.user_id)
+                    #debug
+                    print(f"User Already Updated: {user.user_id}")
                     return True
                 return False
             except Exception as e:

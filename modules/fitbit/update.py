@@ -24,6 +24,8 @@ class Fitbit_Update():
             result = self.data_retriever.api_map[data_key](self.startDate, self.endDate)
             # Expired token
             if result.status_code == 401:
+                #debug
+                print(f"Result Code: 401 for user: {self.user.user_id}")
                 new_auth_info = self.user.get_refreshed_fitbit_auth_info()
                 # If There is a problem with getting new auth info, skip
                 if new_auth_info == '':
@@ -34,6 +36,7 @@ class Fitbit_Update():
                     modify_db.update_refresh_token(auth_db, self.user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 self.data_retriever.token = new_auth_info['access_token']
+                result = self.data_retriever.api_map[data_key](self.startDate, self.endDate)
             data = result.json()
             # print(data) #debug
             # break if there is no device
@@ -78,16 +81,16 @@ class Fitbit_Update():
                 table = data_value
 
                 try:
+                    # write to csv
+                    filepath = os.path.join(self.directory, f"{table}.csv")
+                    with open(filepath, 'a') as f:
+                        df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                     with connect_to_database(FITBIT_DATABASE) as fitbit_db:
                         # remove last days' device data
                         if table == "devices":
                             df['lastUpdate'] = self.endDate
                             modify_db.remove_device_data(self.user.user_id, fitbit_db, self.user.device_type)
                         df.to_sql(con=self.engine, name=table, if_exists='append')
-                    # write to csv
-                    filepath = os.path.join(self.directory, f"{table}.csv")
-                    with open(filepath, 'a') as f:
-                        df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 except Exception as e:
                     print(e)
                     continue
