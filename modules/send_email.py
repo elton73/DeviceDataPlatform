@@ -1,5 +1,5 @@
 """
-Incomplete
+Check last sync time and send email.
 """
 
 from modules import USER, PASSWORD, FITBIT_DATABASE
@@ -12,7 +12,8 @@ from modules import AUTH_DATABASE
 import sys
 import os
 from sqlalchemy import create_engine
-from datetime import datetime, timedelta, timezone, date
+from datetime import datetime, timedelta
+import json
 
 try:
     import httplib  # python < 3.0
@@ -38,7 +39,7 @@ def sendEmail(subject, body):
     smtp_server = "smtp.gmail.com"
     sender_email = os.environ.get('DATA_PLATFORM_EMAIL')  # Enter your address
     # todo: store these emails in database for retrieval
-    receiver_email = ["ehlam@ualberta.ca"]  # Enter receiver addresses
+    receiver_email = json.loads(os.environ.get('EMAIL_LIST'))  # Enter receiver addresses
     password = os.environ.get('DATA_PLATFORM_PASSWORD')
     message = f"Subject: {subject}\n\n{body}"
 
@@ -123,3 +124,6 @@ def check_last_sync():
     with setup_db.connect_to_database(AUTH_DATABASE) as db:
         selected_userids = report_db.get_all_user_ids(db)
         lateSyncEmail(selected_userids)
+
+# if __name__ == '__main__':
+    # check_last_sync()

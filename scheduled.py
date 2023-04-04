@@ -3,7 +3,6 @@
 from modules.data_update import Update_Device
 from datetime import timedelta, date
 import pathlib
-import time
 
 try:
     import httplib  # python < 3.0

@@ -11,7 +11,7 @@ WITHINGS_DATABASE = 'withings_2'
 POLAR_DATABASE = 'polar_2'
 AUTH_DATABASE = 'authorization_info_2'
 LOGIN_DATABASE = 'webapp_login_info_2'
-# EMAILS_DATABASE = ['email_list'] #add database for list of emails
+EMAILS_DATABASE = 'email_list'
 
 # fitbit data
 FITBIT_TABLES = {'devices': 'devices',

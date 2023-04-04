@@ -19,10 +19,14 @@ def runschedule():
     return update.update_all()
 
 if __name__ == '__main__':
-    while True:
-        if time.localtime().tm_hour == 8 and time.localtime().tm_min == 55 and time.localtime().tm_sec == 0:
-            print("Updating:")
-            runschedule()
-            print("Checking Last Sync:")
-            check_last_sync()
-            time.sleep(60)
+    # while True:
+    #     if time.localtime().tm_hour == 8 and time.localtime().tm_min == 55 and time.localtime().tm_sec == 0:
+    #         print("Updating:")
+    #         runschedule()
+    #         print("Checking Last Sync:")
+    #         check_last_sync()
+    #         time.sleep(60)
+    print("Updating:")
+    runschedule()
+    print("Checking Last Sync:")
+    check_last_sync()
