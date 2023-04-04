@@ -4,3 +4,4 @@ secret_keys.py
 exported_data/
 venv/
 
+batch/

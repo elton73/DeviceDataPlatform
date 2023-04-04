@@ -22,7 +22,6 @@ from modules.web_app.users.routes import users
 from modules.web_app.patients.routes import patients
 from modules.web_app.main.routes import main
 
-
 app.register_blueprint(users)
 app.register_blueprint(patients)
 app.register_blueprint(main)

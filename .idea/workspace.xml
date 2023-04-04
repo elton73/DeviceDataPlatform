@@ -4,7 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="restructured data_update file" />
+    <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="Fixed fitbit sql bug, updated send_email function">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/daily_data_update.py" beforeDir="false" afterPath="$PROJECT_DIR$/daily_data_update.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/daily_update.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/daily_update.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/key.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/key.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mysql/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mysql/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/send_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/send_email.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduled.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/scheduled.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduled.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduled.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/setup.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/web_app.bat" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,8 +71,9 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/ML-3/Documents/GitHub/DeviceDataPlatform&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ML-3/Desktop/get-fitbit-data-app&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -73,10 +87,11 @@
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ML-3\Documents\GitHub\DeviceDataPlatform\batch" />
+      <recent name="C:\Users\ML-3\Documents\GitHub\DeviceDataPlatform\modules" />
       <recent name="C:\Users\calga\Documents\GitHub\DeviceDataPlatform\modules\gui" />
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform\batch" />
       <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform\modules\web_app" />
-      <recent name="C:\Users\ML-2\Documents\GitHub\DeviceDataPlatform" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -189,6 +204,33 @@
       <workItem from="1679505321656" duration="3427000" />
       <workItem from="1679582901145" duration="195000" />
       <workItem from="1679583109780" duration="1149000" />
+      <workItem from="1679591349050" duration="90000" />
+      <workItem from="1679945656798" duration="425000" />
+      <workItem from="1679946122707" duration="359000" />
+      <workItem from="1679946527440" duration="928000" />
+      <workItem from="1679947829847" duration="714000" />
+      <workItem from="1679950121800" duration="1143000" />
+      <workItem from="1680015205256" duration="682000" />
+      <workItem from="1680015941967" duration="18000" />
+      <workItem from="1680015973345" duration="7000" />
+      <workItem from="1680016045380" duration="14000" />
+      <workItem from="1680038586797" duration="42000" />
+      <workItem from="1680214863958" duration="775000" />
+      <workItem from="1680275769950" duration="483000" />
+      <workItem from="1680276302906" duration="11000" />
+      <workItem from="1680280163223" duration="666000" />
+      <workItem from="1680282625605" duration="1932000" />
+      <workItem from="1680533555400" duration="710000" />
+      <workItem from="1680534483688" duration="1799000" />
+      <workItem from="1680542748349" duration="286000" />
+      <workItem from="1680619873052" duration="49000" />
+      <workItem from="1680621485905" duration="82000" />
+      <workItem from="1680621592635" duration="967000" />
+      <workItem from="1680622579318" duration="94000" />
+      <workItem from="1680622700053" duration="629000" />
+      <workItem from="1680623375573" duration="16000" />
+      <workItem from="1680623422900" duration="922000" />
+      <workItem from="1680624366637" duration="82000" />
     </task>
     <task id="LOCAL-00001" summary="Added text to sql commands">
       <created>1679339766839</created>
@@ -204,7 +246,70 @@
       <option name="project" value="LOCAL" />
       <updated>1679583160170</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="restructured data_update file">
+      <created>1679591433133</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1679591433133</updated>
+    </task>
+    <task id="LOCAL-00004" summary="added key generator">
+      <created>1679946550254</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1679946550255</updated>
+    </task>
+    <task id="LOCAL-00005" summary="removed unused imports">
+      <created>1679948750417</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1679948750417</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Edited random key generator">
+      <created>1679950981947</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1679950981947</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Changed update message">
+      <created>1680276100042</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1680276100042</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Changed update message">
+      <created>1680276207977</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1680276207977</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Changed update message">
+      <created>1680276245240</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1680276245240</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Added comments">
+      <created>1680280829653</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1680280829653</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Fixed fitbit sql bug, updated send_email function">
+      <created>1680623103103</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1680623103103</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -224,15 +329,24 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added text to sql commands" />
     <MESSAGE value="restructured data_update file" />
-    <option name="LAST_COMMIT_MESSAGE" value="restructured data_update file" />
+    <MESSAGE value="added key generator" />
+    <MESSAGE value="removed unused imports" />
+    <MESSAGE value="Edited random key generator" />
+    <MESSAGE value="Changed update message" />
+    <MESSAGE value="Added comments" />
+    <MESSAGE value="Fixed fitbit sql bug, updated send_email function" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed fitbit sql bug, updated send_email function" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$scheduled.coverage" NAME="scheduled Coverage Results" MODIFIED="1679508764523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$scheduled.coverage" NAME="scheduled Coverage Results" MODIFIED="1680542961972" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$run_web_app.coverage" NAME="run_web_app Coverage Results" MODIFIED="1679429403375" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$send_email.coverage" NAME="send-email Coverage Results" MODIFIED="1677782675652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$test.coverage" NAME="test Coverage Results" MODIFIED="1680276033535" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$daily_data_update.coverage" NAME="daily_data_update Coverage Results" MODIFIED="1680622987906" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$routes.coverage" NAME="routes Coverage Results" MODIFIED="1678128492440" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/web_app/main" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$data_update.coverage" NAME="data_update Coverage Results" MODIFIED="1678806291656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules" />
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$setup.coverage" NAME="setup Coverage Results" MODIFIED="1679428297434" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/mysql" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$generate_key.coverage" NAME="generate_key Coverage Results" MODIFIED="1679950926028" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$send_email.coverage" NAME="send_email Coverage Results" MODIFIED="1680624416815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$setup.coverage" NAME="setup Coverage Results" MODIFIED="1680623901117" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$secret_keys.coverage" NAME="secret_keys Coverage Results" MODIFIED="1679431809734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

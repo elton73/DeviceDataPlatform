@@ -1,7 +1,8 @@
 '''Setup the DB to store authentication codes'''
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from mysql import connector
-from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD
+from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD, \
+    EMAILS_DATABASE
 
 SQL_CREATE_AUTH_TABLE = '''
 CREATE TABLE IF NOT EXISTS Auth_info(
@@ -21,8 +22,7 @@ CREATE TABLE IF NOT EXISTS login_info(
 
 SQL_CREATE_EMAIL_LIST_TABLE = '''
 CREATE TABLE IF NOT EXISTS email_list(
-    email VARCHAR(254) NOT NULL PRIMARY KEY,
-    patientid VARCHAR(30) NOT NULL);
+    email VARCHAR(254) NOT NULL PRIMARY KEY);
 '''
 
 SQL_CREATE_KEY_TABLE = '''
@@ -50,7 +50,7 @@ DEVICE_DATABASES = [FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE] # add da
 def run_commands(engine, command_list):
     with engine.connect() as con:
         for command in command_list:
-            rs = con.execute(command)
+            rs = con.execute(text(command))
     return rs   # return result from last command in list
 
 def make_engine(database=''):
@@ -101,16 +101,16 @@ def select_database(device_type):
 def setup_databases():
     engine = make_engine()
     create_dbs(engine, AUTH_DATABASE, SQL_CREATE_AUTH_TABLE)
-    # create_dbs(engine, EMAILS_DATABASE, SQL_CREATE_EMAIL_LIST_TABLE)
+    create_dbs(engine, EMAILS_DATABASE, SQL_CREATE_EMAIL_LIST_TABLE)
     create_dbs(engine, DEVICE_DATABASES, SQL_CREATE_PATIENT_DEVICE_TABLE)
     create_dbs(engine, LOGIN_DATABASE, SQL_CREATE_WEBAPP_LOGIN_INFO_TABLE)
     create_table(engine, LOGIN_DATABASE, SQL_CREATE_KEY_TABLE)
-    create_key("12345")
+    create_key("0123456789")
     create_table(engine, POLAR_DATABASE, SQL_CREATE_POLAR_MEMBER_ID_TABLE)
 
 #Generate sign up key
 def create_key(key):
-    if key.isnumeric():
+    if key.isalnum():
         command = f"""
         INSERT IGNORE INTO registration_keys (user_key) VALUES ('{key}')
         """
@@ -121,8 +121,8 @@ def create_key(key):
     else:
         print("Invalid Key")
 
-if __name__ == "__main__":
-    create_key("123456789")
+# if __name__ == "__main__":
+#     create_key("123456789")
 
 
 

@@ -1,3 +1,6 @@
+"""
+Class to generate an authorization url and get a user's access token
+"""
 import os
 import sys
 import base64

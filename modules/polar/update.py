@@ -1,3 +1,6 @@
+"""
+Update class for updating a user information
+"""
 import modules.polar.retrieve as polar_retrieve
 from modules.mysql.setup import connect_to_database
 import pandas as pd

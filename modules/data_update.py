@@ -1,15 +1,13 @@
-import modules.fitbit.retrieve as fitbit_retrieve
-import modules.withings.retrieve as withings_retrieve
-import modules.polar.retrieve as polar_retrieve
+"""
+Class for updating all devices here
+"""
+
 from modules.mysql.setup import connect_to_database
-import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
 import requests
 from sqlalchemy import create_engine
-import pandas as pd
-from datetime import datetime, timedelta
-from modules import AUTH_DATABASE, FITBIT_TABLES, WITHINGS_TABLES, WITHINGS_COLUMNS, POLAR_DATABASE, POLAR_TABLES, \
-    FITBIT_DATABASE, WITHINGS_DATABASE, USER, PASSWORD
+from modules import AUTH_DATABASE, POLAR_DATABASE, FITBIT_DATABASE, WITHINGS_DATABASE, USER, PASSWORD
+from datetime import date
 from time import time
 import uuid
 import os
@@ -17,6 +15,9 @@ from modules.fitbit.update import Fitbit_Update
 from modules.polar.update import Polar_Update
 from modules.withings.update import Withings_Update
 
+"""
+User class with auth info
+"""
 class User(object):
     def __init__(self, user_id):
         self.user_id = user_id
@@ -112,6 +113,7 @@ class User(object):
         db.commit()
         return member_id
 
+"""Update class to update all devices"""
 class Update_Device(object):
     def __init__(self, startDate, endDate, path):
         self.startDate = startDate
@@ -177,7 +179,7 @@ class Update_Device(object):
 
         print(f"Users updated: {self.users_updated}")
         print(f"User skipped: {self.users_skipped}")
-        print(f"{self.request_num} users updated in {time() - start} seconds")
+        print(f"{self.request_num} users updated in {time() - start} seconds on {date.today()}")
         return self.request_num
 
     #generate list of all users in auth database
@@ -205,6 +207,8 @@ class Update_Device(object):
                 cursor.execute(command)
                 if cursor.fetchone():
                     self.users_skipped.append(user.user_id)
+                    #debug
+                    print(f"User Already Updated: {user.user_id}")
                     return True
                 return False
             except Exception as e:
