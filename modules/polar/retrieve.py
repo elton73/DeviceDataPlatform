@@ -65,7 +65,7 @@ class DataGetter():
                 'Authorization': f'Bearer {self.token}'}
             )
         if r.status_code == 204:
-            print(f"Transaction ID: {transaction_id}. Status code: {r.status_code}")
+            print(f"User {self.user_id} has no new data. Transaction ID: {transaction_id}. Status code: {r.status_code}")
             return None
         elif r.status_code >= 200 and r.status_code < 400:
             try:

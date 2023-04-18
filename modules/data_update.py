@@ -14,6 +14,7 @@ import os
 from modules.fitbit.update import Fitbit_Update
 from modules.polar.update import Polar_Update
 from modules.withings.update import Withings_Update
+from modules.send_email import check_last_sync
 
 """
 User class with auth info
@@ -120,7 +121,11 @@ class Update_Device(object):
         self.endDate = endDate
         self.request_num = 0
         self.users = self.generate_users()
+
+        self.fitbit_users = []
+
         self.users_updated = []
+
         self.users_skipped = []
         self.path = path
 
@@ -145,6 +150,7 @@ class Update_Device(object):
 
             # fitbit api
             if user.device_type == 'fitbit':
+                self.fitbit_users.append(user)
                 updater = Fitbit_Update(user, self.startDate, self.endDate, self.path, self.FITBIT_ENGINE)
                 flag = updater.update()
                 if flag:
@@ -180,8 +186,13 @@ class Update_Device(object):
         print(f"Users updated: {self.users_updated}")
         print(f"User skipped: {self.users_skipped}")
         print(f"{self.request_num} users updated in {time() - start} seconds on {date.today()}")
-        return self.request_num
 
+        check_last_sync(self.fitbit_users)
+
+    def check_fitbit_last_sync(self):
+        if len(self.fitbit_users)>0:
+            return True
+        return False
     #generate list of all users in auth database
     def generate_users(self):
         users = set()

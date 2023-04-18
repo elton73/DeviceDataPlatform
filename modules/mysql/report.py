@@ -162,7 +162,6 @@ def format_OR_clause(column: str, condition: list):
         if len(condition) > 1:
             for i in range(1, len(condition)):
                 where_clause += f" OR {column} = {condition[i]}"
-        print(where_clause)
         return where_clause
 
 # if __name__ == "__main__":
