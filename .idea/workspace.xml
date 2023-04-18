@@ -4,20 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="Fixed fitbit sql bug, updated send_email function">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/daily_data_update.py" beforeDir="false" afterPath="$PROJECT_DIR$/daily_data_update.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/daily_update.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/daily_update.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/key.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/key.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mysql/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mysql/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/send_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/send_email.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scheduled.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/scheduled.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scheduled.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduled.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/setup.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_app.bat" beforeDir="false" afterPath="$PROJECT_DIR$/batch/web_app.bat" afterDir="false" />
-    </list>
+    <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="Stable Version" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -230,7 +217,15 @@
       <workItem from="1680622700053" duration="629000" />
       <workItem from="1680623375573" duration="16000" />
       <workItem from="1680623422900" duration="922000" />
-      <workItem from="1680624366637" duration="82000" />
+      <workItem from="1680624366637" duration="139000" />
+      <workItem from="1680624554684" duration="16000" />
+      <workItem from="1681137961931" duration="100000" />
+      <workItem from="1681138085082" duration="45000" />
+      <workItem from="1681400366081" duration="24000" />
+      <workItem from="1681401106969" duration="17000" />
+      <workItem from="1681401274590" duration="2082000" />
+      <workItem from="1681855404395" duration="24000" />
+      <workItem from="1681856119768" duration="176000" />
     </task>
     <task id="LOCAL-00001" summary="Added text to sql commands">
       <created>1679339766839</created>
@@ -309,7 +304,21 @@
       <option name="project" value="LOCAL" />
       <updated>1680623103103</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Added environ variables for sending emails">
+      <created>1680624487275</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1680624487275</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Stable Version">
+      <created>1681856264112</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1681856264112</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -335,13 +344,15 @@
     <MESSAGE value="Changed update message" />
     <MESSAGE value="Added comments" />
     <MESSAGE value="Fixed fitbit sql bug, updated send_email function" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed fitbit sql bug, updated send_email function" />
+    <MESSAGE value="Added environ variables for sending emails" />
+    <MESSAGE value="Stable Version" />
+    <option name="LAST_COMMIT_MESSAGE" value="Stable Version" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$scheduled.coverage" NAME="scheduled Coverage Results" MODIFIED="1680542961972" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$run_web_app.coverage" NAME="run_web_app Coverage Results" MODIFIED="1679429403375" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$test.coverage" NAME="test Coverage Results" MODIFIED="1680276033535" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/DeviceDataPlatform$daily_data_update.coverage" NAME="daily_data_update Coverage Results" MODIFIED="1680622987906" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DeviceDataPlatform$daily_data_update.coverage" NAME="daily_data_update Coverage Results" MODIFIED="1681402673543" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$routes.coverage" NAME="routes Coverage Results" MODIFIED="1678128492440" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/web_app/main" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$data_update.coverage" NAME="data_update Coverage Results" MODIFIED="1678806291656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules" />
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$generate_key.coverage" NAME="generate_key Coverage Results" MODIFIED="1679950926028" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
