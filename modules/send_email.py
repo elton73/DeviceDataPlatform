@@ -66,20 +66,20 @@ def lateSyncEmail(users):
                 # Bad Refresh Token
                 if new_auth_info == 400:
                     print(
-                        f'Bad refresh token, enter credentials for userid: {user.userid}')
+                        f'Bad refresh token, enter credentials for userid: {user.user_id}')
                     # new_auth_info = auth.get_auth_info()
                     continue  # move on to next device
 
                 # If There is a problem with getting new auth info, skip
                 if new_auth_info == '':
-                    print(f'X {user.userid} ERROR: Could not get Access Token')
+                    print(f'X {user.user_id} ERROR: Could not get Access Token')
                     continue  # move on to next device
 
                 # Update the database
                 modify_db.update_auth_token(
-                    auth_conn, user.userid, new_auth_info['access_token'])
+                    auth_conn, user.user_id, new_auth_info['access_token'])
                 modify_db.update_refresh_token(
-                    auth_conn, user.userid, new_auth_info['refresh_token'])
+                    auth_conn, user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 UserDataRetriever.token = new_auth_info['access_token']
                 # Try the request again
@@ -95,7 +95,7 @@ def lateSyncEmail(users):
                 # condition to send email notification: > 1 day since last sync
                 if ts + timedelta(days=4) < datetime.now():
                     cursor = mysql_conn.raw_connection().cursor()
-                    cursor.execute(f'SELECT patient_id FROM patient_ids WHERE userid = \'{user.userid}\';')
+                    cursor.execute(f'SELECT patient_id FROM patient_ids WHERE userid = \'{user.user_id}\';')
 
                     patientid = cursor.fetchall()[0][0]
                     device_list.append((patientid, device['deviceVersion']))
@@ -104,6 +104,7 @@ def lateSyncEmail(users):
         subject = f"[AUTOMATED] Patients haven't synced their Charge 2 for more than 3 days"
         body = f"Here is a list of patients and their out-of-sync devices: {device_list}"
         if device_list:
+            print("Sending Email...")
             sendEmail(subject, body)
 
 def check_last_sync(users):
