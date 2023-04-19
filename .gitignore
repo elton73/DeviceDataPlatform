@@ -5,3 +5,6 @@ exported_data/
 venv/
 
 batch/
+/Lib/
+/node_modules/
+/venv/
