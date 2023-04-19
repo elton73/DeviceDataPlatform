@@ -168,8 +168,3 @@ def export_device_to_auth_info(auth_info, db):
 # if __name__ == "__main__":
 #     for key in FITBIT_TABLES:
 #         print(FITBIT_TABLES[key])
-
-
-
-
-

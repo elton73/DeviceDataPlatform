@@ -227,9 +227,3 @@ class Update_Device(object):
             except Exception as e:
                 print(e)
                 return False
-
-
-
-
-
-

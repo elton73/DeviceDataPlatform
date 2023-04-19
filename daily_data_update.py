@@ -33,4 +33,3 @@ if __name__ == '__main__':
             with connect_to_database(LOGIN_DATABASE) as login_db:
                 purge_unused_keys(login_db)
             time.sleep(60)
-
