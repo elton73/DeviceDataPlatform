@@ -57,7 +57,6 @@ def callback():
 
     #setup database connections
     patient_id = session.get('patient_id')
-
     user_id = auth_info['user_id']
     #check if device already exists
     with connect_to_database(AUTH_DATABASE) as auth_db, connect_to_database(session.get('database')) as device_db:

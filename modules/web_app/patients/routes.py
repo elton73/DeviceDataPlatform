@@ -22,7 +22,7 @@ def updatenow():
     return redirect(url_for('main.home'))
 
 @patients.route('/patient/<string:patient_id>/<string:user_id>/delete', methods = ['POST'])
-#todo: delete only the device, not all the devices with patient_id
+#todo:check if function deletes only the device, not all the devices with patient_id
 def deletepatient(patient_id, user_id):
     # user must be logged in
     if 'logged_in' not in session:
@@ -99,3 +99,9 @@ def addpatient():
             session['database'] = POLAR_DATABASE
             return redirect(polar.authorization_url)
     return render_template('addpatient.html', title='Add', form=form)
+
+#don't cache pages
+@patients.after_request
+def after_request(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
