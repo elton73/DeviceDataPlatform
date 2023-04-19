@@ -75,7 +75,7 @@ def create_key():
             session['key'] = key
             session['key_count'] += 1
         else:
-            flash('Max Keys Generated. Please Try Again Later', 'danger')  # todo:Provide details for why unsuccessful later
+            flash('Max Keys Generated. Please Try Again Later.', 'danger')  # todo:Provide details for why unsuccessful later
     return redirect(url_for('users.keys'))
 
 

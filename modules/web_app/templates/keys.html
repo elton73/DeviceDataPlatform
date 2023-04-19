@@ -9,6 +9,8 @@
           {% if key %}
           <p class="font-weight-light my-auto">Key: {{ key }}</p>
           <p class="font-italic">Unused Keys Will Be Removed At 9:00AM MDT.</p>
+          {% else %}
+          <p class="font-weight-light my-auto">Key will appear here</p>
           {% endif %}
     </div>
          <a class="btn btn-primary" href="{{ url_for('users.create_key') }}">
