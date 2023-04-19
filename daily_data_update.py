@@ -16,15 +16,15 @@ def runschedule():
     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
     end_date = date.today().strftime('%Y-%m-%d')  # today
     update = Update_Device(startDate=start_date, endDate=end_date, path=path)
-    update.update_all()
+    return update.update_all()
 
-    if update.check_fitbit_last_sync():
-        print("Checking Last Fitbit Sync:")
-        check_last_sync()
+
 
 if __name__ == '__main__':
     while True:
-        if time.localtime().tm_hour == 10 and time.localtime().tm_min == 2 and time.localtime().tm_sec == 0:
+        if time.localtime().tm_hour == 8 and time.localtime().tm_min == 45 and time.localtime().tm_sec == 0:
             print("Updating:")
-            runschedule()
+            fitbit_users = runschedule()
+            if fitbit_users:
+                check_last_sync(fitbit_users)
             time.sleep(60)

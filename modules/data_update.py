@@ -184,10 +184,12 @@ class Update_Device(object):
         self.POLAR_ENGINE.dispose()
 
         print(f"Users updated: {self.users_updated}")
-        print(f"User skipped: {self.users_skipped}")
+        print(f"Users skipped: {self.users_skipped}")
         print(f"{self.request_num} users updated in {time() - start} seconds on {date.today()}")
 
-        check_last_sync(self.fitbit_users)
+        if self.check_fitbit_last_sync():
+            return self.fitbit_users
+        return False
 
     def check_fitbit_last_sync(self):
         if len(self.fitbit_users)>0:
