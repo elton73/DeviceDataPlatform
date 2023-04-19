@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="Stable Version">
-      <change afterPath="$PROJECT_DIR$/modules/web_app/templates/keys.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/daily_data_update.py" beforeDir="false" afterPath="$PROJECT_DIR$/daily_data_update.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/data_update.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/data_update.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mysql/modify.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mysql/modify.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/send_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/send_email.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/web_app/main/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/main/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/web_app/patients/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/patients/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/web_app/templates/layout.html" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/templates/layout.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/web_app/users/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/web_app/users/routes.py" afterDir="false" />
-    </list>
+    <list default="true" id="d5d746bc-62ad-49cf-a7a4-01315a44ef23" name="Changes" comment="Fixed Main Crashing error" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -239,7 +228,7 @@
       <workItem from="1681855404395" duration="24000" />
       <workItem from="1681856119768" duration="176000" />
       <workItem from="1681935946465" duration="153000" />
-      <workItem from="1681936217257" duration="311000" />
+      <workItem from="1681936217257" duration="348000" />
     </task>
     <task id="LOCAL-00001" summary="Added text to sql commands">
       <created>1679339766839</created>
@@ -332,7 +321,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681856264112</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Fixed Main Crashing error">
+      <created>1681936552933</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1681936552933</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -360,7 +356,8 @@
     <MESSAGE value="Fixed fitbit sql bug, updated send_email function" />
     <MESSAGE value="Added environ variables for sending emails" />
     <MESSAGE value="Stable Version" />
-    <option name="LAST_COMMIT_MESSAGE" value="Stable Version" />
+    <MESSAGE value="Fixed Main Crashing error" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed Main Crashing error" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/DeviceDataPlatform$scheduled.coverage" NAME="scheduled Coverage Results" MODIFIED="1675893308648" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
