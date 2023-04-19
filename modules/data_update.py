@@ -14,6 +14,7 @@ import os
 from modules.fitbit.update import Fitbit_Update
 from modules.polar.update import Polar_Update
 from modules.withings.update import Withings_Update
+from modules.send_email import check_last_sync
 
 """
 User class with auth info
@@ -226,9 +227,3 @@ class Update_Device(object):
             except Exception as e:
                 print(e)
                 return False
-
-
-
-
-
-

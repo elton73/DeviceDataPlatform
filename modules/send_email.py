@@ -11,7 +11,6 @@ import sys
 import os
 from sqlalchemy import create_engine
 from datetime import datetime, timedelta
-import json
 
 try:
     import httplib  # python < 3.0
@@ -36,8 +35,8 @@ def sendEmail(subject, body):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     sender_email = os.environ.get('DATA_PLATFORM_EMAIL')  # Enter your address
-    # receiver_email = ["ehlam@ualberta.ca"]
-    receiver_email = json.loads(os.environ.get('EMAIL_LIST'))  # Enter receiver addresses
+    receiver_email = ["ehlam@ualberta.ca"]
+    # receiver_email = json.loads(os.environ.get('EMAIL_LIST'))  # Enter receiver addresses
     password = os.environ.get('DATA_PLATFORM_PASSWORD')
     message = f"Subject: {subject}\n\n{body}"
 

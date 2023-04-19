@@ -147,6 +147,12 @@ def remove_health_data(user_id, db, device_type):
         return
     return False
 
+#Remove unused keys
+def purge_unused_keys(db):
+    mycursor = db.cursor()
+    mycursor.execute(f"DELETE FROM registration_keys WHERE email is NULL")
+    db.commit()
+
 # Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
 def export_device_to_auth_info(auth_info, db):
     userid = auth_info['user_id']
@@ -162,8 +168,3 @@ def export_device_to_auth_info(auth_info, db):
 # if __name__ == "__main__":
 #     for key in FITBIT_TABLES:
 #         print(FITBIT_TABLES[key])
-
-
-
-
-

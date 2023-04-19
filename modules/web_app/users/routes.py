@@ -6,6 +6,7 @@ from modules.mysql.modify import add_web_app_user, link_user_to_key
 from modules.web_app import bcrypt
 from modules import LOGIN_DATABASE
 from modules.mysql.setup import connect_to_database
+from generate_key import gen_random_key
 
 users = Blueprint('users', __name__)
 
@@ -45,11 +46,46 @@ def register():
                 flash(f'Account created for {form.username.data}!', 'success')
                 return redirect(url_for('main.home'))
             else:
-                flash('Registration Unsuccessful', 'danger')  # Provide details for why unsuccessful later
+                flash('Registration Unsuccessful', 'danger')  #todo: Provide details for why unsuccessful later
     return render_template('register.html', title='Register', form=form)
+
+@users.route('/keys', methods=['GET', 'POST'])
+def keys():
+    # user must be logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('users.login'))
+    #display the key only if it is unused
+    if not session.get('key_count'):
+        session['key_count'] = 1
+    key = None
+    with connect_to_database(LOGIN_DATABASE) as login_db:
+        if session.get('key') and check_input_key(session.get('key'), login_db):
+            key = session['key']
+    return render_template('keys.html', title='Keys', key=key)
+
+@users.route('/create_keys', methods=['GET', 'POST'])
+def create_key():
+    # user must be logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('users.login'))
+    if session.get('key_count'):
+        #set a max of 10 registration keys per session
+        if session['key_count'] < 10:
+            key = gen_random_key()
+            session['key'] = key
+            session['key_count'] += 1
+        else:
+            flash('Max Keys Generated. Please Try Again Later', 'danger')  # todo:Provide details for why unsuccessful later
+    return redirect(url_for('users.keys'))
+
 
 @users.route('/logout')
 def logout():
-    session.pop('logged_in', None)
-    session.pop('username', None)
+    session.clear()
     return redirect(url_for('users.login'))
+
+#don't cache pages
+@users.after_request
+def after_request(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
