@@ -3,6 +3,7 @@ Update class for updating a user information
 """
 import modules.withings.retrieve as withings_retrieve
 from modules.mysql.setup import connect_to_database
+from modules.mysql.report import get_patient_id_from_user_id
 import modules.mysql.modify as modify_db
 import pandas as pd
 from datetime import datetime
@@ -55,6 +56,9 @@ class Withings_Update():
                     df.to_sql(con=self.engine, name=table, if_exists='append')
                     # Export data
                     filepath = os.path.join(self.directory, f"{table}.csv")
+                    with connect_to_database(WITHINGS_DATABASE) as withings_db:
+                        #add patientid identifier for CSVs
+                        df['patientid'] = get_patient_id_from_user_id(self.user, withings_db)
                     with open(filepath, 'a') as f:
                         df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 except Exception as e:
@@ -67,6 +71,9 @@ class Withings_Update():
                 device_df = pd.DataFrame(device_data)
                 device_df['userid'] = self.user.user_id
                 device_df['lastUpdate'] = self.endDate
+                with connect_to_database(WITHINGS_DATABASE) as withings_db:
+                    # add patientid identifier for CSVs
+                    device_df['patient_id'] = get_patient_id_from_user_id(self.user.user_id, withings_db)
 
                 # Export data
                 filepath = os.path.join(self.directory, f"{table}.csv")

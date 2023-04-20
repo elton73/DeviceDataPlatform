@@ -55,7 +55,7 @@ def lateSyncEmail(users):
         request_num = 0
         start_time = time.time()
         for user in users:
-
+            print(f"lateSyncEmail user: {user.user_id}")
             UserDataRetriever = retrieve.DataGetter(user.user_id)
 
             result = UserDataRetriever.get_all_devices('', '')

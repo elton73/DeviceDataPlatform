@@ -14,12 +14,15 @@ try:
 except:
     import http.client as httplib
 
-def runschedule():
+def dailyschedule():
     path = pathlib.Path(__file__).parent.resolve()
     start_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')  # yesterday
     end_date = date.today().strftime('%Y-%m-%d')  # today
     update = Update_Device(startDate=start_date, endDate=end_date, path=path)
-    return update.update_all()
+    update.update_all()
+    fitbit_users = update.get_fitbit_users()
+    if fitbit_users:
+        check_last_sync(fitbit_users)
 
 
 
@@ -27,9 +30,7 @@ if __name__ == '__main__':
     while True:
         if time.localtime().tm_hour == 9 and time.localtime().tm_min == 0 and time.localtime().tm_sec == 0:
             print("Updating:")
-            fitbit_users = runschedule()
-            if fitbit_users:
-                check_last_sync(fitbit_users)
+            dailyschedule()
             with connect_to_database(LOGIN_DATABASE) as login_db:
                 purge_unused_keys(login_db)
             time.sleep(60)

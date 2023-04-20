@@ -3,6 +3,7 @@ Update class for updating a user information
 """
 import modules.polar.retrieve as polar_retrieve
 from modules.mysql.setup import connect_to_database
+from modules.mysql.report import get_patient_id_from_user_id
 import pandas as pd
 from datetime import datetime, timedelta
 from modules import POLAR_DATABASE, POLAR_TABLES
@@ -41,6 +42,9 @@ class Polar_Update():
             # store data in database and csv
             try:
                 df.to_sql(con=self.engine, name=table, if_exists='append')
+                with connect_to_database(POLAR_DATABASE) as polar_db:
+                    # add patientid identifier for CSVs
+                    df['patient_id'] = get_patient_id_from_user_id(self.user.user_id, polar_db)
                 filepath = os.path.join(self.directory, f"{table}.csv")
                 with open(filepath, 'a') as f:
                     df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)

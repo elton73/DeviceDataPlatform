@@ -107,6 +107,14 @@ def check_patient_id(patient_id, device_db):
             return False, message
     return True, None
 
+def get_patient_id_from_user_id(user_id, device_db):
+    cursor = device_db.cursor()
+    cursor.execute(f"SELECT patient_id FROM patient_ids WHERE userid = '{user_id}'")
+    patient = cursor.fetchone()
+    if patient:
+        return patient[0]
+    return False
+
 #Get all current device users from the database
 def get_device_users(db):
     cursor = db.cursor(dictionary=True)
@@ -165,3 +173,5 @@ def format_OR_clause(column: str, condition: list):
         return where_clause
 
 # if __name__ == "__main__":
+#     db = connect_to_database('fitbit_2')
+#     print(get_patient_id_from_user_id('BD6RKR', db))
