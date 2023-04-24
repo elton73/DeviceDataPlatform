@@ -40,7 +40,6 @@ class Withings_Update():
                 self.data_retriever.token = new_auth_info['access_token']
                 raw_data = self.data_retriever.api_map[data_value](self.startDate, self.endDate).json()
             data = raw_data['body']['series']
-            # print(data) #debug
             # if there is no data, move on
             if not data:
                 break
@@ -66,7 +65,7 @@ class Withings_Update():
                         print(f"df.to_sql failed for user: {self.user.user_id}")
                         print(e)
 
-                # Export data
+                # Export data to csv
                 filepath = os.path.join(self.directory, f"{table}.csv")
                 with open(filepath, 'a') as f:
                     df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
@@ -79,14 +78,14 @@ class Withings_Update():
                 device_df['userid'] = self.user.user_id
                 device_df['patient_id'] = self.user.patient_id
                 device_df['lastUpdate'] = self.endDate
-                # Export data
-                filepath = os.path.join(self.directory, f"{table}.csv")
-                with open(filepath, 'a') as f:
-                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
                 # remove last days device data
                 with connect_to_database(WITHINGS_DATABASE) as withings_db:
                     modify_db.remove_device_data(self.user.user_id, withings_db, self.user.device_type)
                     device_df.to_sql(con=self.engine, name="devices", if_exists='append')
+                # Export data to csv
+                filepath = os.path.join(self.directory, f"{table}.csv")
+                with open(filepath, 'a') as f:
+                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
         return data_flag
 
     # Control how the Withings data is structured. This changes how the information will look on mysql

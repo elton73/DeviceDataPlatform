@@ -171,7 +171,7 @@ def repair_sql_table(dataframe, db, schema_name, table_name):
     for column_name in dataframe:
         cursor.execute(f"SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='{schema_name}' AND `TABLE_NAME`='{table_name}' AND `COLUMN_NAME`='{column_name}';")
         if not cursor.fetchone():
-            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} VARCHAR(50);")
+            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} VARCHAR(254);")
     db.commit()
 
 # if __name__ == "__main__":

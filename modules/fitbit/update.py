@@ -91,8 +91,8 @@ class Fitbit_Update():
                     try:
                         df.to_sql(con=self.engine, name=table, if_exists='append')
                     except:
-                        modify_db.repair_sql_table(df, fitbit_db, FITBIT_DATABASE, table)
                         try:
+                            modify_db.repair_sql_table(df, fitbit_db, FITBIT_DATABASE, table)
                             df.to_sql(con=self.engine, name=table, if_exists='append')
                         except Exception as e:
                             print(f"df.to_sql failed for user: {self.user.user_id}")

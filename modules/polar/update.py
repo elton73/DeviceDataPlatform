@@ -45,16 +45,18 @@ class Polar_Update():
                 df.to_sql(con=self.engine, name=table, if_exists='append')
             except:
                 with connect_to_database(POLAR_DATABASE) as polar_db:
-                    modify_db.repair_sql_table(df, polar_db, POLAR_DATABASE, table)
-                try:
-                    df.to_sql(con=self.engine, name=table, if_exists='append')
-                except Exception as e:
-                    print(f"df.to_sql failed for user: {self.user.user_id}")
-                    print(e)
+                    try:
+                        modify_db.repair_sql_table(df, polar_db, POLAR_DATABASE, table)
+                        df.to_sql(con=self.engine, name=table, if_exists='append')
+                    except Exception as e:
+                        print(f"df.to_sql failed for user: {self.user.user_id}")
+                        print(e)
 
+            #write to csv
             filepath = os.path.join(self.directory, f"{table}.csv")
             with open(filepath, 'a') as f:
                 df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
+
             # commit transaction. Old data will be deleted
             self.user_data_retriever.commit_transaction()
         return data_flag
