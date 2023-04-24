@@ -122,8 +122,8 @@ class Fitbit_Update():
         return flat_dict
 
     def make_dir(self, device):
-        new_path = os.path.join(self.filepath, f"exported_data/{device}")
-        output_path = os.path.join(new_path, self.startDate)
+        new_path = os.path.join(self.filepath, f"exported_data/{self.user.patient_id}")
+        output_path = os.path.join(new_path, device)
         if not os.path.exists(output_path):
             os.makedirs(output_path)
         return output_path
