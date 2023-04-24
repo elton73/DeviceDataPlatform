@@ -53,17 +53,23 @@ class Withings_Update():
                 df['userid'] = self.user.user_id
                 df['patient_id'] = self.user.patient_id
                 table = data_value.replace('-', '').replace(' dataset', '')
+
+                # try to upload df into mysql. If this fails, try to repair the sql table and upload again
                 try:
                     df.to_sql(con=self.engine, name=table, if_exists='append')
-                    # Export data
-                    filepath = os.path.join(self.directory, f"{table}.csv")
+                except:
                     with connect_to_database(WITHINGS_DATABASE) as withings_db:
-                        #add patientid identifier for CSVs
-                        df['patientid'] = get_patient_id_from_user_id(self.user, withings_db)
-                    with open(filepath, 'a') as f:
-                        df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
-                except Exception as e:
-                    print(e)
+                        modify_db.repair_sql_table(df, withings_db, WITHINGS_DATABASE, table)
+                    try:
+                        df.to_sql(con=self.engine, name=table, if_exists='append')
+                    except Exception as e:
+                        print(f"df.to_sql failed for user: {self.user.user_id}")
+                        print(e)
+
+                # Export data
+                filepath = os.path.join(self.directory, f"{table}.csv")
+                with open(filepath, 'a') as f:
+                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
             # Manually update device data to mysql
             if not device_data:
                 device_data = [{

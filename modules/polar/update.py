@@ -3,7 +3,7 @@ Update class for updating a user information
 """
 import modules.polar.retrieve as polar_retrieve
 from modules.mysql.setup import connect_to_database
-from modules.mysql.report import get_patient_id_from_user_id
+import modules.mysql.modify as modify_db
 import pandas as pd
 from datetime import datetime, timedelta
 from modules import POLAR_DATABASE, POLAR_TABLES
@@ -40,13 +40,21 @@ class Polar_Update():
             table = data_value.replace('-', '').replace(' dataset', '')
 
             # store data in database and csv
+            # try to upload df into mysql. If this fails, try to repair the sql table and upload again
             try:
                 df.to_sql(con=self.engine, name=table, if_exists='append')
-                filepath = os.path.join(self.directory, f"{table}.csv")
-                with open(filepath, 'a') as f:
-                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
-            except Exception as e:
-                print(e)
+            except:
+                with connect_to_database(POLAR_DATABASE) as polar_db:
+                    modify_db.repair_sql_table(df, polar_db, POLAR_DATABASE, table)
+                try:
+                    df.to_sql(con=self.engine, name=table, if_exists='append')
+                except Exception as e:
+                    print(f"df.to_sql failed for user: {self.user.user_id}")
+                    print(e)
+
+            filepath = os.path.join(self.directory, f"{table}.csv")
+            with open(filepath, 'a') as f:
+                df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
             # commit transaction. Old data will be deleted
             self.user_data_retriever.commit_transaction()
         return data_flag

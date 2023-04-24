@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS Auth_info(
     device_type VARCHAR(30) NOT NULL,
     auth_token VARCHAR(500) NOT NULL,
     refresh_token VARCHAR(500) NOT NULL,
-    expires_by VARCHAR(50) NOT NULL),
+    expires_by VARCHAR(50) NOT NULL,
     patient_id VARCHAR(30));
 '''
 
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS patient_ids(
 SQL_CREATE_POLAR_MEMBER_ID_TABLE = '''
 CREATE TABLE IF NOT EXISTS member_ids(
     userid VARCHAR(30) NOT NULL PRIMARY KEY,
-    member_id VARCHAR(254)),
+    member_id VARCHAR(254),
     patient_id VARCHAR(30));
 '''
 

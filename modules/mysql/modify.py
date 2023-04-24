@@ -165,6 +165,15 @@ def export_device_to_auth_info(auth_info, patient_id, db):
     mycursor.execute(f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by, patient_id) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}', '{patient_id}')")
     db.commit()
 
+# if df.to_sql fails, try to alter the database columns
+def repair_sql_table(dataframe, db, schema_name, table_name):
+    cursor = db.cursor()
+    for column_name in dataframe:
+        cursor.execute(f"SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='{schema_name}' AND `TABLE_NAME`='{table_name}' AND `COLUMN_NAME`='{column_name}';")
+        if not cursor.fetchone():
+            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} VARCHAR(50);")
+    db.commit()
+
 # if __name__ == "__main__":
 #     for key in FITBIT_TABLES:
 #         print(FITBIT_TABLES[key])

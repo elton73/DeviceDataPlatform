@@ -4,7 +4,6 @@ Update class for updating a user information
 import modules.fitbit.retrieve as fitbit_retrieve
 from modules.mysql.setup import connect_to_database
 import modules.mysql.modify as modify_db
-from modules.mysql.report import get_patient_id_from_user_id
 import pandas as pd
 from datetime import datetime, timedelta
 from modules import AUTH_DATABASE, FITBIT_TABLES, FITBIT_DATABASE
@@ -82,20 +81,27 @@ class Fitbit_Update():
                 df['patient_id'] = self.user.patient_id
                 table = data_value
 
-                try:
-                    with connect_to_database(FITBIT_DATABASE) as fitbit_db:
-                        # remove last days' device data
-                        if table == "devices":
-                            df['lastUpdate'] = self.endDate
-                            modify_db.remove_device_data(self.user.user_id, fitbit_db, self.user.device_type)
+                with connect_to_database(FITBIT_DATABASE) as fitbit_db:
+                    # remove last days' device data
+                    if table == "devices":
+                        df['lastUpdate'] = self.endDate
+                        modify_db.remove_device_data(self.user.user_id, fitbit_db, self.user.device_type)
+
+                    #try to upload df into mysql. If this fails, try to repair the sql table and upload again
+                    try:
                         df.to_sql(con=self.engine, name=table, if_exists='append')
-                    # write to csv
-                    filepath = os.path.join(self.directory, f"{table}.csv")
-                    with open(filepath, 'a') as f:
-                        df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
-                except Exception as e:
-                    print(e)
-                    continue
+                    except:
+                        modify_db.repair_sql_table(df, fitbit_db, FITBIT_DATABASE, table)
+                        try:
+                            df.to_sql(con=self.engine, name=table, if_exists='append')
+                        except Exception as e:
+                            print(f"df.to_sql failed for user: {self.user.user_id}")
+                            print(e)
+
+                # write to csv
+                filepath = os.path.join(self.directory, f"{table}.csv")
+                with open(filepath, 'a') as f:
+                    df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
         return data_flag
 
     def range_dates(self, startDate, endDate, step=1):
