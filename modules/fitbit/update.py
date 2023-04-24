@@ -79,6 +79,7 @@ class Fitbit_Update():
                 data = [self.flatten_dictionary(d) for d in data]
                 df = pd.DataFrame(data)
                 df['userid'] = self.user.user_id
+                df['patient_id'] = self.user.patient_id
                 table = data_value
 
                 try:
@@ -88,8 +89,6 @@ class Fitbit_Update():
                             df['lastUpdate'] = self.endDate
                             modify_db.remove_device_data(self.user.user_id, fitbit_db, self.user.device_type)
                         df.to_sql(con=self.engine, name=table, if_exists='append')
-                        #add patientid identifier for CSVs
-                        df['patient_id'] = get_patient_id_from_user_id(self.user.user_id, fitbit_db)
                     # write to csv
                     filepath = os.path.join(self.directory, f"{table}.csv")
                     with open(filepath, 'a') as f:

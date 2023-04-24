@@ -65,9 +65,6 @@ def lateSyncEmail(users):
 
                 # Bad Refresh Token
                 if new_auth_info == 400:
-                    print(
-                        f'Bad refresh token, enter credentials for userid: {user.user_id}')
-                    # new_auth_info = auth.get_auth_info()
                     continue  # move on to next device
 
                 # If There is a problem with getting new auth info, skip

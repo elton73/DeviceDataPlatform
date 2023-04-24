@@ -51,6 +51,7 @@ class Withings_Update():
                 formatted_data = self.format_withings_data(data, data_key)
                 df = pd.DataFrame(formatted_data)
                 df['userid'] = self.user.user_id
+                df['patient_id'] = self.user.patient_id
                 table = data_value.replace('-', '').replace(' dataset', '')
                 try:
                     df.to_sql(con=self.engine, name=table, if_exists='append')
@@ -70,11 +71,8 @@ class Withings_Update():
                 }]
                 device_df = pd.DataFrame(device_data)
                 device_df['userid'] = self.user.user_id
+                device_df['patient_id'] = self.user.patient_id
                 device_df['lastUpdate'] = self.endDate
-                with connect_to_database(WITHINGS_DATABASE) as withings_db:
-                    # add patientid identifier for CSVs
-                    device_df['patient_id'] = get_patient_id_from_user_id(self.user.user_id, withings_db)
-
                 # Export data
                 filepath = os.path.join(self.directory, f"{table}.csv")
                 with open(filepath, 'a') as f:

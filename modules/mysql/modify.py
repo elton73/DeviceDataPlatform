@@ -154,7 +154,7 @@ def purge_unused_keys(db):
     db.commit()
 
 # Input (userid, device_type, auth_token, refresh_token, and expires by) data into mysql
-def export_device_to_auth_info(auth_info, db):
+def export_device_to_auth_info(auth_info, patient_id, db):
     userid = auth_info['user_id']
     device_type = auth_info['device_type']
     auth_token = auth_info['access_token']
@@ -162,7 +162,7 @@ def export_device_to_auth_info(auth_info, db):
     expires_by = auth_info['expires_in']  #todo: change to expires by later
 
     mycursor = db.cursor()
-    mycursor.execute(f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}')")
+    mycursor.execute(f"INSERT INTO auth_info (userid, device_type, auth_token, refresh_token, expires_by, patient_id) VALUES ('{userid}' , '{device_type}', '{auth_token}', '{refresh_token}', '{expires_by}', '{patient_id}')")
     db.commit()
 
 # if __name__ == "__main__":

@@ -25,6 +25,7 @@ class User(object):
             self.device_type = report_db.get_data(auth_db, user_id, 'device_type')
             self.access_token = report_db.get_data(auth_db, user_id, 'auth_token')
             self.refresh_token = report_db.get_data(auth_db, user_id, 'refresh_token')
+            self.patient_id = report_db.get_data(auth_db, user_id, 'patient_id')
 
     """
     FITBIT API

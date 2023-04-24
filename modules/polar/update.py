@@ -31,9 +31,9 @@ class Polar_Update():
                 self.directory = self.make_dir(self.user.device_type)  # set output path
             # format data
             if data_key == 'exercise_summary':
-                formatted_data = self.format_exercise_summary(data, self.user.user_id)
+                formatted_data = self.format_exercise_summary(data, self.user)
             if data_key == 'heart_rate':
-                formatted_data = self.format_heart_rate(data, self.user.user_id)
+                formatted_data = self.format_heart_rate(data, self.user)
 
             # create panda dataframe
             df = pd.DataFrame(formatted_data)
@@ -42,9 +42,6 @@ class Polar_Update():
             # store data in database and csv
             try:
                 df.to_sql(con=self.engine, name=table, if_exists='append')
-                with connect_to_database(POLAR_DATABASE) as polar_db:
-                    # add patientid identifier for CSVs
-                    df['patient_id'] = get_patient_id_from_user_id(self.user.user_id, polar_db)
                 filepath = os.path.join(self.directory, f"{table}.csv")
                 with open(filepath, 'a') as f:
                     df.to_csv(f, header=f.tell() == 0, encoding='utf-8', index=False)
@@ -55,7 +52,7 @@ class Polar_Update():
         return data_flag
 
     # Format polar exerise summary data
-    def format_exercise_summary(self, data, user_id):
+    def format_exercise_summary(self, data, user):
         for exercise_summary in data:
             # remove data columns
             pop_columns = ['upload-time', 'polar-user', 'has-route', 'detailed-sport-info', 'distance']
@@ -72,11 +69,12 @@ class Polar_Update():
             exercise_summary['hr_average'] = heart_rate['average']
             exercise_summary['hr_max'] = heart_rate['maximum']
 
-            exercise_summary['userid'] = user_id
+            exercise_summary['userid'] = user.user_id
+            exercise_summary['patient_id'] = user.patient_id
         return data
 
     # format polar heart_rate data
-    def format_heart_rate(self, data, user_id):
+    def format_heart_rate(self, data, user):
         output = []
         index = 0
         for heart_rates in data:
@@ -97,7 +95,8 @@ class Polar_Update():
                     output[index]['id'] = id
                     output[index]['time'] = current_time
                     output[index]['value'] = int(float(heart_rate))
-                    output[index]['userid'] = user_id
+                    output[index]['userid'] = user.user_id
+                    output[index]['patient_id'] = user.patient_id
                     index += 1
                     current_time = current_time + timedelta(seconds=recording_rate)
         return output

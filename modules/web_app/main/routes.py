@@ -65,9 +65,10 @@ def callback():
             flash(f'{message}', 'danger')
             return redirect(url_for('patients.addpatient'))
 
+        patient_id = session.get('patient_id')
         # export data to sql database
-        export_device_to_auth_info(auth_info, auth_db)
-        export_patient_data(user_id, session.get('patient_id'), session.get('device_type'), device_db)
+        export_device_to_auth_info(auth_info, patient_id, auth_db)
+        export_patient_data(user_id, patient_id, session.get('device_type'), device_db)
         flash('Patient Added', 'success')
     return redirect(url_for('main.home'))
 
