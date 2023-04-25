@@ -75,6 +75,7 @@ def update_auth_token(connection, userid, new_auth_token):
     cursor = connection.cursor()
     cursor.execute(f"UPDATE Auth_info SET auth_token = '{new_auth_token}' WHERE userid = '{userid}';")
     connection.commit()
+    return new_auth_token
 
 def update_refresh_token(connection, userid, new_refresh_token):
     command = f'''
@@ -85,6 +86,7 @@ def update_refresh_token(connection, userid, new_refresh_token):
     cursor = connection.cursor()
     cursor.execute(command)
     connection.commit()
+    return new_refresh_token
 
 def remove_device_data(user_id, db, device_type):
     cursor = db.cursor()

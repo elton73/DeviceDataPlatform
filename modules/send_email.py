@@ -59,6 +59,7 @@ def lateSyncEmail(users):
             UserDataRetriever = retrieve.DataGetter(user.user_id)
 
             result = UserDataRetriever.get_all_devices('', '')
+            print(result)
             if result.status_code == 401:
                 # Expired token
                 new_auth_info = user.get_refreshed_fitbit_auth_info()
@@ -108,4 +109,4 @@ def check_last_sync(users):
     lateSyncEmail(users)
 
 # if __name__ == '__main__':
-    # check_last_sync()
+#     check_last_sync()

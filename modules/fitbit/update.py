@@ -32,8 +32,8 @@ class Fitbit_Update():
                     break
                 # Update the database
                 with connect_to_database(AUTH_DATABASE) as auth_db:
-                    modify_db.update_auth_token(auth_db, self.user.user_id, new_auth_info['access_token'])
-                    modify_db.update_refresh_token(auth_db, self.user.user_id, new_auth_info['refresh_token'])
+                    self.user.access_token = modify_db.update_auth_token(auth_db, self.user.user_id, new_auth_info['access_token'])
+                    self.user.refresh_token = modify_db.update_refresh_token(auth_db, self.user.user_id, new_auth_info['refresh_token'])
                 # Update the retriever
                 self.data_retriever.token = new_auth_info['access_token']
                 result = self.data_retriever.api_map[data_key](self.startDate, self.endDate)
