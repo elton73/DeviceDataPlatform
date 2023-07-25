@@ -6,7 +6,7 @@ from modules.mysql.report import get_data, check_patient_id
 from modules.mysql.modify import remove_patient, update_patientid
 from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE
 from modules.web_app import fitbit, withings, polar
-from scheduled import runschedule
+from modules.update_handler import web_app_update
 
 patients = Blueprint('patients', __name__)
 
@@ -14,7 +14,7 @@ patients = Blueprint('patients', __name__)
 def updatenow():
     if 'logged_in' not in session:
         return redirect(url_for('users.login'))
-    request_num = runschedule()
+    request_num = web_app_update()
     if request_num == 0:
         flash(f'All Users Are Up To Date', 'info')
     else:

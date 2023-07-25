@@ -14,7 +14,8 @@ LOGIN_DATABASE = 'webapp_login_info_2'
 EMAILS_DATABASE = 'email_list'
 
 # fitbit data
-FITBIT_TABLES = {'devices': 'devices',
+FITBIT_TABLES = {'devices': 'devices', # Note: it is important that the first element of this table is devices because
+                 # the updater needs to get the last_sync_time from this row before updating anything else
                  'activities-steps': 'activitiessteps',
                  'sleep': 'sleep',
                  'activities-heart-intraday dataset': 'activitiesheartintraday',

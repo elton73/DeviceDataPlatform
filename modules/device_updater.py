@@ -1,5 +1,5 @@
 """
-Class for updating all devices here
+User and update class
 """
 
 from modules.mysql.setup import connect_to_database
@@ -129,12 +129,14 @@ class Update_Device(object):
         self.users_skipped = []
         self.path = path
 
+        self.out_of_sync_fitbits = []
+
         self.FITBIT_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{FITBIT_DATABASE}')
         self.WITHINGS_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{WITHINGS_DATABASE}')
         self.POLAR_ENGINE = create_engine(f'mysql+pymysql://{USER}:{PASSWORD}@localhost/{POLAR_DATABASE}')
 
     #update all devices
-    def update_all(self):
+    def update_all(self, user_id=None):
         #no users
         start = time()
         if not self.users:
@@ -142,6 +144,8 @@ class Update_Device(object):
             return self.request_num
 
         for user in self.users:
+            if user_id and user.user_id != user_id:
+                continue
             """
             Skip user if their data has been already updated. Polar does not use this check.
             """
@@ -152,12 +156,19 @@ class Update_Device(object):
             if user.device_type == 'fitbit':
                 self.fitbit_users.append(user)
                 updater = Fitbit_Update(user, self.startDate, self.endDate, self.path, self.FITBIT_ENGINE)
+                # When doing a manual update, do not check fitbit sync times.
+                if user_id:
+                    updater.is_manual_update = True
+
                 flag = updater.update()
                 if flag:
                     self.users_updated.append(user.user_id)
                     self.request_num += 1
                 else:
                     self.users_skipped.append(user.user_id)
+
+                if updater.send_email:
+                    self.out_of_sync_fitbits.append(user)
 
             # withings api
             elif user.device_type == "withings":
@@ -186,13 +197,8 @@ class Update_Device(object):
         print(f"Users updated: {self.users_updated}")
         print(f"Users skipped: {self.users_skipped}")
         print(f"{self.request_num} users updated in {time() - start} seconds on {date.today()}")
-
         return self.request_num
 
-    def get_fitbit_users(self):
-        if len(self.fitbit_users)>0:
-            return self.fitbit_users
-        return False
     #generate list of all users in auth database
     def generate_users(self):
         users = set()
@@ -225,3 +231,4 @@ class Update_Device(object):
             except Exception as e:
                 print(e)
                 return False
+

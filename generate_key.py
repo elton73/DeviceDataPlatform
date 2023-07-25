@@ -20,7 +20,7 @@ def gen_random_key():
             else:
                 is_unique = True
                 create_key(random_key)
-    return(random_key)
+    return random_key
 
 
 

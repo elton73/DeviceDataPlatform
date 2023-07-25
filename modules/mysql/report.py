@@ -115,6 +115,14 @@ def get_patient_id_from_user_id(user_id, device_db):
         return patient[0]
     return False
 
+def get_last_update(user_id, device_db):
+    cursor = device_db.cursor()
+    cursor.execute(f"SELECT lastUpdate FROM devices WHERE userid = '{user_id}'")
+    date_time = cursor.fetchone()
+    if date_time:
+        return date_time[0]
+    return False
+
 #Get all current device users from the database
 def get_device_users(db):
     cursor = db.cursor(dictionary=True)
