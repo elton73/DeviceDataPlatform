@@ -6,10 +6,9 @@ from modules.mysql.setup import connect_to_database
 import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
 import pandas as pd
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from modules import AUTH_DATABASE, FITBIT_TABLES, FITBIT_DATABASE
 import os
-import math
 
 
 class Fitbit_Update():
@@ -68,7 +67,7 @@ class Fitbit_Update():
                 # if there is no device connected to the fitbit account, break
                 if data_key == "devices":
                     if data == []:
-                        break
+                        continue
                     # Make sure to only update the device if the device has been synced and new data is available.
                     # Otherwise, the database will be updated with "zero" data. (Ex. 0 Steps taken).
                     if not self.update_flag and not self.is_manual_update:
@@ -131,15 +130,18 @@ class Fitbit_Update():
                     with connect_to_database(FITBIT_DATABASE) as fitbit_db:
                         # remove last days' device data
                         if table == "devices":
+
                             # Check if self.endDate is closer to the future than the last time the device was updated
                             last_update = report_db.get_last_update(self.user.user_id, fitbit_db)
                             if not last_update:
                                 df['lastUpdate'] = self.endDate
-                            elif self.endDate > datetime.strptime(last_update, "%Y-%m-%d").date():
-                                df['lastUpdate'] = self.endDate
                             else:
-                                df['lastUpdate'] = datetime.strptime(last_update, "%Y-%m-%d").date()
-                            modify_db.remove_device_data(self.user.user_id, fitbit_db, self.user.device_type)
+                                modify_db.remove_device_data(self.user.user_id, fitbit_db, self.user.device_type)
+                                if self.endDate > datetime.strptime(last_update, "%Y-%m-%d").date():
+                                    df['lastUpdate'] = self.endDate
+                                else:
+                                    df['lastUpdate'] = datetime.strptime(last_update, "%Y-%m-%d").date()
+
 
                         # try to upload df into mysql. If this fails, try to repair the sql table and upload again
                         try:

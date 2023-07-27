@@ -1,6 +1,5 @@
 '''Insert data into table'''
 import requests
-import pandas as pd
 from modules import FITBIT_TABLES, WITHINGS_TABLES, POLAR_TABLES
 
 #todo: check if patient_id already exists before updating

@@ -13,7 +13,7 @@ class DataGetter():
             'activities-steps': self.get_steps,
             'sleep': self.get_sleep,
             'devices': self.get_all_devices,
-            # 'activities-heart': self.get_heartrate,
+            'activities-heart': self.get_heartrate,
             'activities-heart-intraday dataset': self.get_intraday_heart,
             'activities-steps-intraday dataset': self.get_intraday_steps,
             'activities-elevation-intraday dataset': self.get_intraday_elevation
@@ -53,3 +53,9 @@ class DataGetter():
         return requests.get(
             f'https://api.fitbit.com/1/user/-/activities/elevation/date/{startDate}/{startDate}/1min/time/00:00/23:59.json',
             headers={'authorization': f'Bearer {self.token}'})
+
+    # # for debugging
+    # def test(self, startDate, endDate):return requests.get(
+    #         f'https://api.fitbit.com/1/user/-/activities/steps/date/{startDate}/{endDate}.json',
+    #         headers={'authorization': f'Bearer {self.token}'})
+

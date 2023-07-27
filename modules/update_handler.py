@@ -35,3 +35,5 @@ def manualschedule(days, user_id):
     end_date = (date.today() - timedelta(days=(days - 1))).strftime('%Y-%m-%d')
     update = Update_Device(startDate=start_date, endDate=end_date, path=path)
     update.update_all(user_id)
+
+

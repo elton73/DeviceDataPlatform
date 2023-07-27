@@ -118,8 +118,10 @@ def get_patient_id_from_user_id(user_id, device_db):
 def get_last_update(user_id, device_db):
     cursor = device_db.cursor()
     cursor.execute(f"SELECT lastUpdate FROM devices WHERE userid = '{user_id}'")
-    date_time = cursor.fetchone()
+    date_time = cursor.fetchall()
     if date_time:
+        if isinstance(date_time[0], tuple):
+            return date_time[0][0]
         return date_time[0]
     return False
 

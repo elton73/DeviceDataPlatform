@@ -2,21 +2,13 @@
 Check last sync time and send email.
 """
 
-from modules import USER, PASSWORD, FITBIT_DATABASE
-import modules.fitbit.retrieve as retrieve
-import modules.mysql.setup as setup_db
-import modules.mysql.modify as modify_db
-from modules import AUTH_DATABASE
 import sys
 import os
-from sqlalchemy import create_engine
-from datetime import datetime, timedelta
 
 try:
     import httplib  # python < 3.0
 except:
     import http.client as httplib
-import time
 import smtplib, ssl
 
 

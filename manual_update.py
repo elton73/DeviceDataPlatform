@@ -2,13 +2,30 @@
 Specify which dates and users to update
 """
 
+from datetime import date, datetime
 from modules.update_handler import manualschedule
 
-if __name__ == '__main__':
-    N = 3  # patient participated for N days
-    M = 4  # study began M days ago (from when you run this script)
-    user_id = ""
+def run(user_id, start_date, end_date):
+    # create date object from string
+    _start_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+    _end_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
 
-    for i in range(N):
-        days = M-i
-        manualschedule(days, user_id)
+    # invalid dates entered
+    if (_start_obj > _end_obj) or (_start_obj > date.today()):
+        print("Please check start and end dates.")
+    else:
+        _N = (_end_obj - _start_obj).days
+        _M = (date.today() - _start_obj).days
+        for i in range(_N):
+            days = _M - i
+            manualschedule(days, user_id)
+
+if __name__ == '__main__':
+    #  Enter patient data here
+    user_id = "4YGW8L"
+    study_start_date = "2022-11-12"  # Format dates: '%Y-%m-%d'
+    study_end_date = "2023-01-19"
+    #
+    run(user_id, study_start_date, study_end_date)
+
+
