@@ -39,21 +39,30 @@ class Fitbit_Update():
                 # If token expired, get a new token and retrieve data again
                 if result.status_code == 401:
                     # debug
-                    print(f"Result Code: 401 for user: {self.user.user_id}")
+                    print(f"Attempting to obtain refresh token for user {self.user.user_id}.")
                     new_auth_info = self.user.get_refreshed_fitbit_auth_info()
                     # If There is a problem with getting new auth info, skip
                     if new_auth_info == '':
                         break
                     # Update the database
                     with connect_to_database(AUTH_DATABASE) as auth_db:
-                        self.user.access_token = modify_db.update_auth_token(auth_db, self.user.user_id,
-                                                                             new_auth_info['access_token'])
-                        self.user.refresh_token = modify_db.update_refresh_token(auth_db, self.user.user_id,
-                                                                                 new_auth_info['refresh_token'])
+                        try:
+                            self.user.access_token = modify_db.update_auth_token(auth_db, self.user.user_id,
+                                                                                 new_auth_info['access_token'])
+                            self.user.refresh_token = modify_db.update_refresh_token(auth_db, self.user.user_id,
+                                                                                     new_auth_info['refresh_token'])
+                        except Exception as e:
+                            print(e)
+                            print("Process Failed. Please verify refresh tokens.")
+                            break
                     # Update the retriever
                     self.data_retriever.token = new_auth_info['access_token']
                     result = self.data_retriever.api_map[data_key](self.startDate.strftime(self.datetime_format),
                                                                    self.endDate.strftime(self.datetime_format))
+                    print("Refresh token obtained successfully.")
+                elif result.status_code == 429:
+                    print("Max requests per hour reached. Please try again later.")
+                    break
                 data = result.json()
 
                 # if there is no device connected to the fitbit account, break
@@ -79,6 +88,7 @@ class Fitbit_Update():
                                 if self.days_to_update > 3:
                                     self.send_email = True
                             else:
+                                print(f"User {self.user.user_id} is updated to sync date: {self.last_sync_date}")
                                 return data_flag
 
                 if type(data) is dict:

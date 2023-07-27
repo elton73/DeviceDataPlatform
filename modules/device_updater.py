@@ -15,9 +15,7 @@ from modules.fitbit.update import Fitbit_Update
 from modules.polar.update import Polar_Update
 from modules.withings.update import Withings_Update
 
-"""
-User class with auth info
-"""
+#  User class with auth info
 class User(object):
     def __init__(self, user_id):
         self.user_id = user_id
@@ -114,15 +112,13 @@ class User(object):
         db.commit()
         return member_id
 
-"""Update class to update all devices"""
+#  Update class to update all devices
 class Update_Device(object):
     def __init__(self, startDate, endDate, path):
         self.startDate = startDate
         self.endDate = endDate
         self.request_num = 0
         self.users = self.generate_users()
-
-        self.fitbit_users = []
 
         self.users_updated = []
 
@@ -143,23 +139,24 @@ class Update_Device(object):
             print("No users")
             return self.request_num
 
+        #  filter out users when updating a single user
         for user in self.users:
             if user_id and user.user_id != user_id:
                 continue
-            """
-            Skip user if their data has been already updated. Polar does not use this check.
-            """
+
+            #  Skip user if their data has been already updated. Polar users do not use this
             if self.already_updated(user):
                 continue
 
             # fitbit api
             if user.device_type == 'fitbit':
-                self.fitbit_users.append(user)
                 updater = Fitbit_Update(user, self.startDate, self.endDate, self.path, self.FITBIT_ENGINE)
+
                 # When doing a manual update, do not check fitbit sync times.
                 if user_id:
                     updater.is_manual_update = True
 
+                #  flag for if the user was successfully updated
                 flag = updater.update()
                 if flag:
                     self.users_updated.append(user.user_id)
@@ -167,6 +164,7 @@ class Update_Device(object):
                 else:
                     self.users_skipped.append(user.user_id)
 
+                #  get a list of users who haven't synced their fitbit for more than 3 days
                 if updater.send_email:
                     self.out_of_sync_fitbits.append(user)
 
@@ -225,7 +223,7 @@ class Update_Device(object):
                 if cursor.fetchone():
                     self.users_skipped.append(user.user_id)
                     #debug
-                    print(f"User Already Updated: {user.user_id}")
+                    print(f"User {user.user_id} is updated to today.")
                     return True
                 return False
             except Exception as e:
