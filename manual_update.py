@@ -22,8 +22,8 @@ def run(user_id, start_date, end_date):
 
 if __name__ == '__main__':
     #  Enter patient data here
-    user_id = "4YGW8L"
-    study_start_date = "2022-11-12"  # Format dates: '%Y-%m-%d'
+    user_id = ""
+    study_start_date = "2023-01-05"  # Format dates: '%Y-%m-%d'
     study_end_date = "2023-01-19"
     #
     run(user_id, study_start_date, study_end_date)

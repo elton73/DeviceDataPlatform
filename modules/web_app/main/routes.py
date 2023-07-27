@@ -5,6 +5,7 @@ from modules.mysql.report import get_device_users, check_valid_device
 from modules.mysql.modify import export_patient_data, export_device_to_auth_info
 from modules.web_app import GRAFANA_URL, fitbit, withings, polar
 from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE
+from natsort import natsorted
 
 main = Blueprint('main', __name__)
 
@@ -30,8 +31,8 @@ def home():
             else:
                 for user in get_device_users(db):
                     all_patients.append(user)
-
-    return render_template('home.html', patients=all_patients)
+    sorted_patients = natsorted(all_patients, key=lambda x: x['patient_id'])
+    return render_template('home.html', patients=sorted_patients)
 
 #don't cache pages
 @main.after_request
@@ -75,3 +76,4 @@ def callback():
 @main.route("/grafana")
 def data():
     return redirect(f"{GRAFANA_URL}")
+
