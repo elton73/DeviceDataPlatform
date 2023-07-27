@@ -6,7 +6,7 @@ from modules.mysql.setup import connect_to_database
 import modules.mysql.modify as modify_db
 import modules.mysql.report as report_db
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from modules import AUTH_DATABASE, FITBIT_TABLES, FITBIT_DATABASE
 import os
 
@@ -84,7 +84,8 @@ class Fitbit_Update():
                                 self.startDate = last_update.date()
                                 self.endDate = (last_update + timedelta(days=1)).date()
                                 self.update_flag = True
-                                if self.days_to_update > 3:
+                                #  send an email if it's been 3 days since last sync date
+                                if date.today() - self.last_sync_date.date() > 3:
                                     self.send_email = True
                             else:
                                 print(f"User {self.user.user_id} is updated to sync date: {self.last_sync_date}")
