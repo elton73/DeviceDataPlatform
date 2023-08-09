@@ -195,7 +195,6 @@ class Update_Device(object):
         print(f"Users updated: {self.users_updated}")
         print(f"Users skipped: {self.users_skipped}")
         print(f"{self.request_num} users updated in {time() - start} seconds on {date.today()}")
-        print("\n")
         return self.request_num
 
     #generate list of all users in auth database

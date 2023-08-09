@@ -78,6 +78,8 @@ class Fitbit_Update():
                             last_update = datetime.strptime(last_update, "%Y-%m-%d")
                             for device in data:
                                 self.last_sync_date = datetime.strptime(device['lastSyncTime'], "%Y-%m-%dT%H:%M:%S.%f")
+                            if (date.today() - self.last_sync_date.date()).days > 3:
+                                self.send_email = True
                             # Find how many days were missed due to fitbit sync
                             self.days_to_update = (self.last_sync_date - last_update).days
                             if self.days_to_update > 0:
@@ -85,8 +87,6 @@ class Fitbit_Update():
                                 self.endDate = (last_update + timedelta(days=1)).date()
                                 self.update_flag = True
                                 #  send an email if it's been 3 days since last sync date
-                                if date.today() - self.last_sync_date.date() > 3:
-                                    self.send_email = True
                             else:
                                 print(f"User {self.user.user_id} is updated to sync date: {self.last_sync_date}")
                                 return data_flag
