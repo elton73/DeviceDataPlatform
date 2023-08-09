@@ -1,4 +1,6 @@
-'''Functions to generate reports from the database'''
+"""
+Functions to fetch data from the SQL table
+"""
 from bcrypt import checkpw
 
 def get_all_token_timeouts(connection):

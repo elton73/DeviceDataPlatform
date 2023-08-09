@@ -1,4 +1,6 @@
-'''Insert data into table'''
+"""
+Functions for modifying the data in a SQL table
+"""
 import requests
 from modules import FITBIT_TABLES, WITHINGS_TABLES, POLAR_TABLES
 

@@ -64,7 +64,7 @@ class Fitbit_Update():
                     break
                 data = result.json()
 
-                # if there is no device connected to the fitbit account, break
+                # if there is no device connected to the fitbit account, continue
                 if data_key == "devices":
                     if data == []:
                         continue

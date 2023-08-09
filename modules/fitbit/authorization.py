@@ -11,7 +11,7 @@ import hashlib
 
 CLIENT_ID = os.environ.get('FITBIT_CLIENT_ID')
 CLIENT_SECRET = os.environ.get('FITBIT_CLIENT_SECRET')
-ACCESS_TOKEN_URL = 'https://polarremote.com/v2/oauth2/token'
+ACCESS_TOKEN_URL = 'https://api.fitbit.com/oauth2/token'
 
 SYS_DEFAULT_ENCODING = sys.getdefaultencoding()
 
@@ -44,7 +44,7 @@ class FitbitAccess(object):
     def exchange_token(self, authorization_code):
         try:
             # Exchange the code for a token
-            token_exchange_url = f'https://api.fitbit.com/oauth2/token'
+            token_exchange_url = ACCESS_TOKEN_URL
             headers = {'Content-Type': 'application/x-www-form-urlencoded',
                        'Authorization': self.base64}
             payload = {

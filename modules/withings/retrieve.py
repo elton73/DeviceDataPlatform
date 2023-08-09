@@ -1,5 +1,5 @@
 '''
-Class that use the polar Web Api to get data, returns the entire response object
+Class that use the withings Web Api to get data, returns the entire response object
 '''
 import requests
 import time, datetime

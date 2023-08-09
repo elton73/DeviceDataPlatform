@@ -1,5 +1,5 @@
 """
-Update class for updating a user information
+Update class for updating withings user information
 """
 import modules.withings.retrieve as withings_retrieve
 from modules.mysql.setup import connect_to_database

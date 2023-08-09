@@ -1,5 +1,5 @@
 """
-Update class for updating a user information
+Update class for updating polar user information
 """
 import modules.polar.retrieve as polar_retrieve
 from modules.mysql.setup import connect_to_database
@@ -98,7 +98,6 @@ class Polar_Update():
                 formatted_time = raw_time[0].replace("T", " ") if raw_time else raw_time
                 current_time = datetime.strptime(formatted_time, "%Y-%m-%d %H:%M:%S")
 
-                # create rows
                 recording_rate = heart_rates['recording-rate']
                 for heart_rate in heart_rates['data'].split(","):
                     output.append({})

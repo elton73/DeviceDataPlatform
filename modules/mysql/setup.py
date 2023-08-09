@@ -1,4 +1,6 @@
-'''Setup the DB to store authentication codes'''
+"""
+Functions to connect to the database and create databases, login keys, and tables
+"""
 from sqlalchemy import create_engine, text
 from mysql import connector
 from modules import FITBIT_DATABASE, WITHINGS_DATABASE, POLAR_DATABASE, AUTH_DATABASE, LOGIN_DATABASE, USER, PASSWORD, \
